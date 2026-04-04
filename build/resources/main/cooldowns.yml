@@ -1,0 +1,39 @@
+# Cooldown multipliers for abilities.
+# 1.0 = unchanged, 0.8 = 20% shorter, 1.2 = 20% longer.
+multipliers:
+  default: 1.0
+
+  Crisp: 1.0
+  Fireball: 1.0
+  MeteorShower: 1.0
+  Campfire: 1.0
+
+  KineticBurst: 1.0
+  EnergyBeam: 1.0
+  KineticOverdrive: 1.0
+
+  Bounty: 1.0
+  Frailer: 1.0
+  Nullify: 1.0
+  ChadStrength: 1.0
+
+  VitalityVortex: 1.0
+  HeartLock: 1.0
+  LifeCircle: 1.0
+
+  Thunder: 1.0
+  Blur: 1.0
+  SpeedStorm: 1.0
+
+  DoubleJump: 1.0
+  Dash: 1.0
+  BreezyBash: 1.0
+
+  Pockets: 1.0
+  Unfortunate: 1.0
+  RichRush: 1.0
+
+  Astral: 1.0
+  Drift: 1.0
+  Daggers: 1.0
+

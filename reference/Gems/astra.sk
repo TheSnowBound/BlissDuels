@@ -1,0 +1,933 @@
+every 1 second:
+	loop all players:
+		if {-Disabled::%loop-player's uuid%} is not set:
+			set {-Disabled::%loop-player's uuid%} to 0
+		else:
+			if {-Disabled::%loop-player's uuid%} > 0:
+				remove 1 from {-Disabled::%loop-player's uuid%}
+
+
+on load:
+	set {-Tagged} to team named "Tagged"
+	set team color of {-Tagged} to purple
+
+# Tagging (astral projection)
+
+right click on entity:
+	if {-AstralProjection::%player's uuid%} is true:
+		if player's gamemode is spectator:
+			if target entity of player is not invisible:
+				send "<##A01FFF>🔮 <##B8FFFB>Tagged %target entity of player.getName()%" to player
+			else:
+				send "<##A01FFF>🔮 <##B8FFFB>Tagged &k???" to player
+			apply glowing without particles to target entity of player for 20 seconds
+
+
+# Spooking (astral projection)
+
+on player start spectating:
+	if getGem(player's held item) is "astra":
+		if getTier(player's held item) is 2:
+			if getEnergy(player's held item) is not 0:
+				if {-AstralProjection::%player's uuid%} is true:
+					if player's gamemode is spectator:
+
+						if spectator target of player is not invisible:
+							send "<##A01FFF>🔮 <##B8FFFB>ockSpooked &e%spectator target of player.getName()% <##B8FFFB>for &e10s" to player
+						else:
+							send "<##A01FFF>🔮 <##B8FFFB>Spooked &e&k??? <##B8FFFB>for &e10s" to player
+
+						if player is not invisible:
+							send "<##A01FFF>🔮 <##B8FFFB>You have been Spooked by &e%player.getName()% <##B8FFFB>for &e10 &7seconds" to spectator target of player
+						else:
+							send "<##A01FFF>🔮 <##B8FFFB>You have been Spooked by &e&k??? <##B8FFFB>for &e10 &7seconds" to spectator target of player
+
+						apply darkness without particles to spectator target of player for 10 seconds replacing the existing effect
+						play sound "entity.warden.nearby_closer" with volume 20 and pitch 0.5 to spectator target of player
+						set {-Disabled::%spectator target of player's uuid%} to 10
+						teleport player to {-Loc::%player's uuid%}
+						set player's gamemode to survival
+						execute console command "/npc remove all"
+						set {-AstralProjection::%player's uuid%} to false
+						if getEnergy(player's held item) > 0:
+							blissSetcooldown("Astral::%uuid of player%", toMilliseconds(6, 30), player)
+						if getEnergy(player's held item) > 0:
+							blissSetcooldown("Astral::%uuid of player%", toMilliseconds(5, 45), player)
+						if getEnergy(player's held item) > 0:
+							blissSetcooldown("Astral::%uuid of player%", toMilliseconds(4, 30), player)
+						if getEnergy(player's held item) > 0:
+							blissSetcooldown("Astral::%uuid of player%", toMilliseconds(3, 45), player)
+						if getEnergy(player's held item) > 0:
+							blissSetcooldown("Astral::%uuid of player%", toMilliseconds(2, 30), player)
+
+# Activating astral void
+
+right click on entity:
+	if player's gamemode is not spectator:
+		if isDisabled(player) is not true:
+			if getGem(player's held item) is "astra":
+				if getTier(player's held item) is 2:
+					if getEnergy(player's held item) is not 0:
+						if canUsePower("Astral::%uuid of player%") is true:
+							send "<##A01FFF>🔮 <##B8FFFB>You have activated &7Astral Void" to player
+							If getEnergy(player's held item) is 1:
+								blissSetcooldown("Astral::%uuid of player%", toMilliseconds(3, 0), player)
+							If getEnergy(player's held item) is 2:
+								blissSetcooldown("Astral::%uuid of player%", toMilliseconds(2, 50), player)
+							If getEnergy(player's held item) is 3:
+								blissSetcooldown("Astral::%uuid of player%", toMilliseconds(2, 40), player)
+							If getEnergy(player's held item) is 4:
+								blissSetcooldown("Astral::%uuid of player%", toMilliseconds(2, 35), player)
+							If getEnergy(player's held item) > 4:
+								blissSetcooldown("Astral::%uuid of player%", toMilliseconds(2, 30), player)
+							set {_loc} to (target entity of player)'s location
+							set {_r} to 1
+							set {_h} to 7
+							loop 60 times:
+								loop all players within 7 blocks of {_loc}:
+									if loop-player is not player:
+										if IsTrusted(player, loop-player) is not true:
+											set {-Disabled::%loop-player's uuid%} to 2
+											wait 0.5 seconds
+								domeparticles({_loc}, {_h}, {_r})
+								wait 2 seconds
+
+
+
+
+
+# Teleporting player in astral projection back to his zombie once it gets hit
+
+on npc left click:
+	loop all players:
+		if {-AstralProjection::%loop-player's uuid%} is true:
+			if loop-player's gamemode is spectator:
+				set loop-player's gamemode to survival
+				set {-AstralProjection::%loop-player's uuid%} to false
+				teleport loop-player to event-npc
+				delete event-npc
+				loop all items in loop-player's inventory:
+					if IsGem(loop-item) is true:
+						if getEnergy(loop-item) is 1:
+							blissSetcooldown("Astral::%uuid of loop-player%", toMilliseconds(2, 50), loop-player)
+						if getEnergy(loop-item) is 2:
+							blissSetcooldown("Astral::%uuid of loop-player%", toMilliseconds(2, 45), loop-player)
+						if getEnergy(loop-item) is 3:
+							blissSetcooldown("Astral::%uuid of loop-player%", toMilliseconds(2, 40), loop-player)
+						if getEnergy(loop-item) is 4:
+							blissSetcooldown("Astral::%uuid of loop-player%", toMilliseconds(2, 35), loop-player)
+						if getEnergy(loop-item) > 4:
+							blissSetcooldown("Astral::%uuid of loop-player%", toMilliseconds(2, 30), loop-player)
+							reset world border of loop-player
+							if {dragongames::%loop-player's uuid%} is true:
+								set world border of loop-player to virtual world border
+								set border center of world border of loop-player to location at {PedestalLoc}
+								set size of world border of loop-player to 1000
+
+# Drawing particles on players in astral projection
+
+every 2 seconds:
+	loop all players:
+		if {-AstralProjection::%loop-player's uuid%} is true:
+			if loop-player's gamemode is spectator:
+				draw 20 of dust using dustOption(rgb(160, 31, 255), 1) at location 1 block above loop-player with offset vector(0.4, 0.4, 0.4) with extra 0 with force
+		else:
+			reset world border of loop-player
+			if {dragongames::%loop-player's uuid%} is true:
+				set world border of loop-player to virtual world border
+				set border center of world border of loop-player to location at {PedestalLoc}
+				set size of world border of loop-player to 1000
+			else:
+				reset world border of loop-player
+
+
+
+# Stopping astral projection when player left clicks air
+
+on left click:
+	if {-AstralProjection::%player's uuid%} is true:
+		if player's gamemode is spectator:		
+			teleport the player to {-Loc::%player's uuid%}
+			loop all items in player's inventory:
+				if IsGem(loop-item) is true:
+					if getEnergy(loop-item) is 1:
+						blissSetcooldown("Astral::%uuid of player%", toMilliseconds(2, 40), player)
+					if getEnergy(loop-item) is 2:
+						blissSetcooldown("Astral::%uuid of player%", toMilliseconds(2, 30), player)
+					if getEnergy(loop-item) is 3:
+						blissSetcooldown("Astral::%uuid of player%", toMilliseconds(2, 20), player)
+					if getEnergy(loop-item) is 4:
+						blissSetcooldown("Astral::%uuid of player%", toMilliseconds(2, 10), player)
+					if getEnergy(loop-item) > 4:
+						blissSetcooldown("Astral::%uuid of player%", toMilliseconds(2, 0), player)
+			set player's gamemode to survival
+			if player is not invisible:				
+				execute console command "/npc remove %player%"
+			else:
+				execute console command "/npc remove all"
+			set {-AstralProjection::%player's uuid%} to false
+			reset world border of player
+			if {dragongames::%player's uuid%} is true:
+				set world border of player to virtual world border
+				set border center of world border of player to location at {PedestalLoc}
+				set size of world border of player to 1000
+
+# Activating astral projection
+
+on right click:
+	if target entity of player is not set:
+		if isDisabled(player) is not true:
+			if getGem(player's held item) is "astra":
+				if getTier(player's held item) is 2:
+					if getEnergy(player's held item) is not 0:
+						if canUsePower("Astral::%uuid of player%") is true:
+							if {-AstralProjection::%player's uuid%} is not true:
+								If getEnergy(player's held item) > 0:
+									blissSetcooldown("Astral::%uuid of player%", toMilliseconds(7, 45), player)
+								If getEnergy(player's held item) > 2:
+									blissSetcooldown("Astral::%uuid of player%", toMilliseconds(5, 45), player)
+								If getEnergy(player's held item) > 4:
+									blissSetcooldown("Astral::%uuid of player%", toMilliseconds(4, 45), player)
+								If getEnergy(player's held item) > 6:
+									blissSetcooldown("Astral::%uuid of player%", toMilliseconds(4, 0), player)
+								If getEnergy(player's held item) > 7:
+									blissSetcooldown("Astral::%uuid of player%", toMilliseconds(3, 45), player)
+								send "<##A01FFF>🔮 <##B8FFFB>You have activated <##c7c7c7>Astral Projection" to player
+								set {-Loc::%player's uuid%} to location of player
+								set {_uuid} to uuid of player
+								if player is not invisible:
+									create citizen named "%player%" at {-Loc::%player's uuid%}
+									execute console command "/npc select %player%"
+								else:
+									create citizen named "&k???" at {-Loc::%player's uuid%}
+									execute console command "/npc select &k???"
+								set world border of player to virtual world border
+								set border center of world border of player to location of player
+								set size of world border of player to 100
+								execute console command "/npc gravity"
+								set player's gamemode to spectator
+								set {-AstralProjection::%player's uuid%} to true
+
+every 10 ticks:
+	loop all players:
+		if {-AstralProjection::%loop-player's uuid%} is true:
+			if block above loop-player is stone or grass block or dirt or cobblestone:
+				apply blindness 4 to loop-player for 3 second replacing the existing effect
+	
+
+# Activating dimensional drift
+
+on right click:
+	if player is holding an axe or a sword or air:
+		if player's gamemode is not spectator:
+			if isDisabled(player) is not true:
+				if getGem(player's offhand item) is "astra":
+					if getTier(player's offhand item) is 1 or 2:
+						if getEnergy(player's offhand item) is not 0:
+							if {-DoubleClick::%player's uuid%} is not set:
+								set {-DoubleClick::%player's uuid%} to true
+							else:
+								delete {-DoubleClick::%player's uuid%}
+								if canUsePower("Drift::%uuid of player%") is true:
+									player is not sneaking
+									set {-jumpAmount::%player's uuid%} to 1
+									blissSetcooldown("Drift::%uuid of player%", toMilliseconds(0, 40), player)
+									apply invisibility without particles to player for 200 ticks
+									send "<##A01FFF>🔮 <##FF686F>You used <##C7C7C7>Dimensional Drift" to player
+									set {_loc} to location of player
+									summon horse at player
+									set {-astraHorse::%player's uuid%} to last spawned entity
+									set {-astraHorse::%player's uuid%}'s movement speed attribute to 0.243
+									set {-astraHorse::%player's uuid%}'s max health to 53
+									execute console command "attribute %uuid of {-astraHorse::%player's uuid%}% horse.jump_strength base set 1.2"
+									make {-astraHorse::%player's uuid%} invisible
+									make {-astraHorse::%player's uuid%} invincible
+									equip {-astraHorse::%player's uuid%} with a saddle
+									tame {-astraHorse::%player's uuid%} to the player
+									make player ride {-astraHorse::%player's uuid%}
+									set {-driftActive::%player's uuid%} to true
+									set {-driftNoFall::%player's uuid%} to true
+									wait 5 seconds
+									set {-driftActive::%player's uuid%} to false
+									remove invisibility from potion effects of player
+									{-astraHorse::%player's uuid%}.eject()
+									kill {-astraHorse::%player's uuid%}
+									wait 6 seconds
+									set {-driftNoFall::%player's uuid%} to false
+								else:
+									set {_bb} to getCooldownSeconds("Drift::%uuid of player%")
+									send "<##A01FFF>🔮 <##FF686F>Your <##C7C7C7>Dimensional Drift <##FF686F>skill is on cooldown for <##A01FFF>%{_bb}%" to player
+
+# Astra horse double jump mechanic
+
+on horse jump:
+	loop all players:
+		if loop-player is riding {-astraHorse::%loop-player's uuid%}:
+			if {-jumpAmount::%loop-player's uuid%} > 0:
+				set {-Jumping::%loop-player's uuid%} to true
+				{-astraHorse::%loop-player's uuid%}.eject()
+				wait 3 tick
+				push loop-player up at speed 1.5
+				push loop-player forward at speed 2.5
+				kill {-astraHorse::%loop-player's uuid%}
+				wait 1 second
+				set {-Jumping::%loop-player's uuid%} to false
+
+# Dimensional drift particles
+
+every 2 ticks:
+	loop all players:
+		if {-driftActive::%loop-player's uuid%} is true:
+			set {_loc} to location 1 block above loop-player
+			draw 20 of dust using dustOption(rgb(156, 16, 255), 1) at {_loc} with offset vector(0.4, 0.4, 0.4) with extra 0 with force
+
+# Spawning new horse once you double jump
+
+every 0.5 second:
+	loop all players:
+		if the block below loop-player is not air:
+			if loop-player is not riding a horse:
+				if {-driftActive::%loop-player's uuid%} is true:
+					if {-Jumping::%loop-player's uuid%} is not true:
+						set {_loc} to location of loop-player
+						summon horse at loop-player
+						set {-astraHorse::%loop-player's uuid%} to last spawned entity
+						set {-astraHorse::%loop-player's uuid%}'s movement speed attribute to 0.243
+						set {-astraHorse::%loop-player's uuid%}'s max health to 50
+						heal {-astraHorse::%loop-player's uuid%}
+						execute console command "attribute %uuid of {-astraHorse::%loop-player's uuid%}% horse.jump_strength base set 1.2"
+						make {-astraHorse::%loop-player's uuid%} invisible
+						make {-astraHorse::%loop-player's uuid%} invincible
+						equip {-astraHorse::%loop-player's uuid%} with a saddle
+						tame {-astraHorse::%loop-player's uuid%} to the loop-player
+						make loop-player ride {-astraHorse::%loop-player's uuid%}
+						
+
+# Being able to get off of current horse (aka stop using ability)
+
+on sneak toggle:
+	if player is riding {-astraHorse::%player's uuid%}:
+		remove invisibility from potion effects of player
+		{-astraHorse::%player's uuid%}.eject()
+		set {-driftActive::%player's uuid%} to false
+		blissSetcooldown("Drift::%uuid of player%", toMilliseconds(0, 35), player)
+		loop all entities within 5 blocks of player:
+			if loop-entity is a horse:
+				if {-astraHorse::%player's uuid%} is set:
+					kill loop-entity
+					delete {-astraHorse::%player's uuid%}
+
+# No fall damage when using dimensional drift
+
+on damage:
+	if damage cause is fall:
+		if {-driftNoFall::%victim's uuid%} is true:
+			cancel event
+
+# Activating unbounded
+
+on damage:
+	if {-Daggers::%attacker's uuid%} is not true:
+		victim is not attacker
+		if isDisabled(attacker) is not true:
+			if getGem(attacker's held item) is "astra":
+				if getTier(attacker's held item) is 2:
+					if getEnergy(attacker's held item) is not 0:
+						if canUsePower("Daggers::%uuid of attacker%") is true:
+							if victim is a player:
+								set {-Unbounded::%attacker's uuid%} to true
+								cancel event
+								if victim is not invisible:
+									send "<##A01FFF>🔮 <##B8FFFB>You have used <##C7C7C7>Unbounded <##B8FFFB>on &2%victim.getName()%" to attacker
+								else:
+									send "<##A01FFF>🔮 <##B8FFFB>You have used <##C7C7C7>Unbounded <##B8FFFB>on &2&k???" to attacker
+								set attacker's gamemode to spectator
+								teleport attacker to victim
+								wait 1 tick
+								set spectator target of attacker to victim
+								set {-unbinded::%victim's uuid%} to true
+							else:
+								send "<##A01FFF>🔮&c You can only unbound on &eplayers" to attacker
+						else:
+							set {_message} to getActionBarCooldown("Daggers::%uuid of attacker%")
+							send "<##A01FFF>🔮 <##C7C7C7>Unbounded <##FF686F>is on cooldown for <##A01FFF>%{_message}%" to attacker
+
+# Setting the unbounded player back to survival once the person they're spectating gets hit
+
+on damage:
+	loop all players:
+		if loop-player's gamemode is spectator:
+			if loop-player is within 0.3 blocks of victim:
+				if {-Unbounded::%loop-player's uuid%} is true:
+					set loop-player's gamemode to survival
+
+# When person that's unbounding gets set to survival, it checks the gem that the other person has and disables it for 30s
+
+on player stop spectating:
+	if {-Unbounded::%player's uuid%} is true:
+		blissSetcooldown("Daggers::%uuid of player%", toMilliseconds(4, 30), player)
+		teleport player to spectator target of player
+		set {-Unbounded::%player's uuid%} to false
+		loop all players within 1 blocks of player:
+			if loop-player is not player:
+				loop all items in loop-player's inventory:
+					if {_gem} is not set:
+						if getGem(loop-item) is "astra":
+							set {_gem} to "<##A01FFF>&lᴀsᴛʀᴀ"
+						else if getGem(loop-item) is "wealth":
+							set {_gem} to "<##0EC912>&lᴡᴇᴀʟᴛʜ"
+						else if getGem(loop-item) is "puff":
+							set {_gem} to "<##EFEFEF>&lᴘᴜғғ"
+						else if getGem(loop-item) is "speed":
+							set {_gem} to "<##FEFD17>&lsᴘᴇᴇᴅ"
+						else if getGem(loop-item) is "life":
+							set {_gem} to "<##FE04B4>&lʟɪғᴇ"
+						else if getGem(loop-item) is "strength":
+							set {_gem} to "<##F10103>&lsᴛʀᴇɴɢᴛʜ"
+						else if getGem(loop-item) is "flux":
+							set {_gem} to "<##5ED7FF>&lғʟᴜx"
+						else if getGem(loop-item) is "fire":
+							set {_gem} to "<##FE8120>&lғɪʀᴇ"
+
+						if loop-player is not invisible:
+							send "<##A01FFF>🔮 <##B8FFFB>You haunted and disabled &e%loop-player%'s %{_gem}% <##B8FFFB>for &e30s" to player
+						else:
+							send "<##A01FFF>🔮 <##B8FFFB>You haunted and disabled &e&k???&e's %{_gem}% <##B8FFFB>for &e30s" to player
+						set {-Disabled::%loop-player's uuid%} to 25
+						set player's gamemode to survival
+
+on disconnect:
+	if {-unbinded::%player's uuid%} is set:
+		loop all players:
+			if {-Unbounded::%loop-player's uuid%} is true:
+				set loop-player's gamemode to survival
+				delete {-unbinded::%player's uuid%}
+				blissSetcooldown("Daggers::%uuid of loop-player%", toMilliseconds(4, 30), player)
+				teleport loop-player to player
+				set player's gamemode to survival
+				set loop-player's gamemode to survival
+
+# Fixing teleport bug in astral projection or unbounded
+
+on player teleport:
+	if {-Unbounded::%player's uuid%} is true:
+		cancel event
+	if {-AstralProjection::%player's uuid%} is true:
+		if teleport cause is spectate:
+			cancel event
+
+# Phasing passive
+
+on damage:
+	if {-phasing::%victim's uuid%} is not true:
+		victim is not attacker
+		loop all items in victim's inventory:
+			if getGem(loop-item) is "astra":
+				if getTier(loop-item) is 2:
+					if victim's health < 2:
+						chance of 10%
+						cancel event
+						set {-phasing::%victim's uuid%} to true
+						hide victim
+						wait 10 ticks
+						reveal victim
+						set {-phasing::%victim's uuid%} to false
+						add 1 to progress of the custom advancement "bliss/phase" for victim
+					else:
+						chance of 10%
+						cancel event
+						set {-phasing::%victim's uuid%} to true
+						hide victim
+						wait 10 ticks
+						reveal victim
+						set {-phasing::%victim's uuid%} to false
+				if getTier(loop-item) is 1:
+					if victim's health < 2:
+						chance of 5%
+						cancel event
+						set {-phasing::%victim's uuid%} to true
+						apply invisibility without particles to victim for 10 ticks
+						hide victim
+						wait 10 ticks
+						reveal victim
+						set {-phasing::%victim's uuid%} to false
+						add 1 to progress of the custom advancement "bliss/phase" for victim
+					else:
+						chance of 5%
+						cancel event
+						set {-phasing::%victim's uuid%} to true
+						apply invisibility without particles to victim for 10 ticks
+						hide victim
+						wait 10 ticks
+						reveal victim
+						set {-phasing::%victim's uuid%} to false
+
+
+
+on join:
+	reveal player
+
+on damage:
+	if {-phasing::%victim's uuid%} is true:
+		cancel event
+
+# Soul capture - spawning particles
+
+on death:
+	if attacker is a player:
+		if victim is not player:
+			if getGem(attacker's offhand item) is "astra":
+				if getEnergy(attacker's offhand item) > 2:
+					set {_mobLoc} to location of victim
+					set {_mobType} to "%victim%"
+					add {_mobLoc} to {-mobLocs::*}
+					add {_mobType} to {-mobTypes::*}
+				
+					loop 60 times:
+						if attacker is within 1 blocks of {_mobLoc}:
+							stop loop
+							heal attacker by 2 hearts
+							set attacker's saturation to attacker's saturation + 4
+						else:
+							make 180 of dust using dustOption(rgb(160, 31, 255), 1) at location 1 block above {_mobLoc} with offset vector(0.15, 0.15, 0.15) with extra 0 with force
+							wait 0.5 seconds
+				
+					remove {_mobLoc} from {-mobLocs::*}
+					remove {_mobType} from {-mobTypes::*}
+		else:
+			if getGem(attacker's offhand item) is "astra":
+				if getEnergy(attacker's offhand item) > 2:
+					set {_mobLoc} to location of victim
+				
+					loop 60 times:
+						if attacker is within 1 blocks of {_mobLoc}:
+							stop loop
+							heal attacker by 4 hearts
+							set attacker's saturation to attacker's saturation + 10
+						else:
+							make 180 of dust using dustOption(rgb(160, 31, 255), 1) at location 1 block above {_mobLoc} with offset vector(0.15, 0.15, 0.15) with extra 0 with force
+							wait 0.5 seconds
+
+# Soul capture - actually capturing the soul
+
+on player move:
+	if getGem(player's offhand item) is "astra":
+		if getTier(player's offhand item) is 1 or 2:
+			if getEnergy(player's offhand item) > 2:
+				loop {-mobLocs::*}:
+					set {_loc} to loop-value
+					
+					if player is within 1 block of {_loc}:
+						set {_index} to 0
+						loop {-mobLocs::*}:
+							add 1 to {_index}
+							if loop-value-2 is {_loc}:
+								set {_mobType} to {-mobTypes::%{_index}%}
+								stop loop
+						
+						if size of {-mobkills::%player%::*} >= 2:
+							remove {-mobkills::%player%::2} from {-mobkills::%player%::*}
+						
+						add {_mobType} to {-mobkills::%player%::*}
+						
+						remove {_loc} from {-mobLocs::*}
+						remove {-mobTypes::%{_index}%} from {-mobTypes::*}
+						add {_loc} to {-collectedMobLocs::*}
+						set {_energy} to getEnergy(player's offhand item)
+						SetEnergy(player, {_energy} - 1)
+						wait 4 ticks
+						SetEnergy(player, {_energy})
+						heal player by 2 hearts
+						set player's saturation to player's saturation + 3
+						stop loop
+
+on death:
+	loop all items in victim's inventory:
+		if getGem(loop-item) is "astra":
+			draw 250 of dust using dustOption(rgb(160, 31, 255), 1) at location 1 blocks above victim with offset vector(1, 1, 1) with extra 0 with force
+
+# Spawning particles on the mob that astra just spawned
+
+every 1 second:
+	loop all entities:
+		if {-AstraSpawning::%loop-entity%} is set:
+			if {-AstraSpawning::%loop-entity%} > 0:
+				remove 1 from {-AstraSpawning::%loop-entity%}
+				draw 20 of dust using dustOption(rgb(160, 31, 255), 1) at location 0.5 blocks above loop-entity with offset vector(0.4, 0.4, 0.4) with extra 0 with force
+
+# Spawning the mob you captured
+
+right click:
+	if isDisabled(player) is not true:
+		if getGem(player's offhand item) is "astra":
+			if getEnergy(player's offhand item) > 1:
+				if player is sneaking:
+					if clicked block is set:
+						if clicked block is within 5 blocks of player:
+							if {-mobkills::%player%::2} is set:
+								set {_e} to {-mobkills::%player%::2} parsed as entity type
+								spawn {_e} at location 1 block above clicked block
+								set {-AstraSpawning::%last spawned entity%} to 3
+								remove {-mobkills::%player%::2} from {-mobkills::%player%::*}
+							else:
+								if {-mobkills::%player%::1} is set:
+									set {_e} to {-mobkills::%player%::1} parsed as entity type
+									spawn {_e} at location 1 block above clicked block
+									set {-AstraSpawning::%last spawned entity%} to 3
+									clear {-mobkills::%player%::*}
+
+
+# Removing dagger bossbar progress, when its 0 it removes all daggers
+
+every 2 tick:
+	loop all players:
+		if {-Daggers::%loop-player's uuid%} is true:
+			if bar progress of {-daggersBossBar::%uuid of loop-player%} > 0:
+				remove 0.2 from bar progress of {-daggersBossBar::%uuid of loop-player%}
+			else:
+				remove loop-player from bossbar players of {-daggersBossBar::%uuid of loop-player%}
+				kill {-Dagger1::%loop-player's uuid%}
+				kill {-Dagger2::%loop-player's uuid%}
+				kill {-Dagger3::%loop-player's uuid%}
+				kill {-Dagger4::%loop-player's uuid%}
+				kill {-Dagger5::%loop-player's uuid%}
+				set {-daggerAmount::%loop-player's uuid%} to 0
+				set {-Daggers::%loop-player's uuid%} to false
+				setDCooldown("Daggers::%uuid of loop-player%", toMilliseconds(4, 35))
+				delete {-Daggering}
+
+# Teleporting daggers infront of player
+
+every 3 ticks:
+	loop all players:
+		if {-Daggers::%loop-player's uuid%} is true:
+			if {-daggerAmount::%loop-player's uuid%} is 5:
+				teleport {-Dagger1::%loop-player's uuid%} to location 2 blocks infront and 0.1 blocks below loop-player
+				teleport {-Dagger2::%loop-player's uuid%} to location 1.5 blocks infront and 1.1 blocks left and 0.1 blocks below loop-player
+				teleport {-Dagger3::%loop-player's uuid%} to location 1.5 blocks infront and 1.1 blocks right and 0.1 blocks below loop-player
+				teleport {-Dagger4::%loop-player's uuid%} to location 0.5 blocks infront and 1.8 blocks left and 0.1 blocks below loop-player
+				teleport {-Dagger5::%loop-player's uuid%} to location 0.5 blocks infront and 1.8 blocks right and 0.1 blocks below loop-player
+			if {-daggerAmount::%loop-player's uuid%} is 4:
+				teleport {-Dagger1::%loop-player's uuid%} to location 2 blocks infront and 0.1 blocks below loop-player
+				teleport {-Dagger2::%loop-player's uuid%} to location 1.5 blocks infront and 1.1 blocks left and 0.1 blocks below loop-player
+				teleport {-Dagger3::%loop-player's uuid%} to location 1.5 blocks infront and 1.1 blocks right and 0.1 blocks below loop-player
+				teleport {-Dagger4::%loop-player's uuid%} to location 0.5 blocks infront and 1.8 blocks left and 0.1 blocks below loop-player
+			if {-daggerAmount::%loop-player's uuid%} is 3:
+				teleport {-Dagger1::%loop-player's uuid%} to location 2 blocks infront and 0.1 blocks below loop-player
+				teleport {-Dagger2::%loop-player's uuid%} to location 1.5 blocks infront and 1.1 blocks left and 0.1 blocks below loop-player
+				teleport {-Dagger4::%loop-player's uuid%} to location 0.5 blocks infront and 1.8 blocks left and 0.1 blocks below loop-player
+			if {-daggerAmount::%loop-player's uuid%} is 2:
+				teleport {-Dagger2::%loop-player's uuid%} to location 1.5 blocks infront and 1.1 blocks left and 0.1 blocks below loop-player
+				teleport {-Dagger4::%loop-player's uuid%} to location 0.5 blocks infront and 1.8 blocks left and 0.1 blocks below loop-player
+			if {-daggerAmount::%loop-player's uuid%} is 1:
+				teleport {-Dagger4::%loop-player's uuid%} to location 0.5 blocks infront and 1.8 blocks left and 0.1 blocks below loop-player
+
+# Dagger functions (what makes them actually fly forwards)
+
+function Dagger5(p: player):
+	set {_projectile} to {_p}.launchProjectile(Snowball.class)
+	{_projectile}.setThunder((location of {_p}).getDirection().multiply(1.5))
+	{_projectile}.setItem(new ItemStack({-dag}))
+	{_projectile}.setVelocity({_projectile}.getVelocity().multiply(2))
+	set {-at} to {_p}
+	wait 1 tick
+	set {_ticksAlive} to 1
+
+	set {_oldLoc} to location of {_projectile}
+	while {_projectile} is alive:
+		if {_ticksAlive} is 200:
+			kill {_projectile}
+		draw 1 dust using dustOption(rgb(160, 31, 255), 1) at {_projectile} with extra 0 with force
+		add 1 to {_ticksAlive}
+		wait 1 tick
+
+import:
+	org.bukkit.inventory.ItemStack
+	org.bukkit.entity.Snowball
+
+command /dag:
+	permission: op
+	trigger:
+		set {_projectile} to player.launchProjectile(Snowball.class)
+		{_projectile}.setThunder((location of player).getDirection().multiply(1.5))
+		{_projectile}.setItem(new ItemStack({-dag}))
+		{_projectile}.setVelocity({_projectile}.getVelocity().multiply(2))
+		set {-at} to player
+		wait 1 tick
+		set {_ticksAlive} to 1
+
+		set {_oldLoc} to location of {_projectile}
+		while {_projectile} is alive:
+			if {_ticksAlive} is 200:
+				kill {_projectile}
+			draw 1 dust using dustOption(rgb(160, 31, 255), 1) at {_projectile} with extra 0 with force
+			add 1 to {_ticksAlive}
+			wait 1 tick
+
+
+on projectile collide:
+	if shooter is {-at}:
+		damage event-entity by 0.001
+		set {_v} to vector between event-entity and event-projectile
+		knock event-entity {_v} with strength 0.4
+		daggerDMG(2.5,event-entity)
+
+
+
+function daggerDMG(n: number,victim: entity):
+	add 10 to {-Disabled::%{_victim}'s uuid%}
+	set {-beingDaggered::%{_victim}'s uuid%} to true
+	if {_victim} is alive:
+		if {_victim}'s health is less than or equal to {_n}:
+			if {_victim}'s held item is a totem of undying:
+				damage {_victim} by 9999
+				set invulnerability ticks of {_victim} to 0
+			else if {_victim}'s offhand item is a totem of undying:
+				damage {_victim} by 9999
+				set invulnerability ticks of {_victim} to 0
+			else:
+				set {_victim}'s health to {_victim}'s health - {_n}
+				set invulnerability ticks of {_victim} to 0
+		else:
+			set {_victim}'s health to {_victim}'s health - {_n}
+			set invulnerability ticks of {_victim} to 0
+
+function Dagger3(p: player):
+	set {_projectile} to {_p}.launchProjectile(Snowball.class)
+	{_projectile}.setThunder((location of {_p}).getDirection().multiply(1.5))
+	{_projectile}.setItem(new ItemStack({-dag}))
+	{_projectile}.setVelocity({_projectile}.getVelocity().multiply(2))
+	set {-at} to {_p}
+	wait 1 tick
+	set {_ticksAlive} to 1
+
+	set {_oldLoc} to location of {_projectile}
+	while {_projectile} is alive:
+		if {_ticksAlive} is 200:
+			kill {_projectile}
+		draw 1 dust using dustOption(rgb(160, 31, 255), 1) at {_projectile} with extra 0 with force
+		add 1 to {_ticksAlive}
+		wait 1 tick
+
+function Dagger1(p: player):
+	set {_projectile} to {_p}.launchProjectile(Snowball.class)
+	{_projectile}.setThunder((location of {_p}).getDirection().multiply(1.5))
+	{_projectile}.setItem(new ItemStack({-dag}))
+	{_projectile}.setVelocity({_projectile}.getVelocity().multiply(2))
+	set {-at} to {_p}
+	wait 1 tick
+	set {_ticksAlive} to 1
+
+	set {_oldLoc} to location of {_projectile}
+	while {_projectile} is alive:
+		if {_ticksAlive} is 200:
+			kill {_projectile}
+		draw 1 dust using dustOption(rgb(160, 31, 255), 1) at {_projectile} with extra 0 with force
+		add 1 to {_ticksAlive}
+		wait 1 tick
+
+function Dagger2(p: player):
+	set {_projectile} to {_p}.launchProjectile(Snowball.class)
+	{_projectile}.setThunder((location of {_p}).getDirection().multiply(1.5))
+	{_projectile}.setItem(new ItemStack({-dag}))
+	{_projectile}.setVelocity({_projectile}.getVelocity().multiply(2))
+	set {-at} to {_p}
+	wait 1 tick
+	set {_ticksAlive} to 1
+
+	set {_oldLoc} to location of {_projectile}
+	while {_projectile} is alive:
+		if {_ticksAlive} is 200:
+			kill {_projectile}
+		draw 1 dust using dustOption(rgb(160, 31, 255), 1) at {_projectile} with extra 0 with force
+		add 1 to {_ticksAlive}
+		wait 1 tick
+
+function Dagger4(p: player):
+	set {_projectile} to {_p}.launchProjectile(Snowball.class)
+	{_projectile}.setThunder((location of {_p}).getDirection().multiply(1.5))
+	{_projectile}.setItem(new ItemStack({-dag}))
+	{_projectile}.setVelocity({_projectile}.getVelocity().multiply(2))
+	set {-at} to {_p}
+	wait 1 tick
+	set {_ticksAlive} to 1
+
+	set {_oldLoc} to location of {_projectile}
+	while {_projectile} is alive:
+		if {_ticksAlive} is 200:
+			kill {_projectile}
+		draw 1 dust using dustOption(rgb(160, 31, 255), 1) at {_projectile} with extra 0 with force
+		add 1 to {_ticksAlive}
+		wait 1 tick
+
+# Phantom daggers - activating ability and showing bossbar
+
+left click:
+	if player's gamemode is not spectator:
+		if {-Unbounded::%player's uuid%} is not true:
+			if {-AstralProjection::%player's uuid%} is not true:
+				if isDisabled(player) is not true:
+					if getGem(player's held item) is "astra":
+						if getTier(player's held item) is 2:
+							if getEnergy(player's held item) is not 0:
+								if canUsePower("Daggers::%uuid of player%") is true:
+									if {-Daggers::%player's uuid%} is not true:
+										send "<##A01FFF>🔮 <##B8FFFB>You have used <##c7c7c7>Phantom Daggers" to player
+										set bar progress of {-daggersBossBar::%uuid of player%} to 100
+										set {-daggersBossBar::%uuid of player%} to boss bar with id "%{_uuid}%sdaggers" with title "&fDaggers" with color aqua with progress 100
+										set bar style of {-daggersBossBar::%uuid of player%} to solid bar
+										add player to bossbar players of {-daggersBossBar::%uuid of player%}
+										set {-daggerAmount::%player's uuid%} to 5
+										wait 1 tick
+										set {-Daggering} to player
+										set {-Daggers::%player's uuid%} to true
+										set {-ShotDagger5::%player's uuid%} to false
+										set {-ShotDagger4::%player's uuid%} to false
+										set {-ShotDagger3::%player's uuid%} to false
+										set {-ShotDagger2::%player's uuid%} to false
+										set {-ShotDagger1::%player's uuid%} to false
+
+										spawn armor stand at location of player with nbt compound from "{Marker:1b,Invisible:1b,Tags:""%player%dag1"",ArmorItems:[{},{},{},{id:nautilus_shell,tag:{CustomModelData:230},Count:1}],ArmorDropChances:[0f,0f,0f,0f]}"       
+										set {-Dagger1::%player's uuid%} to last spawned armor stand
+										set helmet of {-Dagger1::%player's uuid%} to nautilus shell with custom model data 230
+										make {-Dagger1::%player's uuid%} invulnerable
+										make {-Dagger1::%player's uuid%} invisible
+
+										spawn armor stand at location of player with nbt compound from "{Marker:1b,Invisible:1b,Tags:""%player%dag2"",ArmorItems:[{},{},{},{id:nautilus_shell,tag:{CustomModelData:230},Count:1}],ArmorDropChances:[0f,0f,0f,0f]}"        
+										set {-Dagger2::%player's uuid%} to last spawned armor stand
+										set helmet of {-Dagger2::%player's uuid%} to nautilus shell with custom model data 230
+										make {-Dagger2::%player's uuid%} invulnerable
+										make {-Dagger2::%player's uuid%} invisible
+
+										spawn armor stand at location of player with nbt compound from "{Marker:1b,Invisible:1b,Tags:""%player%dag3"",ArmorItems:[{},{},{},{id:nautilus_shell,tag:{CustomModelData:230},Count:1}],ArmorDropChances:[0f,0f,0f,0f]}"        
+										set {-Dagger3::%player's uuid%} to last spawned armor stand
+										set helmet of {-Dagger3::%player's uuid%} to nautilus shell with custom model data 230
+										make {-Dagger3::%player's uuid%} invulnerable
+										make {-Dagger3::%player's uuid%} invisible
+
+										spawn armor stand at location of player with nbt compound from "{Marker:1b,Invisible:1b,Tags:""%player%dag4"",ArmorItems:[{},{},{},{id:nautilus_shell,tag:{CustomModelData:230},Count:1}],ArmorDropChances:[0f,0f,0f,0f]}"        
+										set {-Dagger4::%player's uuid%} to last spawned armor stand
+										set helmet of {-Dagger4::%player's uuid%} to nautilus shell with custom model data 230
+										make {-Dagger4::%player's uuid%} invulnerable
+										make {-Dagger4::%player's uuid%} invisible
+
+										spawn armor stand at location of player with nbt compound from "{Marker:1b,Invisible:1b,Tags:""%player%dag5"",ArmorItems:[{},{},{},{id:nautilus_shell,tag:{CustomModelData:230},Count:1}],ArmorDropChances:[0f,0f,0f,0f]}"      
+										set {-Dagger5::%player's uuid%} to last spawned armor stand
+										set helmet of {-Dagger5::%player's uuid%} to nautilus shell with custom model data 230
+										make {-Dagger5::%player's uuid%} invulnerable
+										make {-Dagger5::%player's uuid%} invisible
+
+								else:
+									set {_message} to getActionBarCooldown("Daggers::%uuid of player%")
+									send "<##A01FFF>🔮 <##C7C7C7>Phantom Daggers <##FF686F>are on cooldown for <##A01FFF>%{_message}%" to player
+
+
+
+on join:
+	set {-daggercooldown::%player's uuid%} to false
+
+
+command /daggercooldown:
+	permission: op
+	trigger:
+		set {-daggercooldown::%player's uuid%} to false
+
+
+# Phantom daggers - shooting daggers
+
+left click:
+	if {-AstralProjection::%player's uuid%} is not true:
+		if isDisabled(player) is not true:
+			if getGem(player's held item) is "astra":
+				if getTier(player's held item) is 2:
+					if getEnergy(player's held item) is not 0:
+						if {-daggercooldown::%player's uuid%} is false:
+							if {-Daggers::%player's uuid%} is true:
+								if {-daggerAmount::%player's uuid%} is 5:
+									remove 1 from {-daggerAmount::%player's uuid%}
+									set {-ShotDagger5::%player's uuid%} to true
+									kill {-Dagger5::%player's uuid%}
+									Dagger5(player)
+									set {-daggercooldown::%player's uuid%} to true
+									wait 7 ticks
+									set {-daggercooldown::%player's uuid%} to false
+
+								else if {-daggerAmount::%player's uuid%} is 4:
+									remove 1 from {-daggerAmount::%player's uuid%}
+									set {-ShotDagger3::%player's uuid%} to true
+									kill {-Dagger3::%player's uuid%}
+									Dagger3(player)
+									set {-daggercooldown::%player's uuid%} to true
+									wait 7 ticks
+									set {-daggercooldown::%player's uuid%} to false
+
+								else if {-daggerAmount::%player's uuid%} is 3:
+									remove 1 from {-daggerAmount::%player's uuid%}
+									set {-ShotDagger1::%player's uuid%} to true
+									kill {-Dagger1::%player's uuid%}
+									Dagger1(player)
+									set {-daggercooldown::%player's uuid%} to true
+									wait 7 ticks
+									set {-daggercooldown::%player's uuid%} to false
+
+								else if {-daggerAmount::%player's uuid%} is 2:
+									remove 1 from {-daggerAmount::%player's uuid%}
+									set {-ShotDagger2::%player's uuid%} to true
+									kill {-Dagger2::%player's uuid%}
+									Dagger2(player)
+									set {-daggercooldown::%player's uuid%} to true
+									wait 7 ticks
+									set {-daggercooldown::%player's uuid%} to false
+
+								else if {-daggerAmount::%player's uuid%} is 1:
+									remove 1 from {-daggerAmount::%player's uuid%}
+									set {-ShotDagger4::%player's uuid%} to true
+									kill {-Dagger4::%player's uuid%}
+									Dagger4(player)
+									set {-daggercooldown::%player's uuid%} to false
+									remove player from bossbar players of {-daggersBossBar::%uuid of player%}
+									if getEnergy(player's held item) is 1:
+										blissSetcooldown("Daggers::%uuid of player%", toMilliseconds(1, 50), player)
+									if getEnergy(player's held item) is 2:
+										blissSetcooldown("Daggers::%uuid of player%", toMilliseconds(1, 45), player)
+									if getEnergy(player's held item) is 3:
+										blissSetcooldown("Daggers::%uuid of player%", toMilliseconds(1, 40), player)
+									if getEnergy(player's held item) is 4:
+										blissSetcooldown("Daggers::%uuid of player%", toMilliseconds(1, 35), player)
+									if getEnergy(player's held item) > 4:
+										blissSetcooldown("Daggers::%uuid of player%", toMilliseconds(1, 30), player)
+									wait 3 seconds
+									set {-Daggers::%player's uuid%} to false
+									delete {-Daggering}
+
+
+on damage:
+	if victim is a player:
+		if attacker is not player:
+			if {-Daggering} is set:
+				if {-beingDaggered::%victim's uuid%} is set:
+					add 1 to progress of the custom advancement "bliss/dagger" for {-Daggering}
+					loop 60 times:
+						if {-Daggering} is not set:
+							set {_uuid} to {-daggering}'s uuid
+							if {dagg::%{_uuid}%} is not set:
+								remove 1 from progress of the custom advancement "bliss/my_root" for {-Daggering}
+								wait 1 second
+
+
+# Astra gem dagger death message
+
+on death:
+	if {-Daggering} is set:
+		if attacker is not set:
+			if {-beingDaggered::%victim's uuid%} is set:
+				if victim is not invisible:
+					if {-Daggering} is not invisible:
+						set death message to "%victim% was pierced by %{-Daggering}%"
+					else:
+						set death message to "%victim% was pierced by &k???"
+				else:
+					if {-Daggering} is not invisible:
+						set death message to "&k??? &fwas pierced by %{-Daggering}%"
+					else:
+						set death message to "&k??? &fwas pierced by &k???"

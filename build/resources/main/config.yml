@@ -1,0 +1,9 @@
+# Main BlissGem config. Keep this file present so saveDefaultConfig() can copy it.
+
+settings:
+  debug: false
+
+auto-gem:
+  enabled: true
+  # Tier granted to gemless players on join/respawn. Valid values: 1 or 2
+  tier: 2

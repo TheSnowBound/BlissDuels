@@ -1,0 +1,528 @@
+# Strength Gem
+import:
+	java.time.Duration
+	java.lang.System
+	org.bukkit.Particle
+	java.lang.String
+	org.bukkit.event.inventory.InventoryClickEvent
+	org.bukkit.inventory.PlayerInventory
+	org.bukkit.entity.Fireball
+	org.bukkit.util.Vector
+	org.bukkit.Location
+	org.bukkit.potion.PotionEffect
+	org.bukkit.potion.PotionEffectType
+	org.bukkit.Material
+	org.bukkit.block.data.BlockData
+	org.bukkit.block.Block
+	org.bukkit.block.data.Waterlogged
+	org.bukkit.event.world.GenericGameEvent
+	org.bukkit.Bukkit
+	com.hyperdondon.glowingEntitiesLib.GlowingEntitiesLib
+	org.bukkit.ChatColor
+	org.bukkit.entity.Player
+
+on right click:
+	if isDisabled(player) is not true:
+		if getGem(player's offhand item) is "strength":
+			if player is sneaking:
+				if getEnergy(player's offhand item) is not 0:
+					if player's held item is a sword or air or an axe:
+						if difference between {-StrengthDBC::%player%} and now is less than 0.7 seconds:
+							set {_s} to 0
+							set {_Strength::Tracking::GUI1} to new chest inventory with 6 row with name "&8Select Target"
+							set {_p} to player
+							loop all players:
+								if loop-player is not {_p}:
+									set {_sk} to skull of loop-player
+									set slot {_s} of {_Strength::Tracking::GUI1} to {_sk} named "%loop-player%"
+									add 1 to {_s}
+							wait 1 tick
+							open {_Strength::Tracking::GUI1} to player	
+						else:
+							set {-StrengthDBC::%player%} to now
+
+
+on left click:
+	if isDisabled(player) is not true:
+		if getGem(player's held item) is "strength":
+			if getEnergy(player's held item) is not 0:
+				if getTier(player's held item) is 1:
+					send "<##F10303>🔺 <##FD8988>You need tier 2 gem to cast this skill!" to player
+
+command /TestBounty:
+	permission: op
+	trigger:
+		set {_s} to 0
+		set {_Strength::Tracking::GUI1} to new chest inventory with 6 row with name "&8Select Target"
+		set {_p} to player
+		loop all players:
+			if loop-player is not {_p}:
+				set {_sk} to skull of loop-player
+				set slot {_s} of {_Strength::Tracking::GUI1} to {_sk} named "%loop-player%"
+				add 1 to {_s}
+
+		wait 1 tick
+		open {_Strength::Tracking::GUI1} to player
+		
+on inventory click:
+	loop all players:
+		if name of event-inventory is "&8Select Target":
+			cancel event
+			if event-item is a player head:
+				set {_uuid} to uuid of player
+				set {_T} to event-item's name
+				set {-T} to event-item's name
+				set {-Tplayer::%{_uuid}%} to {_T} parsed as player
+
+				set {_Strength::Tracking::GUI2} to a hopper inventory named "&8Place Items Belonging To Target"
+
+				open {_Strength::Tracking::GUI2} to player 
+
+on inventory close:
+	if name of event-inventory is "&8Place Items Belonging To Target":
+		set {_uuid} to uuid of player
+		if {-BountyCounter::%{_uuid}%} is less than or equal to 0:
+			send "<##F10303>🔮 &cInsufficient amount of items." to player
+
+		else:
+			send "<##F10303>🔮 &cActivated <##F10303>Bounty Hunter" to player
+
+			play sound "entity.warden.heartbeat" with volume 4 to {-Tplayer::%{_uuid}%}
+			play sound "block.bell.use" with volume 10 and pitch 0.8 to {-Tplayer::%{_uuid}%}
+			play sound "ambient.cave" with volume 8 and pitch 0.8 to {-Tplayer::%{_uuid}%}
+			hunting({-Tplayer::%{_uuid}%})
+			if getEnergy(player's offhand item) > 0:
+				blissSetcooldown("Bounty::%uuid of player%", toMilliseconds(7, 0), player)
+			if getEnergy(player's offhand item) > 2:
+				blissSetcooldown("Bounty::%uuid of player%", toMilliseconds(5, 0), player)
+			if getEnergy(player's offhand item) > 4:
+				blissSetcooldown("Bounty::%uuid of player%", toMilliseconds(4, 0), player)
+			if getEnergy(player's offhand item) > 6:
+				blissSetcooldown("Bounty::%uuid of player%", toMilliseconds(3, 0), player)
+			set {strength.cooldown4.%player%} to true
+			set {StrengthMin4.%player%} to 5
+			set {StrengthSec4.%player%} to 0
+			add 1 to progress of the custom advancement "bliss/track" for player
+
+			loop {-BountyCounter::%{_uuid}%} times:
+				BountyHunter(player, {-Tplayer::%{_uuid}%})
+				remove 1 from {-BountyCounter::%{_uuid}%}
+				wait 0.30 seconds
+			set {-BountyCounter::%{_uuid}%} to 0
+
+function hunting(p: player):
+	loop 283 times:
+		send action bar "<##F10303>You feel like you're being watched..." to {_p}
+		wait 1 ticks
+		
+
+on inventory click:
+	if event-inventory is a hopper inventory:
+		if name of event-inventory is "&8Place Items Belonging To Target":
+			if click type is number key:
+				wait 1 tick
+				set {_uuid} to uuid of player
+				if event-item's lore contains "%{-T}%" or "&7by &a&l%{-T}%" or "&7from &c&l%{-T}%" or "&7Return to &a&l%{-T}%":
+					add 60 to {-BountyCounter::%{_uuid}%}
+				else if event-item is air:
+					if {-BountyCounter::%{_uuid}%} is more than or equal to 60:
+						remove 60 from {-BountyCounter::%{_uuid}%}
+
+
+on inventory click:
+	if name of event-inventory is "&8Place Items Belonging To Target":
+		if click type is left mouse button with shift:
+			set {_uuid} to uuid of player
+			if event-inventory is not a hopper inventory:
+				if event-item's lore contains "%{-T}%" or "&7by &a&l%{-T}%" or "&7from &c&l%{-T}%" or "&7Return to &a&l%{-T}%":
+					add 60 to {-BountyCounter::%{_uuid}%}
+				else if event-item is air:
+					if {-BountyCounter::%{_uuid}%} is more than or equal to 60:
+						remove 60 from {-BountyCounter::%{_uuid}%}
+
+on inventory click:
+	if name of event-inventory is "&8Place Items Belonging To Target":
+		if click type is right mouse button with shift:
+			set {_uuid} to uuid of player
+			if event-inventory is not a hopper inventory:
+				if event-item's lore contains "%{-T}%" or "&7by &a&l%{-T}%" or "&7from &c&l%{-T}%" or "&7Return to &a&l%{-T}%":
+					add 60 to {-BountyCounter::%{_uuid}%}
+				else if event-item is air:
+					if {-BountyCounter::%{_uuid}%} is more than or equal to 60:
+						remove 60 from {-BountyCounter::%{_uuid}%}
+
+on inventory click:
+	if event-inventory is a hopper inventory:
+		if name of event-inventory is "&8Place Items Belonging To Target":
+			wait 1 tick
+			set {_uuid} to uuid of player
+			if event-item's lore contains "%{-T}%" or "&7by &a&l%{-T}%" or "&7from &c&l%{-T}%" or "&7Return to &a&l%{-T}%":
+				add 60 to {-BountyCounter::%{_uuid}%}
+			else if event-item is air:
+				if {-BountyCounter::%{_uuid}%} is more than or equal to 60:
+					remove 60 from {-BountyCounter::%{_uuid}%}
+
+
+command /CheckCounter:
+	permission: op
+	trigger:
+		set {_uuid} to uuid of player
+		send "%{-BountyCounter::%{_uuid}%}%" to player
+
+
+
+on damage:
+	if isDisabled(attacker) is not true:
+		if getGem(attacker's held item) is "strength":
+			if getTier(attacker's held item) is 2:
+				if IsTrusted(attacker, victim) is not true:
+					if canUsePower("Frailer::%uuid of attacker%") is true:
+						if getEnergy(attacker's held item) is not 0:
+							if attacker is not invisible:
+								send "<##F10303>🔮 <##B8FFFB>You have been affected with &f🤺<##F10303>Frailer <##B8FFFB>by <##F10303>%attacker.getName()%" to victim
+							else:
+								send "<##F10303>🔮 <##B8FFFB>You have been affected with &f🤺<##F10303>Frailer <##B8FFFB>by <##F10303>&k???" to victim
+									
+							if victim is not invisible:
+								send "<##F10303>🔮 <##B8FFFB>You have activated &f🤺<##F10303>Frailer <##B8FFFB>skill on <##F10303>%victim.getName()%" to attacker
+							else:
+								send "<##F10303>🔮 <##B8FFFB>You have activated &f🤺<##F10303>Frailer <##B8FFFB>skill on <##F10303>&k???" to attacker
+							clear all the potion effects of victim
+							apply weakness to victim for 20 seconds
+							if getEnergy(attacker's held item) > 4:
+								blissSetcooldown("Frailer::%uuid of attacker%", toMilliseconds(1, 30), attacker)
+							else if getEnergy(attacker's held item) is 4:
+								blissSetcooldown("Frailer::%uuid of attacker%", toMilliseconds(1, 35), attacker)
+							else if getEnergy(attacker's held item) is 3:
+								blissSetcooldown("Frailer::%uuid of attacker%", toMilliseconds(1, 40), attacker)
+							else if getEnergy(attacker's held item) is 2:
+								blissSetcooldown("Frailer::%uuid of attacker%", toMilliseconds(1, 45), attacker)
+							else if getEnergy(attacker's held item) is 1:
+								blissSetcooldown("Frailer::%uuid of attacker%", toMilliseconds(1, 50), attacker)
+									
+							set {-StrengthLine::%attacker's uuid%::%victim's uuid%} to true
+							set {-frailerbar::Attacker::%attacker's uuid%::Victim::%victim's uuid%} to boss bar with id "Frailer-Attacker%attacker's uuid%Victim%victim's uuid%" with title "Frailer" with color red with style solid_bar with progress 100
+							add victim to bossbar players of {-frailerbar::Attacker::%attacker's uuid%::Victim::%victim's uuid%}
+							strengthline(attacker, victim)
+							set {-strengthLine::%victim's uuid%} to true
+
+							loop 400 times:
+								remove 0.25 from bar progress of {-frailerbar::Attacker::%attacker's uuid%::Victim::%victim's uuid%}
+								if bar progress of {-frailerbar::Attacker::%attacker's uuid%::Victim::%victim's uuid%} < 1:
+									remove victim from bossbar players of {-frailerbar::Attacker::%attacker's uuid%::Victim::%victim's uuid%}
+									delete boss bar with id "Frailer-Attacker%attacker's uuid%Victim%victim's uuid%"
+								if loop-iteration is 60:
+									set {-StrengthLine::%attacker's uuid%::%victim's uuid%} to false
+								wait 1 tick
+						else:
+							set {_fr} to getActionBarCooldown("Frailer::%attacker's uuid%")
+							send "<##F10303>🔮 &cYour &f🤺<##F10303>Frailer &cskill is on cooldown for <##F10303>%{_fr}%" to attacker
+				else:
+					send "<##FFD773>🔮 <##FFE4AB>You cannot cast negative skills on allies!" to attacker
+			else:
+				send "<##F10303>🔺 <##FD8988>You need tier 2 gem to cast this skill!" to attacker
+			
+on left click:
+	if isDisabled(player) is not true:
+		if getGem(player's held item) is "strength":
+			if getTier(player's held item) is 2:
+				if getEnergy(player's held item) > 0:
+					if canUsePower("Frailer::%uuid of player%") is true:
+						send "<##F10303>🔮 <##B8FFFB>You have used &f🤺<##F10303>Nullify &7(radius 5)" to player
+						if getEnergy(player's held item) > 4:
+							blissSetcooldown("Frailer::%uuid of player%", toMilliseconds(2, 0), player)
+							set {_num} to 5
+						else if getEnergy(player's held item) is 4:
+							blissSetcooldown("Frailer::%uuid of player%", toMilliseconds(2, 5), player)
+							set {_num} to 4.5
+						else if getEnergy(player's held item) is 3:
+							blissSetcooldown("Frailer::%uuid of player%", toMilliseconds(2, 10), player)
+							set {_num} to 3.5
+						else if getEnergy(player's held item) is 2:
+							blissSetcooldown("Frailer::%uuid of player%", toMilliseconds(2, 15), player)
+							set {_num} to 2.5
+						else if getEnergy(player's held item) is 1:
+							blissSetcooldown("Frailer::%uuid of player%", toMilliseconds(2, 20), player)
+							set {_num} to 1.5
+						set {_loc} to location of player
+
+						set {_rad} to 0.5
+						loop {_num} + {_num} times:
+							StrengthCircle({_rad}, {_loc})
+							add 0.5 to {_rad}						
+							wait 1 tick
+						StrengthCirclelast({_rad}, {_loc})
+
+						loop all entities within {_num} blocks of player:
+							if loop-entity is not player:
+								if IsTrusted(player, loop-entity) is not true:
+									if player is not invisible:
+										send "<##F10303>🔮 <##B8FFFB>You have been affected with &f🤺<##F10303>Nullify <##B8FFFB>by <##F10303>%player%" to loop-entity
+									else:
+										send "<##F10303>🔮 <##B8FFFB>You have been affected with &f🤺<##F10303>Nullify <##B8FFFB>by <##F10303>&k???" to loop-entity
+
+									clear all the potion effects of loop-entity
+									set {-Nulify::%loop-entity's uuid%} to true
+									set bar progress of {-Nullify::Bar::%player's uuid%} to 100
+									set {-Nullify::Bar::%player's uuid%} to boss bar with id "%player's uuid%snullify" with title "&fNullify" with color red with progress 100
+									set bar style of {-Nullify::Bar::%player's uuid%} to solid bar
+									add loop-entity to bossbar players of {-Nullify::Bar::%player's uuid%}
+							
+									loop 600 times:
+										remove 0.167 from bar progress of {-Nullify::Bar::%player's uuid%}
+										wait 1 tick
+						
+									remove loop-entity from bossbar players of {-Nullify::Bar::%player's uuid%}
+									set {-Nulify::%loop-entity's uuid%} to false
+
+function StrengthCircle(s: number, p: location):
+	set {_pl} to location of {_p}
+
+	loop all players:
+		if {particlelvl::%loop-player's uuid%} is "default":
+			
+			set {_spacing} to 0.1
+			set {_circumference} to 2 * pi * {_s} # Calculate the number of particles based on the spacing
+			set {_numParticles} to floor({_circumference} / {_spacing}) # Spawn the exact number of particles needed
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				draw 1 of dust using dustOption(rgb(241, 3, 3), 1) at {_pl} ~ {_v} for loop-player
+				draw 1 of smoke at {_pl} ~ {_v} with extra 0 with force for loop-player
+
+		else if {particlelvl::%loop-player's uuid%} is "less":
+
+			set {_spacing} to 0.15
+			set {_circumference} to 2 * pi * {_s}
+			set {_numParticles} to floor({_circumference} / {_spacing})
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				draw 1 of dust using dustOption(rgb(241, 3, 3), 1) at {_pl} ~ {_v} for loop-player
+
+		else if {particlelvl::%loop-player's uuid%} is "none":
+
+			set {_spacing} to 0.5
+			set {_circumference} to 2 * pi * {_s}
+			set {_numParticles} to floor({_circumference} / {_spacing})
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				draw 1 of dust using dustOption(rgb(241, 3, 3), 1) at {_pl} ~ {_v} for loop-player
+
+function StrengthCirclelast(s: number, p: location):
+	set {_pl} to location of {_p}
+	loop 7 times:
+		StrengthCircle({_s}, {_pl})
+		wait 0.3 seconds
+			
+on consume of potion:
+	if {-Nulify::%uuid of player%} is true:
+		cancel event
+		
+on right click:
+	if player's held item is a splash potion:
+		if {-Nulify::%uuid of player%} is true:
+			cancel event
+
+	if player's held item is a lingering potion:
+		if {-Nulify::%uuid of player%} is true:
+			cancel event
+
+	if player's offhand item is a splash potion:
+		if {-Nulify::%uuid of player%} is true:
+			cancel event
+
+	if player's offhand item is a lingering potion:
+		if {-Nulify::%uuid of player%} is true:
+			cancel event
+
+
+rightclick:
+	if isDisabled(player) is not true:
+		if getGem(player's held item) is "strength":
+			if getTier(player's held item) is 2:
+				if canUsePower("ChadStrength::%uuid of player%") is true:
+					if getEnergy(player's held item) is not 0:
+						if target entity of player is not set:
+							send "<##F10303>🔮 <##B8FFFB>You have activated &f⚔<##F10303>Chad Strength" to player
+							if getEnergy(player's held item) > 4:
+								blissSetcooldown("ChadStrength::%uuid of player%", toMilliseconds(2, 30), player)
+							else if getEnergy(player's held item) is 4:
+								blissSetcooldown("ChadStrength::%uuid of player%", toMilliseconds(2, 35), player)
+							else if getEnergy(player's held item) is 3:
+								blissSetcooldown("ChadStrength::%uuid of player%", toMilliseconds(2, 40), player)
+							else if getEnergy(player's held item) is 2:
+								blissSetcooldown("ChadStrength::%uuid of player%", toMilliseconds(2, 45), player)
+							else if getEnergy(player's held item) is 1:
+								blissSetcooldown("ChadStrength::%uuid of player%", toMilliseconds(2, 50), player)
+							draw 5 of dust using dustOption(rgb(241, 3, 3), 1) at location 1 block above player with offset vector(0.3, 0.4, 0.3) with extra 0 with force
+							make 5 of happy_villager at location 1 block above player with offset vector(0.3, 0.4, 0.3) with extra 0 with force
+							set {-ChadCounter::%player's uuid%} to 0
+							set {-ChadActive::%player's uuid%} to true
+							wait 60 seconds
+							delete {-ChadActive::%player's uuid%}
+							delete {-ChadCounter::%player's uuid%}
+						else:
+							delete {-ChadCounter::%player's uuid%}
+							set {-ChadActive2::%player's uuid%} to true
+							set {-ChadCounter2::%player's uuid%} to 0
+							send "<##F10303>🔮 <##B8FFFB>You have used group &f⚔<##F10303>Chad Strength &7(radius 2)" to player
+							if getEnergy(player's held item) > 4:
+								blissSetcooldown("ChadStrength::%uuid of player%", toMilliseconds(2, 30), player)
+							else if getEnergy(player's held item) is 4:
+								blissSetcooldown("ChadStrength::%uuid of player%", toMilliseconds(2, 35), player)
+							else if getEnergy(player's held item) is 3:
+								blissSetcooldown("ChadStrength::%uuid of player%", toMilliseconds(2, 40), player)
+							else if getEnergy(player's held item) is 2:
+								blissSetcooldown("ChadStrength::%uuid of player%", toMilliseconds(2, 45), player)
+							else if getEnergy(player's held item) is 1:
+								blissSetcooldown("ChadStrength::%uuid of player%", toMilliseconds(2, 50), player)
+							set {_num} to 0.5
+							set {_loc} to location of target entity of player
+							loop 7 times:
+								StrengthCircleEXP({_num}, {_loc})
+								add 0.5 to {_num}
+								wait 1 tick
+							StrengthCirclelastEXP({_num}, {_loc})
+							loop all players within 4 blocks of {_loc}:
+								if IsTrusted(player, loop-player) is true:
+									set {-ChadActive2::%loop-player's uuid%} to true
+									set {-ChadCounter2::%loop-player's uuid%} to 0
+							wait 60 seconds
+							loop all players:
+								delete {-ChadActive2::%loop-player's uuid%}
+								delete {-ChadCounter2::%loop-player's uuid%}
+					
+				
+every 2 ticks:
+	loop all players:
+		if isDisabled(loop-player) is not true:
+			if {-ChadActive::%loop-player's uuid%} is set:
+				if {-ChadCounter::%loop-player's uuid%} is 0:
+					draw 1 smoke at location 0.6 block infront and 1.1 block above loop-player with extra 0
+					draw 1 smoke at location 0.4 block infront and 0.5 blocks right and 1.1 block above loop-player with extra 0
+					draw 1 smoke at location 0.4 block infront and 0.5 blocks left and 1.1 block above loop-player with extra 0
+				if {-ChadCounter::%loop-player's uuid%} is 1:
+					draw 1 smoke at location 0.6 block infront and 1.1 block above loop-player with extra 0
+					draw 1 smoke at location 0.4 block infront and 0.5 blocks right and 1.1 block above loop-player with extra 0
+					draw 1 of dust using dustOption(rgb(241, 3, 3), 1) at location 0.4 block infront and 0.5 blocks left and 1.1 block above loop-player with extra 0
+				if {-ChadCounter::%loop-player's uuid%} is 2:
+					draw 1 of dust using dustOption(rgb(241, 3, 3), 1) at location 0.6 block infront and 1.1 block above loop-player with extra 0
+					draw 1 smoke at location 0.4 block infront and 0.5 blocks right and 1.1 block above loop-player with extra 0
+					draw 1 of dust using dustOption(rgb(241, 3, 3), 1) at location 0.4 block infront and 0.5 blocks left and 1.1 block above loop-player with extra 0
+				if {-ChadCounter::%loop-player's uuid%} is 3:
+					draw 1 of dust using dustOption(rgb(241, 3, 3), 1) at location 0.6 block infront and 1.1 block above loop-player with extra 0
+					draw 1 of dust using dustOption(rgb(241, 3, 3), 1) at location 0.4 block infront and 0.5 blocks right and 1.1 block above loop-player with extra 0
+					draw 1 of dust using dustOption(rgb(241, 3, 3), 1) at location 0.4 block infront and 0.5 blocks left and 1.1 block above loop-player with extra 0
+			if {-ChadActive2::%loop-player's uuid%} is set:
+				if {-ChadCounter2::%loop-player's uuid%} is not 8:
+					draw 1 smoke at location 2.5 blocks above loop-player with extra 0
+				else:
+					draw 1 of dust using dustOption(rgb(126, 2, 2), 1) at location 2.5 blocks above loop-player
+				
+on damage:
+	if isDisabled(attacker) is not true:
+		if {-ChadActive::%attacker's uuid%} is set:
+			if {-ChadCounter::%attacker's uuid%} is set:
+				if {-ChadCounter::%attacker's uuid%} < 3:
+					hit is critical
+					add 1 to {-ChadCounter::%attacker's uuid%}
+				else:
+					add damage to damage
+					set {-ChadCounter::%attacker's uuid%} to 0
+
+		if {-ChadActive2::%attacker's uuid%} is set:		
+			if {-ChadCounter2::%attacker's uuid%} is set:
+				if {-ChadCounter2::%attacker's uuid%} < 8:
+					hit is critical
+					add 1 to {-ChadCounter2::%attacker's uuid%}
+				else:
+					add damage to damage
+					set {-ChadCounter2::%attacker's uuid%} to 0
+				
+function StrengthCircleEXP(s: number, p: location):
+	set {_spacing} to 0.1
+	set {_pl} to location of {_p}
+	set {_circumference} to 2 * pi * {_s}
+	
+	set {_numParticles} to floor({_circumference} / {_spacing})
+	
+	loop {_numParticles} times:
+		set {_angle} to loop-value * 360 / {_numParticles}
+		set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+		
+		draw 1 of dust using dustOption(rgb(241, 3, 3), 1) at {_pl} ~ {_v}
+		draw 1 of happy_villager at {_pl} ~ {_v} with extra 0 with force
+
+function StrengthCirclelastEXP(s: number, p: location):
+	set {_pl} to location of {_p}
+	loop 7 times:
+		StrengthCircleEXP({_s}, {_pl})
+		wait 0.3 seconds
+
+
+on death:
+	loop all players:
+		if {-frailerbar::Attacker::%loop-player's uuid%::Victim::%victim's uuid%} is set:
+			remove loop-player from bossbar players of {-frailerbar::Attacker::%loop-player's uuid%::Victim::%victim's uuid%}
+			remove victim from bossbar players of {-frailerbar::Attacker::%loop-player-1's uuid%::Victim::%victim's uuid%}
+			delete {-frailerbar::Attacker::%loop-player-1's uuid%::Victim::%victim's uuid%}
+			set {-StrengthLine::%loop-player-1's uuid%::%victim's uuid%} to false
+
+# ------------[Disabled Cuz Bliss Disabled]------------<Blood Torns>-------
+#on damage:
+#	if isDisabled(attacker) is not true:
+#		if getGem(attacker's offhand item) is "strength":
+#			if getTier(attacker's offhand item) is 2:
+#				if getEnergy(attacker's offhand item) > 3:
+#					if victim is a player:
+#						if victim is not attacker:
+#							if attacker's health is between 7 and 6:
+#								add 0.5 to damage
+#							if attacker's health is between 6 and 5:
+#								add 1 to damage
+#							if attacker's health is between 5 and 4:
+#								add 1.5 to damage
+#							if attacker's health is between 4 and 3:
+#								add 2 to damage
+#							if attacker's health is below 3:
+#								add 2.5 to damage
+#
+#		if getGem(attacker's held item) is "strength":
+#			if getTier(attacker's held item) is 2:
+#				if getEnergy(attacker's held item) > 3:
+#					if victim is a player:
+#						if victim is not attacker:
+#							if attacker's health is between 7 and 6:
+#								add 0.5 to damage
+#							if attacker's health is between 6 and 5:
+#								add 1 to damage
+#							if attacker's health is between 5 and 4:
+#								add 1.5 to damage
+#							if attacker's health is between 4 and 3:
+#								add 2 to damage
+#							if attacker's health is below 3:
+#								add 2.5 to damage
+
+
+function BountyHunter(p1: player, p2: player):
+	set {_v} to vector from {_p1}'s head to {_p2}'s head
+	set vector length of {_v} to 0.2
+	set {_loc} to the location 0.7 meters under {_p1}'s head
+	loop (distance between {_loc} and {_p2}) / 0.4 times:
+
+		add 1 to {_distance}
+		draw 3 dust using dustOption(rgb(241, 3, 3), 2) at {_loc} with force for {_p1}
+		set {_loc} to {_loc} ~ {_v}
+		if {_distance} = 16:
+			stop
+	wait 0.25 seconds
+
+#https://discord.gg/Z4EQbkBD

@@ -1,0 +1,12 @@
+# Feature toggles and system-level options.
+features:
+  trustSystem: true
+  trustGui: true
+  persistTrust: true
+  nodupe: true
+
+trading:
+  ultimateMenuEnabled: true
+
+actionBar:
+  enabled: true

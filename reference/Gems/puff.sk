@@ -1,0 +1,301 @@
+# Puff Gem
+
+on game event sculk_sensor_tendrils_clicking:
+	if getGem(player's held item) is "puff":
+		if getEnergy(player's held item) > 1:
+			cancel event
+	if getGem(player's offhand item) is "puff":
+		if getEnergy(player's offhand item) > 1:
+			cancel event
+
+
+on right click:
+	if isDisabled(player) is not true:
+		if getEnergy(player's held item) is not 0:
+			if getGem(player's held item) is "puff":
+				if getTier(player's held item) is 2:
+					if canUsePower("Dash::%uuid of player%") is true:
+						if getEnergy(player's held item) is 1:
+							blissSetcooldown("Dash::%uuid of player%", toMilliseconds(1, 5), player)
+						else if getEnergy(player's held item) is 2:
+							blissSetcooldown("Dash::%uuid of player%", toMilliseconds(1, 0), player)
+						else if getEnergy(player's held item) is 3:
+							blissSetcooldown("Dash::%uuid of player%", toMilliseconds(0, 55), player)
+						else if getEnergy(player's held item) is 4:
+							blissSetcooldown("Dash::%uuid of player%", toMilliseconds(0, 50), player)
+						else if getEnergy(player's held item) > 4:
+							blissSetcooldown("Dash::%uuid of player%", toMilliseconds(0, 45), player)
+
+						set {_vector} to player.getEyeLocation().getDirection().multiply(3.5)
+						if pitch of player <= -15:
+							{_vector}.setY(2.85)
+
+						set {_block} to block at location of player
+						if all:
+							pitch of player > -15
+							{_block}.getRelative(BlockFace.DOWN).isSolid()
+						then:
+							{_vector}.setY(0.35)
+						
+						player.setVelocity({_vector})
+
+						send "<#EFEFEF>🔮 <##B8FFFB>You have activated &f⏫<##EFEFEF>Dash <##B8FFFB>skill" to player
+
+						set {_puffholder} to player
+						wait 1 tick
+						loop 40 times:
+							loop all entities within 2.5 blocks of the player:
+								if loop-entity is not {_puffholder}:
+									if IsTrusted(player, loop-entity) is not true:
+										set {_ent} to loop-entity
+										if {_ent} doesn't contain {_dontdmgagain::*}:
+											if {_ent} is not a player:
+												damage {_ent} by 0.000001
+												if {_ent} is a player:
+													set {_pla} to {_ent} parsed as player
+												if {_pla}'s health > 2:
+													remove 2 from {_pla}'s health
+												else:
+													if {_pla}'s offhand item is not a totem of undying:
+														if {_pla}'s held item is not a totem of undying:
+															remove 2.5 from {_pla}'s health
+														else:
+															damage {_pla} by 9999
+													else:
+														damage {_pla} by 9999
+											else:
+												remove 2.5 from {_ent}'s health
+									else:
+										send "<##FFD773>🔮 &fYou cannout cast negative skills on allies!" to {_puffholder}
+							wait 1 ticks
+
+
+					else:
+						set {_dash} to getActionBarCooldown("Dash::%uuid of player%")
+						send "<#EFEFEF>🔮 &cYour &f⏫<##EFEFEF>Dash &cskill is on cooldown for <##EFEFEF>%{_dash}%" to player
+
+				else:
+					send "<#EFEFEF>🔺 <#ff8a8a>You need tier 2 gem to cast this skill!" to player
+
+on damage:
+	if isDisabled(attacker) is not true:
+		if getEnergy(attacker's held item) is not 0:
+			if getGem(attacker's held item) is "puff":
+				if getTier(attacker's held item) is 2:
+					if canUsePower("BreezyBash::%uuid of attacker%") is true:
+						puffLine(attacker, victim)
+						set {-puffline::%victim's uuid%} to true
+						if IsTrusted(attacker, victim) is not true:
+							if getEnergy(attacker's held item) > 4:
+								blissSetcooldown("BreezyBash::%uuid of attacker%", toMilliseconds(1, 15), attacker)
+							else if getEnergy(attacker's held item) is 4:
+								blissSetcooldown("BreezyBash::%uuid of attacker%", toMilliseconds(1, 20), attacker)
+							else if getEnergy(attacker's held item) is 3:
+								blissSetcooldown("BreezyBash::%uuid of attacker%", toMilliseconds(1, 25), attacker)
+							else if getEnergy(attacker's held item) is 2:
+								blissSetcooldown("BreezyBash::%uuid of attacker%", toMilliseconds(1, 30), attacker)
+							else if getEnergy(attacker's held item) is 1:
+								blissSetcooldown("BreezyBash::%uuid of attacker%", toMilliseconds(1, 35), attacker)
+									
+							send "<#EFEFEF>🔮 <##B8FFFB>You have been affected with &f☁<##EFEFEF>Breazy bash <##B8FFFB>by <##EFEFEF>%attacker%" to victim
+							send "<#EFEFEF>🔮 <##B8FFFB>You have activated &f☁<##EFEFEF>Breazy bash <##B8FFFB>skill on <##EFEFEF>%victim.getName()%" to attacker
+							wait 1 ticks
+							push victim up at speed 6
+							wait 0.95 seconds
+							push victim down at speed 9
+
+						else:
+							send "<##FFD773>🔮 &fYou cannot cast negative powers on allies!" to attacker
+
+					else:
+						set {_bb} to getActionBarCooldown("BreezyBash::%uuid of attacker%")
+						send "<#EFEFEF>🔮 &cYour &f☁<##EFEFEF>Breazy bash &cskill is on cooldown for <##EFEFEF>%{_bb}%" to attacker
+
+
+
+
+left click:
+	if isDisabled(player) is not true:
+		if getEnergy(player's held item) is not 0:
+			if getGem(player's held item) is "puff":
+				if getTier(player's held item) is 2:
+					if canUsePower("BreezyBash::%uuid of player%") is true:
+						if getEnergy(player's held item) > 4:
+							blissSetcooldown("BreezyBash::%uuid of player%", toMilliseconds(1, 15), player)
+							set {_num} to 4
+						else if getEnergy(player's held item) is 4:
+							blissSetcooldown("BreezyBash::%uuid of player%", toMilliseconds(1, 20), player)
+							set {_num} to 3.5
+						else if getEnergy(player's held item) is 3:
+							blissSetcooldown("BreezyBash::%uuid of player%", toMilliseconds(1, 25), player)
+							set {_num} to 2.5
+						else if getEnergy(player's held item) is 2:
+							blissSetcooldown("BreezyBash::%uuid of player%", toMilliseconds(1, 30), player)
+							set {_num} to 2.5
+						else if getEnergy(player's held item) is 1:
+							blissSetcooldown("BreezyBash::%uuid of player%", toMilliseconds(1, 35), player)
+							set {_num} to 1.5
+
+						send "<#EFEFEF>🔮 <##B8FFFB>You have activated group &f☁<##EFEFEF>Breazy Bash <##B8FFFB>skill &7(radius 4)" to player
+						set {_loc} to location of player
+						set {_s} to 0.5
+						loop {_num} + {_num} times:
+							PuffCircle({_s}, {_loc})	
+							add 0.5 to {_s}
+							wait 1 tick
+						PuffCirclelast({_s}, {_loc})
+						loop all entities within {_num} blocks of the player:
+							if loop-entity is not player:
+								if IsTrusted(player, loop-entity) is not true:
+											
+									send "<#EFEFEF>🔮 <##B8FFFB>You have been affected with &f☁<##EFEFEF>Breazy Bash <##B8FFFB>by <##EFEFEF>%player%" to loop-entity
+									set {_p} to loop-entity
+									set {_direction} to vector between player and {_p}
+
+									push {_p} up at speed 1
+									push {_p} {_direction} at speed 3
+								else:
+									send "<##FFD773>🔮 &fYou cannout cast negative skills on allies!" to player
+
+								
+
+
+				else:
+					send "<#EFEFEF>🔺 <#ff8a8a>You need tier 2 gem to cast this skill!" to player
+
+function PuffCircle(s: number, p: location):
+	set {_pl} to location of {_p}
+
+	loop all players:
+		if {particlelvl::%loop-player's uuid%} is "default":
+			
+			set {_spacing} to 0.1
+			set {_circumference} to 2 * pi * {_s} # Calculate the number of particles based on the spacing
+			set {_numParticles} to floor({_circumference} / {_spacing}) # Spawn the exact number of particles needed
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(239, 239, 239), 1) at {_pl} ~ {_v} for loop-player
+				draw 1 of smoke at {_pl} ~ {_v} with extra 0 with force for loop-player
+
+		else if {particlelvl::%loop-player's uuid%} is "less":
+
+			set {_spacing} to 0.15
+			set {_circumference} to 2 * pi * {_s}
+			set {_numParticles} to floor({_circumference} / {_spacing})
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(239, 239, 239), 1) at {_pl} ~ {_v} for loop-player
+
+		else if {particlelvl::%loop-player's uuid%} is "none":
+
+			set {_spacing} to 0.5
+			set {_circumference} to 2 * pi * {_s}
+			set {_numParticles} to floor({_circumference} / {_spacing})
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(239, 239, 239), 1) at {_pl} ~ {_v} for loop-player
+
+function PuffCirclelast(s: number, p: location):
+	set {_pl} to location of {_p}
+	loop 7 times:
+		PuffCircle({_s}, {_pl})
+		wait 0.3 seconds
+
+import:
+	org.bukkit.block.BlockFace
+
+on flight toggle:
+	player's gamemode is survival
+	if all:
+		getGem(player's held item) is not "puff"
+		getGem(player's off hand item) is not "puff"
+	then:
+		stop
+	getEnergy(player's held item) is not 0
+	canUsePower("DoubleJump::%uuid of player%") is true
+	if getGem(player's held item) is "puff":
+		set {_tier} to getTier(player's held item)
+	else if getGem(player's off hand item) is "puff":
+		set {_tier} to getTier(player's off hand item)
+	wait 1 tick
+	if player is flying:
+		set fly mode of player to false
+
+		set {_vector} to player.getEyeLocation().getDirection()
+		{_vector}.setY(1.8)
+		player.setVelocity({_vector})
+
+		setDCooldown("DoubleJump::%uuid of player%", toMilliseconds(0, 50))
+		set {-DoubleJumping::%player's uuid%} to true
+		
+		send "<#EFEFEF>🔮 <##B8FFFB>You have used <##EFEFEF>Double Jump&f! <##B8FFFB>Now on cooldown for <##EFEFEF>5 seconds" to player
+		while {-DoubleJumping::%player's uuid%} is set:
+			if the block below player is air:
+				draw 2 of cloud at player with extra 0
+				wait 1 tick if mod(loop-iteration, 2) is 2
+			else:
+				delete {-DoubleJumping::%player's uuid%}
+				blissSetcooldown("DoubleJump::%uuid of player%", toMilliseconds(0, 5), player)
+			wait 1 tick
+
+	else:
+		set fly mode of player to false
+
+
+on jump:
+	if isDisabled(player) is not true:
+		if getGem(player's held item) is "puff":
+			if getEnergy(player's held item) is not 0:
+				if canUsePower("DoubleJump::%uuid of player%") is true:
+					set fly mode of player to true
+
+		if getGem(player's offhand item) is "puff":
+			if getEnergy(player's offhand item) is not 0:
+				if canUsePower("DoubleJump::%uuid of player%") is true:
+					set fly mode of player to true
+
+		if getGem(player's offhand item) is not "puff":
+			if getGem(player's held item) is not "Puff":
+				if player's gamemode is survival:
+					set fly mode of player to false
+				else:
+					set fly mode of player to true
+
+
+
+
+on damage:
+	if isDisabled(victim) is not true:
+		if damage cause is fall:
+			if getGem(victim's offhand item) is "puff":
+				if getEnergy(victim's offhand item) > 1:
+					set {_d} to damage
+					add {_d} to progress of the custom advancement "bliss/puff" for victim
+					cancel event
+			if getGem(victim's held item) is "puff":
+				if getEnergy(victim's held item) > 1:
+					set {_d} to damage
+					add {_d} to progress of the custom advancement "bliss/puff" for victim 
+					cancel event
+
+
+on block trample:
+	if isDisabled(event-entity) is not true:
+		if event-entity is a player:
+			if getGem(player's offhand item) is "puff":
+				if getEnergy(player's offhand item) > 1:
+					cancel event
+
+			if getGem(player's held item) is "puff":
+				if getEnergy(player's held item) > 1:
+					cancel event
+

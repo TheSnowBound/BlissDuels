@@ -1,0 +1,389 @@
+
+right click:
+	if isDisabled(player) is not true:
+		if player's held item is a sword or an axe or air:
+			if getGem(player's offhand item) is "speed":
+				if getEnergy(player's offhand item) is not 0:
+					if {-DoubleClick::%player's uuid%} is not set:
+						set {-DoubleClick::%player's uuid%} to true
+					else:
+						delete {-DoubleClick::%player's uuid%}
+						if canUsePower("Thunder::%uuid of player%") is true:
+							push player forward at speed 1.5
+							thunderStep(player)
+							play sound "entity.breeze.death" with volume 1 and pitch 1.2 at player
+							play sound "entity.warden.attack_impact" with volume 1 and pitch 1.4 at player
+							setDCooldown("Thunder::%uuid of player%", toMilliseconds(0, 30))
+							send "<##FEFD17>🔮 You activated <##FF686F>Thunder Step" to player
+						else:
+							set {_message} to getCooldownSeconds("Thunder::%uuid of player%")
+							send "<##FEFD17>🔮 <##FF686F>Thunder Step is on cooldown for %{_message}%" to player
+
+
+function thunderStep(p: player):
+	set {_l} to {_p}'s location 
+	set {_y} to {_p}'s yaw - 90
+	set {_angle} to 0
+	set {_step} to 1
+	while {_angle} < 360:
+		add {_step} to {_angle}
+		set {_v} to spherical vector with radius 0.1, yaw {_y} and pitch {_angle}
+		set {_v2} to spherical vector with radius 2, yaw {_y} and pitch {_angle}
+		draw 0 of cloud at {_l} ~ {_v} with offset {_v2} with extra 0.1
+		wait 1 tick if mod(loop-iteration,50) is 0
+
+
+every 2 seconds:
+	loop all players:
+		if isDisabled(loop-player) is not true:
+			if getGem(loop-player's offhand item) is "speed":
+				if loop-player is swimming:
+					if boots of loop-player is not enchanted with depth strider:
+						set {_loc} to location 0.2 block above and 0.5 block behind loop-player
+						draw 1 dust using dustOption(rgb(254, 253, 23), 1) at {_loc} with extra 0 with force
+		
+
+
+on left click:
+	if all:
+		isDisabled(player) is not true
+		getGem(player's held item) is "speed"
+		getTier(player's held item) is 2
+		getEnergy(player's held item) is not 0
+		canUsePower("Blur::%uuid of player%") is true
+	then:
+		set {-blur::%player's uuid%} to true
+		set {-blured::%player's uuid%} to 0
+		draw 5 electric spark 1 block above player with offset vector(0.5, 0.5, 0.5) with extra 0.00001 with force
+		send "<##FEFD17>Your next hit will inflict Blur!" to player
+		wait 5 seconds
+		if {-blured::%player's uuid%} is not 0:
+			if getEnergy(player's held item) is 1:
+				blissSetcooldown("Blur::%uuid of player%", toMilliseconds(1, 50), player)
+			if getEnergy(player's held item) is 2:
+				blissSetcooldown("Blur::%uuid of player%", toMilliseconds(1, 45), player)
+			if getEnergy(player's held item) is 3:
+				blissSetcooldown("Blur::%uuid of player%", toMilliseconds(1, 40), player)
+			if getEnergy(player's held item) is 4:
+				blissSetcooldown("Blur::%uuid of player%", toMilliseconds(1, 35), player)
+			if getEnergy(player's held item) > 4:
+				blissSetcooldown("Blur::%uuid of player%", toMilliseconds(1, 30), player)
+		else:
+			delete {-blured::%player's uuid%}
+			set {-blur::%player's uuid%} to false
+			set {-blured::%player's uuid%} to 0
+			send "<##FEFD17>Blur Unredied, You took too long" to player
+
+function blurPart(l1: location, l2: location):
+	set {_v} to vector from {_l1} and {_l2} 
+	set vector length of {_v} to 0.2
+	loop (distance between {_l1} and {_l2}) / 0.2 times:
+		draw 2 of electric spark at {_l1} with extra 0.001 with force
+		set {_l1} to {_l1} ~ {_v}
+
+
+
+
+on damage:
+	if isDisabled(attacker) is not true:
+		if {-Blurring::%victim's uuid%} is not true:
+			if canUsePower("Blur::%uuid of attacker%") is true:
+				if IsTrusted(attacker, victim) is not true:
+					if {-blur::%attacker's uuid%} is set:
+						set {-Blurring::%victim's uuid%} to true
+						if attacker is not invisible:
+							send "<##FEFD17>🔮 <##12302e>You have been affected by <##FEFD17>Blur <##B8FFFB>by <##FEFD17>%attacker%" to victim
+						else if attacker is not invisible:
+							send "<##FEFD17>🔮 <##B8FFFB>You have been affected by <##FEFD17>Blur <##B8FFFB>by <##FEFD17>&k???" to victim
+									
+						if victim is not invisible:
+							send "<##FEFD17>🔮 <##B8FFFB>You have used <##FEFD17>Blur <##B8FFFB>on <##FEFD17>%victim.getName()%" to attacker
+						else:
+							send "<##FEFD17>🔮 <##B8FFFB>You have used <##FEFD17>Blur <##B8FFFB>on <##FEFD17>&k???" to attacker
+						set {-Blurring} to attacker
+						set {_vic} to victim
+						add 1 to {-blured::%attacker's uuid%}
+						if victim is alive:
+							set invulnerability ticks of victim to 0
+							set {_loc} to location 3 blocks left of victim
+							set {_l1} to location 1 block above {_loc}
+							set {_direction} to vector between {_loc} and victim
+							set {_pit} to the pitch of {_direction}
+							set {_yaw} to the yaw of {_direction}
+							set pitch of {_loc} to {_pit}
+							set yaw of {_loc} to {_yaw}
+							spawn a citizen named "npc-%uuid of attacker%" at {_loc}
+							set {_npc} to last created npc
+							set invulnerability ticks of victim to 0
+							execute console command "/npc select npc-%uuid of attacker%"
+							set skin of {_npc} to "%attacker%"
+							set the npc gravity of {_npc} to false
+							damage victim by 1 heart
+							set invulnerability ticks of victim to 0
+							knock victim {_direction} with strength 0.4
+							knock victim upwards with strength 0.6
+							make {_npc} aggressive
+							play sound "item.trident.thunder" with volume 0.5 and pitch 1.5 at attacker
+							play sound "block.amethyst_cluster.break" with volume 1.5 and pitch 1.2 at attacker
+							wait 5 ticks
+							make {_npc} attack victim
+							execute console command "/npc remove npc-%uuid of attacker%"
+							set {_loc} to location 3 blocks right and 1 above victim
+							set {_l2} to location 1 block above {_loc}
+							blurPart({_l1}, {_l2})
+							set {_direction} to vector between {_loc} and victim
+							set {_pit} to the pitch of {_direction}
+							set {_yaw} to the yaw of {_direction}
+							set pitch of {_loc} to {_pit}
+							set yaw of {_loc} to {_yaw}
+							spawn a citizen named "npc-%uuid of attacker%" at {_loc}
+							set {_npc} to last created npc
+							set invulnerability ticks of victim to 0
+							execute console command "/npc select npc-%uuid of attacker%"
+							set skin of {_npc} to "%attacker%"
+							set the npc gravity of {_npc} to false
+							damage victim by 1 hearts
+							set invulnerability ticks of victim to 0
+							knock victim {_direction} with strength 0.4
+							make {_npc} aggressive
+							play sound "item.trident.thunder" with volume 0.5 and pitch 1.5 at attacker
+							play sound "block.amethyst_cluster.break" with volume 1.5 and pitch 1.2 at attacker
+							wait 5 ticks
+							make {_npc} attack victim
+							execute console command "/npc remove npc-%uuid of attacker%"
+							set {_loc} to location 3 infront and 2 right of victim
+							set {_l3} to location 1 block above {_loc}
+							blurPart({_l2}, {_l3})
+							set {_direction} to vector between {_loc} and victim
+							set {_pit} to the pitch of {_direction}
+							set {_yaw} to the yaw of {_direction}
+							set pitch of {_loc} to {_pit}
+							set yaw of {_loc} to {_yaw}
+							spawn a citizen named "npc-%uuid of attacker%" at {_loc}
+									
+							set {_npc} to last created npc
+							execute console command "/npc select npc-%uuid of attacker%"
+							set skin of {_npc} to "%attacker%"
+							set the npc gravity of {_npc} to false
+									
+							damage victim by 1.5 hearts
+							set invulnerability ticks of victim to 0
+							knock victim {_direction} with strength 0.6
+							knock victim upwards with strength 0.3
+							make {_npc} aggressive
+							play sound "item.trident.thunder" with volume 0.5 and pitch 1.5 at attacker
+							play sound "block.amethyst_cluster.break" with volume 1.5 and pitch 1.2 at attacker
+							wait 5 ticks
+							make {_npc} attack victim
+							execute console command "/npc remove npc-%uuid of attacker%"
+							set {_loc} to location 3 blocks behind and 1 left and 1 above victim
+							set {_l4} to location 1 block above {_loc}
+							blurPart({_l3}, {_l4})
+							set {_direction} to vector between {_loc} and victim
+							set {_pit} to the pitch of {_direction}
+							set {_yaw} to the yaw of {_direction}
+							set pitch of {_loc} to {_pit}
+							set yaw of {_loc} to {_yaw}
+							spawn a citizen named "npc-%uuid of attacker%" at {_loc}
+							set {_npc} to last created npc
+									
+							execute console command "/npc select npc-%uuid of attacker%"
+							set skin of {_npc} to "%attacker%"
+							set the npc gravity of {_npc} to false
+							damage victim by 1 hearts
+							set invulnerability ticks of victim to 0
+							knock victim {_direction} with strength 0.4
+							make {_npc} aggressive
+							play sound "item.trident.thunder" with volume 0.5 and pitch 1.5 at attacker
+							play sound "block.amethyst_cluster.break" with volume 1.5 and pitch 1.2 at attacker
+							wait 5 ticks
+							make {_npc} attack victim
+							execute console command "/npc remove npc-%uuid of attacker%"
+							delete {-Blurring}
+							set {-BlurringIgniteFalse} to false
+							wait 5 ticks
+							delete {-Blurring::%victim's uuid%}
+							wait 5 seconds
+							delete {-blur::%attacker's uuid%}
+							if canUsePower("Blur::%uuid of attacker%") is true:
+								if getEnergy(attacker's held item) is 1:
+									blissSetcooldown("Blur::%uuid of attacker%", toMilliseconds(1, 50), attacker)
+								if getEnergy(attacker's held item) is 2:
+									blissSetcooldown("Blur::%uuid of attacker%", toMilliseconds(1, 45), attacker)
+								if getEnergy(attacker's held item) is 3:
+									blissSetcooldown("Blur::%uuid of attacker%", toMilliseconds(1, 40), attacker)
+								if getEnergy(attacker's held item) is 4:
+									blissSetcooldown("Blur::%uuid of attacker%", toMilliseconds(1, 35), attacker)
+								if getEnergy(attacker's held item) > 4:
+									blissSetcooldown("Blur::%uuid of attacker%", toMilliseconds(1, 30), attacker)
+								set {-blured::%attacker's uuid%} to 0
+						else:
+							delete {-Blurring}
+							delete {-Blurring::%victim's uuid%}
+							set {-BlurringIgniteFalse} to false
+							stop
+				else:
+					send "<##FFD773>🔮 <##FFE4AB>You cannot cast negative skills on allies!" to attacker			
+
+function SpeedCircleEXP(s: number, p: location):
+	set {_spacing} to 0.1
+	set {_pl} to location of {_p}
+	set {_circumference} to 2 * pi * {_s}
+	
+	set {_numParticles} to floor({_circumference} / {_spacing})
+
+	loop {_numParticles} times:
+		set {_angle} to loop-value * 360 / {_numParticles}
+		set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+		
+		make 1 of dust using dustOption(rgb(254, 253, 23), 1) at {_pl} ~ {_v}
+		draw 1 of happy_villager at {_pl} ~ {_v} with extra 0 with force
+		
+function SpeedCirclelastEXP(s: number, p: location):
+	set {_pl} to location of {_p}
+	loop 7 times:
+		SpeedCircleEXP({_s}, {_pl})
+		wait 0.3 seconds  
+
+		
+import:
+	org.bukkit.inventory.ItemStack
+	org.bukkit.entity.Snowball
+	org.bukkit.Color
+
+#dumb solution, but we can also hardcode it. just like in the above code set speedstorm1 to player's name, and then if speedstorm1 is set, set speedstorm2 to the other player's name. 99% wont be more than two people using speedstorm at the same time
+on damage:
+	if damage cause is lightning:
+		if {-Blurring} is not set:
+			if {-SpeedStormActive} is set:
+				if {-SpeedCaster::%victim's uuid%} is true:
+					if victim is within 12 blocks around {-SpeedStormLoc::%victim's uuid%}:
+						cancel event
+						apply speed 6 without particles to victim for 12 seconds replacing the existing effect
+				else:
+					Stun(victim, 3)
+		
+
+rightclick:
+	if isDisabled(player) is not true:
+		if target entity of player is not set:
+			if getGem(player's held item) is "speed":
+				if getTier(player's held item) is 2:
+					if getEnergy(player's held item) is not 0:
+						if canUsePower("SpeedStorm::%uuid of player%") is true:
+							If getEnergy(player's held item) is 1:
+								blissSetcooldown("SpeedStorm::%uuid of player%", toMilliseconds(2, 50), player)
+							If getEnergy(player's held item) is 2:
+								blissSetcooldown("SpeedStorm::%uuid of player%", toMilliseconds(2, 45), player)
+							If getEnergy(player's held item) is 3:
+								blissSetcooldown("SpeedStorm::%uuid of player%", toMilliseconds(2, 40), player)
+							If getEnergy(player's held item) is 4:
+								blissSetcooldown("SpeedStorm::%uuid of player%", toMilliseconds(2, 35), player)
+							If getEnergy(player's held item) > 4:
+								blissSetcooldown("SpeedStorm::%uuid of player%", toMilliseconds(2, 30), player)
+							send "<##FEFD17>🔮 <##B8FFFB>You summoned a &f🌩<##FEFD17>speed storm" to player
+							delete {-SpeedStormActive}
+							set {-SpeedStormActive} to true
+							set {-SpeedStorm::%player's uuid%} to true
+							set {-SpeedCaster::%player's uuid%} to true
+							set {_loc} to location of player
+							set {-SpeedStormLoc::%player's uuid%} to location of player
+							set {_num} to 1
+							loop 6 times:
+								SpeedCircleEXP({_num},{_loc})
+								add 0.5 to {_num}
+								wait 1 tick
+							SpeedCirclelastEXP({_num},{_loc})
+							loop 20 times:
+								set {_rand1} to a random integer between 0 and 5
+								set {_rand2} to a random integer between 0 and 5
+								set {_rand3} to a random integer between 0 and 5
+								set {_rand4} to a random integer between 0 and 5
+								set {_loc2} to location {_rand1} blocks right and {_rand2} blocks left and {_rand3} blocks behind and {_rand4} blocks infront of {_loc}
+								strike lightning at {_loc2}
+								loop 10 times:
+									set {_clusterLoc} to {_loc}
+									add a random number between -5 and 5 to {_clusterLoc}'s x-coordinate
+									add a random number between -5 and 5 to {_clusterLoc}'s z-coordinate
+									set {_clusterLoc}'s y-coordinate to {_loc}'s y-coordinate + 10
+		
+									loop 20 times:
+										set {_randX} to a random number between -1 and 1
+										set {_randZ} to a random number between -1 and 1
+										set {_loc3} to {_clusterLoc}
+										add {_randX} to {_loc3}'s x-coordinate
+										add {_randZ} to {_loc3}'s z-coordinate
+										draw 1 of campfire cosy smoke at {_loc3} with offset vector(0.2,0.2,0.2) with extra 0 with force
+								wait 1 second
+							delete {-SpeedStormActive}
+							set {-SpeedStorm::%player's uuid%} to false
+							delete {-SpeedStormLoc::%player's uuid%}
+							set {-SpeedCaster::%player's uuid%} to true						
+						
+						else:
+							set {_pt} to getActionBarCooldown("SpeedStorm::%uuid of player%")
+							send "<##FEFD17>🔮 <##FFADAD>Your &f🌩<##FEFD17>Speedy Storm <##FFADAD>skill is on cooldown for <##FEFD17>%{_pt}%" to player
+					
+				else:
+					send "<##FEFD17>🔺 <##FD8988>You need tier 2 gem to cast this skill!" to player
+					
+		else:
+			if getGem(player's held item) is "speed":
+				if getTier(player's held item) is 2:
+					if getEnergy(player's held item) is not 0:
+						if canUsePower("SpeedStorm::%uuid of player%") is true:
+							If getEnergy(player's held item) is 1:
+								blissSetcooldown("SpeedStorm::%uuid of player%", toMilliseconds(2, 50), player)
+							If getEnergy(player's held item) is 2:
+								blissSetcooldown("SpeedStorm::%uuid of player%", toMilliseconds(2, 45), player)
+							If getEnergy(player's held item) is 3:
+								blissSetcooldown("SpeedStorm::%uuid of player%", toMilliseconds(2, 40), player)
+							If getEnergy(player's held item) is 4:
+								blissSetcooldown("SpeedStorm::%uuid of player%", toMilliseconds(2, 35), player)
+							If getEnergy(player's held item) > 4:
+								blissSetcooldown("SpeedStorm::%uuid of player%", toMilliseconds(2, 30), player)
+							send "<##FEFD17>🔮 <##B8FFFB>You have used group &f🌩<##FEFD17>speed storm <##B8FFFB>skill &7(radius 4)" to player
+							set {_loc} to location of target entity of player
+							execute console command "attribute %player% minecraft:attack_speed base set 6"
+							set {_num} to 1
+							loop 6 times:
+								SpeedCircleEXP({_num},{_loc})
+								add 0.5 to {_num}
+								wait 1 tick
+							SpeedCirclelastEXP({_num},{_loc})
+							loop all players within 4 blocks of {_loc}:
+								if IsTrusted(player, loop-player) is true:
+									execute console command "attribute %loop-player% minecraft:attack_speed base set 6"
+								
+							wait 30 seconds
+							loop all players:
+								if {-SpeedStorm::%loop-player's uuid%} is not true:
+									execute console command "attribute %loop-player% minecraft:attack_speed base set 4"
+						
+						else:
+							set {_pt} to getActionBarCooldown("SpeedStorm::%uuid of player%")
+							send "<##FEFD17>🔮 <##FFADAD>Your &f🌩<##FEFD17>Speedy Storm <##FFADAD>skill is on cooldown for <##FEFD17>%{_pt}%" to player
+					
+				else:
+					send "<##FEFD17>🔺 <##FD8988>You need tier 2 gem to cast this skill!" to player
+	
+
+
+on death:
+	if {-Blurring} is set:
+		if attacker is not set:
+			if {-Blurring::%victim's uuid%} is set:
+				if victim is not invisible:
+					if {-Blurring} is not invisible:
+						set death message to "%victim% couldn't keep up with %{-Blurring}%"
+					else:
+						set death message to "%victim% couldn't keep up with &k???"
+				else:
+					if {-Blurring} is not invisible:
+						set death message to "&k??? &fcouldn't keep up with %{-Blurring}%"
+					else:
+						set death message to "&k??? &fcouldn't keep up with &k???"
+
+#Made by HyperDondon, his team, and contributors
+#https://discord.gg/Z4EQbkBD
+#https://hypercoding.vip

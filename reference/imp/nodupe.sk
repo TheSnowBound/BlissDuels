@@ -1,0 +1,270 @@
+import:
+	java.time.Duration
+	java.lang.System
+	org.bukkit.Particle
+	java.lang.String
+	org.bukkit.inventory.PlayerInventory
+	org.bukkit.Bukkit
+	org.bukkit.event.player.PlayerInteractEntityEvent
+	org.bukkit.event.player.PlayerInteractEvent
+	org.bukkit.inventory.EquipmentSlot
+	org.bukkit.event.inventory.InventoryClickEvent
+	org.bukkit.Material
+
+on right click:
+	if {-trading::%player's uuid%} is true:
+		cancel event
+
+on inventory click:
+	if player's open inventory = event-inventory:
+		if any:
+			click action is lmb
+			click action is rmb
+		then:
+			if IsGem(player's cursor slot) is true:
+				cancel event
+		if click action is swap offhand:
+			if IsGem(player's offhand item) is true:
+				cancel event
+		if click action is number key:
+			if IsGem(player's inventory.getItem(event.getHotbarButton())) is true:
+				cancel event
+	if event-inventory = player's inventory:
+		if any:
+			click action is shift+lmb
+			click action is shift+rmb
+		then:
+			if IsGem(event-item) is true:
+				cancel event
+
+on InventoryClickEvent:
+	set {_clicked} to event.getCurrentItem()
+	set {_cursor} to event.getCursor()
+
+	if "%event.getCurrentItem()%" contains "bundle":
+		if IsGem({_cursor}) is true:
+			cancel event
+
+on InventoryClickEvent:
+	set {_clicked} to event.getCurrentItem()
+	set {_cursor} to event.getCursor()
+
+	if "%event.getCursor()%" contains "bundle":
+		if IsGem({_clicked}) is true:
+			cancel event
+
+function noextraGems(p: player):
+	loop all items in {_p}'s inventory where [IsGem(input) is true]:
+		if {_gem} is set:
+			set loop-item to air
+			continue
+		set {_gem} to loop-item
+
+every 5 seconds:
+	{-Options::MultipleGems} is false
+	loop all players:
+		noextraGems(loop-player)
+
+on inventory drag:
+	set {_slots::*} to event.getRawSlots()
+	loop {_slots::*}:
+		set {_slot} to "%loop-value%"
+		replace all "[" with "" in {_slot}
+		replace all "]" with "" in {_slot}
+		set {_list::*} to split {_slot} at " "
+
+	loop {_list::*}:
+		set {_num} to loop-value parsed as integer
+		if player's open inventory = event.getView().getInventory({_num}):
+			if IsGem(past event-item) is true:
+				cancel event
+
+#on inventory click:
+#	IsGem(event-item) is true
+#	cursor slot of player is not air
+#	set {_filled} to true
+#	loop 35 times:
+#		if slot (loop-number) of player's inventory is air:
+#			set {_filled} to false
+#			stop loop
+#	if {_filled} is true:
+#		cancel event
+
+on inventory click:
+	IsGem(event-item) is true
+	cursor slot of player is not air
+	if player can't hold 1 water bucket:
+		cancel event
+
+on pickup arrow:
+	set {_filled} to true
+	loop 35 times:
+		if slot (loop-number) of player's inventory is air:
+			set {_filled} to false
+			stop loop
+	if {_filled} is true:
+		cancel event
+
+
+on pickup:
+	IsGem(player's cursor slot) is true
+	cancel event
+
+
+#on pickup:
+#	IsGem(player's offhand item) is true
+#	set {_cancel} to true
+#	loop all items in player's inventory:
+#		loop-item is not air
+#		set {_i} to loop-item
+#		{_i}.setAmount(event-item.getAmount())
+#		event-item is {_i}
+#		({_i}.getMaxStackSize() - {_i}.getAmount()) >= event-item.getAmount()
+#		delete {_cancel}
+#
+#	{_cancel} is set
+#	cancel event
+
+#on pickup:
+#	IsGem(player's held item) is true
+#	set {_cancel} to true
+#	loop all items in player's inventory:
+#		loop-item is not air
+#		set {_i} to loop-item
+#		{_i}.setAmount(event-item.getAmount())
+#		event-item is {_i}
+#		({_i}.getMaxStackSize() - {_i}.getAmount()) >= event-item.getAmount()
+#		delete {_cancel}
+#
+#	{_cancel} is set
+#	cancel event
+
+#on inventory click:
+#	IsGem(player's offhand item) is true
+#	set {_cancel} to true
+#	loop all items in player's inventory:
+#		loop-item is not air
+#		set {_i} to loop-item
+#		{_i}.setAmount(event-item.getAmount())
+#		event-item is {_i}
+#		({_i}.getMaxStackSize() - {_i}.getAmount()) >= event-item.getAmount()
+#		delete {_cancel}
+#
+#	{_cancel} is set
+#	cancel event
+
+on drop:
+	if IsGem(event-item) is true:
+		cancel event
+
+
+on PlayerInteractEntityEvent:
+	event.getRightClicked() is an item frame
+	if event.getHand() is EquipmentSlot.HAND:
+		IsGem(event.getPlayer()'s held item) is true
+		event.setCancelled(true)
+
+	if event.getHand() is EquipmentSlot.OFF_HAND:
+		IsGem(event.getPlayer()'s off hand item) is true
+		event.setCancelled(true)
+
+
+on PlayerInteractEntityEvent:
+	event.getRightClicked() is an allay
+	if event.getHand() is EquipmentSlot.HAND:
+		IsGem(event.getPlayer()'s held item) is true
+		event.setCancelled(true)
+
+	if event.getHand() is EquipmentSlot.OFF_HAND:
+		IsGem(event.getPlayer()'s off hand item) is true
+		event.setCancelled(true)
+
+on PlayerInteractEvent:
+	event.getClickedBlock() is a decorated pot
+	if event.getHand() is EquipmentSlot.HAND:
+		IsGem(event.getPlayer()'s held item) is true
+		event.setCancelled(true)
+
+	if event.getHand() is EquipmentSlot.OFF_HAND:
+		IsGem(event.getPlayer()'s off hand item) is true
+		event.setCancelled(true)
+
+
+# DRAGON EGG AND MACE
+
+on inventory drag:
+	set {_slots::*} to event.getRawSlots()
+	loop {_slots::*}:
+		set {_slot} to "%loop-value%"
+		replace all "[" with "" in {_slot}
+		replace all "]" with "" in {_slot}
+		set {_list::*} to split {_slot} at ", "
+
+	loop {_list::*}:
+		set {_num} to loop-value parsed as integer
+		if player's open inventory = event.getView().getInventory({_num}):
+			if past event-item is a dragon egg or a mace:
+				cancel event
+
+on inventory click:
+	if player's open inventory = event-inventory:
+		if any:
+			click action is lmb
+			click action is rmb
+		then:
+			if player's cursor slot is a dragon egg or a mace:
+				cancel event
+		if click action is swap offhand:
+			if player's offhand item is a mace or a dragon egg:
+				cancel event
+		if click action is number key:
+			if player's inventory.getItem(event.getHotbarButton()) is a dragon egg or a mace:
+				cancel event
+	if event-inventory = player's inventory:
+		if any:
+			click action is shift+lmb
+			click action is shift+rmb
+		then:
+			if event-item is a mace or a dragon egg:
+				cancel event
+
+
+on inventory click:
+	if any:
+		click action is lmb
+		click action is rmb
+	then:
+		if any:
+			"%cursor slot of player%" contains "bundle"
+			IsGem(cursor slot of player) is true
+		then:
+			if any:
+				"%event-item%" contains "bundle"
+				IsGem(event-item) is true
+			then:
+				cancel event
+	
+
+
+on inventory click:
+	if {Prog1} is true:
+		if player's open inventory = event-inventory:
+			if any:
+				click action is lmb
+				click action is rmb
+			then:
+				if player's cursor slot is obsidian:
+					cancel event
+			if click action is swap offhand:
+				if player's offhand item is obsidian:
+					cancel event
+			if click action is number key:
+				if player's inventory.getItem(event.getHotbarButton()) is obsidian:
+					cancel event
+		if event-inventory = player's inventory:
+			if any:
+				click action is shift+lmb
+				click action is shift+rmb
+			then:
+				if event-item is obsidian:
+					cancel event

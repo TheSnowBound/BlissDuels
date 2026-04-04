@@ -1,0 +1,43 @@
+
+function domeparticles(origin: location, h: number, r: number):
+	dustparticlering2({_origin}, 160, 31, 255, 7.0, 1.0)
+	dustparticlering2({_origin}, 160, 31, 255, 6.0, 2)
+	dustparticlering2({_origin}, 160, 31, 255, 5.0, 3)
+	dustparticlering2({_origin}, 160, 31, 255, 4.0, 4)
+	dustparticlering2({_origin}, 160, 31, 255, 3.0, 5)
+	dustparticlering2({_origin}, 160, 31, 255, 2.0, 6)
+	dustparticlering2({_origin}, 160, 31, 255, 1.0, 7)
+
+
+
+# Helper functions
+#2
+function dustparticlering2(pl: location, r: number, g: number, b: number, h: number, radius: number):
+	loop all players:
+		if {particlelvl::%loop-player's uuid%} is "default":
+			set {_spacing} to 0.3
+			set {_circumference} to 2 * pi * {_radius}
+			set {_numParticles} to floor({_circumference} / {_spacing})
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_radius}, yaw {_angle} and pitch 0
+				draw 1 of dust using dustOption(rgb({_r}, {_g}, {_b}), 1.3) at location {_h} meter above {_pl} ~ {_v} for loop-player
+		
+		if {particlelvl::%loop-player's uuid%} is "less":
+			set {_spacing} to 0.5
+			set {_circumference} to 2 * pi * {_radius}
+			set {_numParticles} to floor({_circumference} / {_spacing})
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_radius}, yaw {_angle} and pitch 0
+				draw 1 of dust using dustOption(rgb({_r}, {_g}, {_b}), 1) at location {_h} meter above {_pl} ~ {_v} for loop-player
+		
+		if {particlelvl::%loop-player's uuid%} is "none":
+			set {_spacing} to 0.7
+			set {_circumference} to 2 * pi * {_radius}
+			set {_numParticles} to floor({_circumference} / {_spacing})
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_radius}, yaw {_angle} and pitch 0
+				draw 1 of dust using dustOption(rgb({_r}, {_g}, {_b}), 1) at location {_h} meter above {_pl} ~ {_v} for loop-player
+				

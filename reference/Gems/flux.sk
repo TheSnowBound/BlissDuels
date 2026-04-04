@@ -1,0 +1,1427 @@
+#[ <----- Flux Gem -----> ]
+
+every 2 seconds:
+	loop all players:
+		if getGem(loop-player's offhand item) is "flux":
+			if getEnergy(loop-player's offhand item) > 4:
+				if loop-player has potion slowness:
+					remove slowness from potion effects of loop-player
+				if loop-player has potion hunger:
+					remove hunger from potion effects of loop-player
+				if loop-player has potion effect weakness:
+					remove weakness from potion effects of loop-player
+
+		if getGem(loop-player's held item) is "flux":
+			if getEnergy(loop-player's held item) > 4:
+				if loop-player has potion slowness:
+					remove slowness from potion effects of loop-player
+				if loop-player has potion hunger:
+					remove hunger from potion effects of loop-player
+				if loop-player has potion effect weakness:
+					remove weakness from potion effects of loop-player
+
+
+					
+on shoot:
+	if isDisabled(shooter) is not true:
+		if getEnergy(shooter's offhand item) > 3:
+			if getGem(shooter's offhand item) is "flux":
+				if getEnergy(shooter's offhand item) > 2:
+					if getTier(shooter's offhand item) is 1:
+						if event-projectile is an arrow:
+							chance of 10%
+							set {-fluxShot1::%shooter's uuid%} to true
+							set {-fluxShot::%event-projectile%} to true
+					else if getTier(shooter's offhand item) is 2:
+						if event-projectile is an arrow:
+							chance of 20%
+							set {-fluxShot1::%shooter's uuid%} to true
+							set {-fluxShot::%event-projectile%} to true
+
+
+on projectile hit:
+	if event-projectile is an arrow:
+		set {-fluxShot::%event-projectile%} to false
+
+on shoot:
+	if isDisabled(shooter) is not true:
+		if getGem(shooter's offhand item) is "flux":
+			if event-projectile is an arrow:
+				loop 100 times:
+					wait 1 tick
+					if {-fluxShot::%event-projectile%} is true:
+						draw 1 of dust using dustOption(rgb(94, 215, 255), 2) at location of event-projectile with extra 0.000000001 with force
+					else:
+						stop loop
+
+
+
+on damage:
+	if isDisabled(attacker) is not true:
+		if event-projectile is an arrow:
+			if {-fluxShot1::%attacker's uuid%} is true:
+				strike lightning effect at victim's location
+				play sound "block.beacon.activate" with volume 10 at victim
+				set victim's health to victim's health - 0.5
+				Stun(victim, 2)
+				set {-fluxShot::%event-projectile%} to false
+				set {-fluxShot1::%attacker's uuid%} to false
+
+
+
+on damage:
+	if isDisabled(attacker) is not true:
+		set {-fluxMoved::%victim's uuid%} to 0
+		set {-fluxDamaged::%victim's uuid%} to 0
+		set the victim's walk speed to 0.2
+		if getGem(attacker's offhand item) is "flux":
+			if getEnergy(attacker's offhand item) > 1:
+				set {-fluxDamagedTimer::%attacker's uuid%} to 3
+				add 1 to {-fluxDamaged::%attacker's uuid%}
+				
+				if {-fluxDamaged::%attacker's uuid%} is between 0 and 3:
+					add 0.8 to damage
+						
+				if {-fluxDamaged::%attacker's uuid%} is between 3 and 6:
+					add 0.9 to damage
+						
+				if {-fluxDamaged::%attacker's uuid%} is between 6 and 9:
+					add 1 to damage
+					
+				if {-fluxDamaged::%attacker's uuid%} is between 9 and 12:
+					add 1.1 to damage
+						
+				if {-fluxDamaged::%attacker's uuid%} is between 12 and 15:
+					add 1.2 to damage
+						
+				if {-fluxDamaged::%attacker's uuid%} is between 15 and 15:
+					add 1.5 to damage
+			
+
+on break:
+	if isDisabled(player) is not true:
+		if getGem(player's offhand item) is "flux":
+			if getEnergy(player's offhand item) > 1:
+				set {-fluxBrokenTimer::%player's uuid%} to 3
+				add 1 to {-fluxBroken::%player's uuid%}
+
+on player move:
+	if isDisabled(player) is not true:
+		if getGem(player's offhand item) is "flux":
+			if getEnergy(player's offhand item) > 1:
+				set {-fluxMovedTimer::%player's uuid%} to 3
+				add 0.5 to {-fluxMoved::%player's uuid%}
+				
+				if {-fluxMoved::%player's uuid%} is between 0 and 100:
+					set the player's walk speed to 0.2
+					
+				else if {-fluxMoved::%player's uuid%} is between 100 and 200:
+					set the player's walk speed to 0.22
+					if {-fluxSpeed1::%player's uuid%} is not true:
+						send "&7Now moving at +10%% speed!" to player
+						set {-fluxSpeed1::%player's uuid%} to true
+						
+				else if {-fluxMoved::%player's uuid%} is between 200 and 300:
+					set the player's walk speed to 0.24
+					if {-fluxSpeed2::%player's uuid%} is not true:
+						send "&7Now moving at +20%% speed!" to player
+						set {-fluxSpeed2::%player's uuid%} to true
+						
+				else if {-fluxMoved::%player's uuid%} is between 300 and 400:
+					set the player's walk speed to 0.26
+					if {-fluxSpeed3::%player's uuid%} is not true:
+						send "&7Now moving at +30%% speed!" to player
+						set {-fluxSpeed3::%player's uuid%} to true
+						
+				else if {-fluxMoved::%player's uuid%} is between 400 and 500:
+					set the player's walk speed to 0.28
+					if {-fluxSpeed4::%player's uuid%} is not true:
+						send "&7Now moving at +40%% speed!" to player
+						set {-fluxSpeed4::%player's uuid%} to true
+						
+				else if {-fluxMoved::%player's uuid%} is between 500 and 600:
+					set the player's walk speed to 0.3
+					if {-fluxSpeed5::%player's uuid%} is not true:
+						send "&7Now moving at +50%% speed!" to player
+						set {-fluxSpeed5::%player's uuid%} to true
+						
+				else if {-fluxMoved::%player's uuid%} is between 600 and 700:
+					set the player's walk speed to 0.32
+					if {-fluxSpeed6::%player's uuid%} is not true:
+						send "&7Now moving at +60%% speed!" to player
+						set {-fluxSpeed6::%player's uuid%} to true
+						
+				else if {-fluxMoved::%player's uuid%} is between 700 and 800:
+					set the player's walk speed to 0.34
+					if {-fluxSpeed7::%player's uuid%} is not true:
+						send "&7Now moving at +70%% speed!" to player
+						set {-fluxSpeed7::%player's uuid%} to true
+						
+				else if {-fluxMoved::%player's uuid%} is between 800 and 900:
+					set the player's walk speed to 0.36
+					if {-fluxSpeed8::%player's uuid%} is not true:
+						send "&7Now moving at +80%% speed!" to player
+						set {-fluxSpeed8::%player's uuid%} to true
+						
+				else if {-fluxMoved::%player's uuid%} is between 900 and 1000:
+					set the player's walk speed to 0.38
+					if {-fluxSpeed9::%player's uuid%} is not true:
+						send "&7Now moving at +90%% speed!" to player
+						set {-fluxSpeed9::%player's uuid%} to true
+						
+				else if {-fluxMoved::%player's uuid%} is between 1000 and 1100:
+					set the player's walk speed to 0.4
+					if {-fluxSpeed10::%player's uuid%} is not true:
+						send "&7Now moving at +100%% speed!" to player
+						set {-fluxSpeed10::%player's uuid%} to true
+
+				else if {-fluxMoved::%player's uuid%} is between 1100 and 1200:
+					set the player's walk speed to 0.42
+					if {-fluxSpeed11::%player's uuid%} is not true:
+						send "&7Now moving at +110%% speed!" to player
+						set {-fluxSpeed11::%player's uuid%} to true
+						
+				else if {-fluxMoved::%player's uuid%} is between 1200 and 1300:
+					set the player's walk speed to 0.44
+					if {-fluxSpeed12::%player's uuid%} is not true:
+						send "&7Now moving at +120%% speed!" to player
+						set {-fluxSpeed12::%player's uuid%} to true
+						
+				else if {-fluxMoved::%player's uuid%} is between 1300 and 1400:
+					set the player's walk speed to 0.46
+					if {-fluxSpeed13::%player's uuid%} is not true:
+						send "&7Now moving at +130%% speed!" to player
+						set {-fluxSpeed13::%player's uuid%} to true
+						
+				else if {-fluxMoved::%player's uuid%} is between 1400 and 1500:
+					set the player's walk speed to 0.48
+					if {-fluxSpeed14::%player's uuid%} is not true:
+						send "&7Now moving at +140%% speed!" to player
+						set {-fluxSpeed14::%player's uuid%} to true
+						
+				else if {-fluxMoved::%player's uuid%} is between 1500 and 1600:
+					set the player's walk speed to 0.5
+					if {-fluxSpeed15::%player's uuid%} is not true:
+						send "&7Now moving at +150%% speed!" to player
+						set {-fluxSpeed15::%player's uuid%} to true
+						
+				else if {-fluxMoved::%player's uuid%} is between 1600 and 1700:
+					set the player's walk speed to 0.52
+					if {-fluxSpeed16::%player's uuid%} is not true:
+						send "&7Now moving at +160%% speed!" to player
+						set {-fluxSpeed16::%player's uuid%} to true
+						
+				else if {-fluxMoved::%player's uuid%} is between 1700 and 1800:
+					set the player's walk speed to 0.54
+					if {-fluxSpeed17::%player's uuid%} is not true:
+						send "&7Now moving at +170%% speed!" to player
+						set {-fluxSpeed17::%player's uuid%} to true
+						
+				else if {-fluxMoved::%player's uuid%} is between 1800 and 1900:
+					set the player's walk speed to 0.56
+					if {-fluxSpeed18::%player's uuid%} is not true:
+						send "&7Now moving at +180%% speed!" to player
+						set {-fluxSpeed18::%player's uuid%} to true
+						
+				else if {-fluxMoved::%player's uuid%} is between 1900 and 2000:
+					set the player's walk speed to 0.58
+					if {-fluxSpeed19::%player's uuid%} is not true:
+						send "&7Now moving at +190%% speed!" to player
+						set {-fluxSpeed19::%player's uuid%} to true
+						
+				else if {-fluxMoved::%player's uuid%} is between 2000 and 2100:
+					set the player's walk speed to 0.6
+					if {-fluxSpeed20::%player's uuid%} is not true:
+						send "&7Now moving at +200%% speed!" to player
+						set {-fluxSpeed20::%player's uuid%} to true
+						
+		else:
+			set {-fluxMoved::%player's uuid%} to 0
+			set the player's walk speed to 0.2
+			set {-fluxSpeed1::%player's uuid%} to false
+			set {-fluxSpeed2::%player's uuid%} to false
+			set {-fluxSpeed3::%player's uuid%} to false
+			set {-fluxSpeed4::%player's uuid%} to false
+			set {-fluxSpeed5::%player's uuid%} to false
+			set {-fluxSpeed6::%player's uuid%} to false
+			set {-fluxSpeed7::%player's uuid%} to false
+			set {-fluxSpeed8::%player's uuid%} to false
+			set {-fluxSpeed9::%player's uuid%} to false
+			set {-fluxSpeed10::%player's uuid%} to false
+
+			set {-fluxSpeed11::%player's uuid%} to false
+			set {-fluxSpeed12::%player's uuid%} to false
+			set {-fluxSpeed13::%player's uuid%} to false
+			set {-fluxSpeed14::%player's uuid%} to false
+			set {-fluxSpeed15::%player's uuid%} to false
+			set {-fluxSpeed16::%player's uuid%} to false
+			set {-fluxSpeed17::%player's uuid%} to false
+			set {-fluxSpeed18::%player's uuid%} to false
+			set {-fluxSpeed19::%player's uuid%} to false
+			set {-fluxSpeed20::%player's uuid%} to false
+	
+on damage:
+	if isDisabled(victim) is not true:
+		if attacker is charged creeper:
+			if getTier(victim's offhand item) is 2:
+				if getGem(victim's offhand item) is "flux":
+					if getEnergy(victim's offhand item) > 4:
+						cancel event
+
+			if getTier(victim's held item) is 2:
+				if getGem(victim's held item) is "flux":
+					if getEnergy(victim's held item) > 4:
+						cancel event
+
+every 0.5 second:
+	loop all players:
+	
+		if {-fluxBrokenTimer::%loop-player's uuid%} > 0:
+			remove 1 from {-fluxBrokenTimer::%loop-player's uuid%}
+		if {-fluxBrokenTimer::%loop-player's uuid%} is 0:
+			set {-fluxBroken::%loop-player's uuid%} to 0
+			
+		if {-fluxDamagedTimer::%loop-player's uuid%} > 0:
+			remove 1 from {-fluxDamagedTimer::%loop-player's uuid%}
+		if {-fluxDamagedTimer::%loop-player's uuid%} is 0:
+			set {-fluxDamaged::%loop-player's uuid%} to 0
+			
+		if {-fluxMovedTimer::%loop-player's uuid%} > 0:
+			remove 1 from {-fluxMovedTimer::%loop-player's uuid%}
+		if {-fluxMovedTimer::%loop-player's uuid%} is 0:
+			set {-fluxMoved::%loop-player's uuid%} to 0
+			set {-fluxSpeed1::%loop-player's uuid%} to false
+			set {-fluxSpeed2::%loop-player's uuid%} to false
+			set {-fluxSpeed3::%loop-player's uuid%} to false
+			set {-fluxSpeed4::%loop-player's uuid%} to false
+			set {-fluxSpeed5::%loop-player's uuid%} to false
+			set {-fluxSpeed6::%loop-player's uuid%} to false
+			set {-fluxSpeed7::%loop-player's uuid%} to false
+			set {-fluxSpeed8::%loop-player's uuid%} to false
+			set {-fluxSpeed9::%loop-player's uuid%} to false
+			set {-fluxSpeed10::%loop-player's uuid%} to false
+			
+every 1 second:
+	loop all players:
+		if isDisabled(loop-player) is not true:
+			if {-fluxBroken::%loop-player's uuid%} > 5:
+				apply haste 1 without particles to loop-player for 2 seconds replacing the existing effect
+			if {-fluxBroken::%loop-player's uuid%} > 10:
+				apply haste 2 without particles to loop-player for 2 seconds replacing the existing effect
+			if {-fluxBroken::%loop-player's uuid%} > 15:
+				apply haste 3 without particles to loop-player for 2 seconds replacing the existing effect
+			if {-fluxBroken::%loop-player's uuid%} > 20:
+				apply haste 4 without particles to loop-player for 2 seconds replacing the existing effect
+			if {-fluxBroken::%loop-player's uuid%} > 25:
+				apply haste 5 without particles to loop-player for 2 seconds replacing the existing effect
+			if {-fluxBroken::%loop-player's uuid%} > 30:
+				apply haste 6 without particles to loop-player for 2 seconds replacing the existing effect
+			if {-fluxBroken::%loop-player's uuid%} > 35:
+				apply haste 7 without particles to loop-player for 2 seconds replacing the existing effect
+			if {-fluxBroken::%loop-player's uuid%} > 40:
+				apply haste 8 without particles to loop-player for 2 seconds replacing the existing effect
+			if {-fluxBroken::%loop-player's uuid%} > 45:
+				apply haste 9 without particles to loop-player for 2 seconds replacing the existing effect
+			if {-fluxBroken::%loop-player's uuid%} > 50:
+				apply haste 10 without particles to loop-player for 2 seconds replacing the existing effect
+
+
+
+
+import:
+	java.time.Duration
+	java.lang.System
+	org.bukkit.Particle
+	java.lang.String
+	org.bukkit.event.inventory.InventoryClickEvent
+	org.bukkit.inventory.PlayerInventory
+	org.bukkit.entity.Fireball
+	org.bukkit.util.Vector
+	org.bukkit.Location
+	org.bukkit.potion.PotionEffect
+	org.bukkit.potion.PotionEffectType
+	org.bukkit.Material
+	org.bukkit.block.data.BlockData
+	org.bukkit.block.Block
+	org.bukkit.block.data.Waterlogged
+	org.bukkit.event.world.GenericGameEvent
+	org.bukkit.Bukkit
+	com.hyperdondon.glowingEntitiesLib.GlowingEntitiesLib
+	org.bukkit.ChatColor
+
+
+
+
+on left click:
+	if isDisabled(player) is not true:
+		if getGem(player's held item) is "flux":
+			set {_uuid} to uuid of player
+			if getTier(player's held item) is 2:
+				if canUsePower("EnergyBeam::%player's uuid%") is true:
+					if {-player_dropping::%player%} is not set:
+						if {-invdropping::%player%} is not true:
+							if getEnergy(player's held item) is 1:
+								blissSetcooldown("EnergyBeam::%uuid of player%", toMilliseconds(0, 50), player)
+							if getEnergy(player's held item) is 2:
+								blissSetcooldown("EnergyBeam::%uuid of player%", toMilliseconds(0, 45), player)
+							if getEnergy(player's held item) is 3:
+								blissSetcooldown("EnergyBeam::%uuid of player%", toMilliseconds(0, 40), player)
+							if getEnergy(player's held item) is 4:
+								blissSetcooldown("EnergyBeam::%uuid of player%", toMilliseconds(0, 35), player)
+							if getEnergy(player's held item) > 4:
+								blissSetcooldown("EnergyBeam::%uuid of player%", toMilliseconds(0, 30), player)
+							set {-fluxCharging::%player's uuid%} to false
+							set {-fluxchargeHidden::%player's uuid%} to 0
+							set {-fluxOvercharging::%player's uuid%} to false
+							set {-fluxtrueOvercharging::%player's uuid%} to false
+							set {fluxKineticDMG::%player's uuid%} to {fluxKinetic::%player's uuid%}
+							set {-dura} to {fluxKineticDMG::%player's uuid%} + 44
+							set {-fluxKiller} to player
+							wait 1 tick
+							if {fluxKinetic::%player's uuid%} is 0 or Format(0):
+								set {_pl2} to location 1.6 above player
+								play sound "entity.zombie_villager.converted" with volume 20 at player
+								play sound "block.beacon.power_select" with volume 20 and pitch 1 at player
+								play sound "block.beacon.activate" with volume 20 and pitch 2 at player
+								play sound "block.respawn_anchor.deplete" with volume 20 and pitch 1 at player
+								play sound "block.respawn_anchor.set_spawn" with volume 20 and pitch 1 at player
+								play sound "entity.lightning_bolt.thunder" with volume 20 and pitch 0.8 at player
+								energyboom651({_pl2}, player)
+								loop 6 times:
+									energyboom6544844({_pl2})
+									wait 3 ticks
+							if {fluxKinetic::%player's uuid%} is between 0.01 and 5: 
+								set {fluxKinetic::%player's uuid%} to 0
+								play sound "item.axe.scrape" with volume 20 and pitch 0.5 at player
+								wait 0.7 seconds
+								set {_pl} to location 3 meters infront and 1.6 above player
+								set {_pl2} to location 1 meters infront and 1.6 above player
+								play sound "block.beacon.ambient" with volume 50 and pitch 1.6 at player
+								play sound "entity.warden.sonic_boom" with volume 20 and pitch 1 at player	
+								play sound "entity.generic.explode" with volume 20 and pitch 0.75 at player
+								energyboom659({_pl2}, player)
+								loop 6 times:
+									energyboom654444({_pl2})
+									wait 3 ticks
+							if {fluxKinetic::%player's uuid%} is 5:
+								set {fluxKinetic::%player's uuid%} to 0
+								play sound "item.axe.scrape" with volume 20 and pitch 0.5 at player
+								wait 0.7 seconds
+								set {_pl} to location 3 meters infront and 1.6 above player
+								set {_pl2} to location 1 meters infront and 1.6 above player
+								play sound "block.beacon.ambient" with volume 50 and pitch 1.6 at player
+								play sound "entity.warden.sonic_boom" with volume 20 and pitch 1 at player	
+								play sound "entity.generic.explode" with volume 20 and pitch 0.75 at player
+								energyboom65444({_pl2}, player)
+								loop 6 times:
+									energyboom654444({_pl2})
+									wait 3 ticks
+							if {fluxKinetic::%player's uuid%} is between 5 and 11:
+								set {fluxKinetic::%player's uuid%} to 0
+								play sound "item.axe.scrape" with volume 20 and pitch 0.5 at player
+								wait 0.7 seconds
+								set {_pl} to location 3 meters infront and 1.6 above player
+								set {_pl2} to location 1 meters infront and 1.6 above player
+								play sound "block.beacon.ambient" with volume 50 and pitch 1.6 at player
+								play sound "entity.warden.sonic_boom" with volume 20 and pitch 1 at player	
+								play sound "entity.generic.explode" with volume 20 and pitch 0.75 at player
+								energyboom654({_pl2}, player)
+								loop 6 times:
+									energyboom6544({_pl2})
+									wait 3 ticks
+
+							if {fluxKinetic::%player's uuid%} is between 11 and 20:
+								set {fluxKinetic::%player's uuid%} to 0
+								play sound "item.axe.scrape" with volume 20 and pitch 0.5 at player
+								wait 0.7 seconds
+								set {_pl} to location 3 meters infront and 1.6 above player
+								set {_pl2} to location 1 meters infront and 1.6 above player
+								play sound "block.beacon.ambient" with volume 50 and pitch 1.6 at player
+								play sound "entity.warden.sonic_boom" with volume 20 and pitch 1 at player	
+								play sound "entity.generic.explode" with volume 20 and pitch 0.75 at player
+								energyboom607({_pl2}, player)
+								loop 5 times:
+									energyboom6077({_pl2})
+									wait 5 ticks
+
+							if {fluxKinetic::%player's uuid%} is between 20 and 41:
+								set {fluxKinetic::%player's uuid%} to 0
+								play sound "item.axe.scrape" with volume 20 and pitch 0.5 at player
+								wait 0.7 seconds
+								set {_pl} to location 3 meters infront and 1.6 above player
+								set {_pl2} to location 1 meters infront and 1.6 above player
+								play sound "block.beacon.ambient" with volume 50 and pitch 1.6 at player
+								play sound "entity.warden.sonic_boom" with volume 20 and pitch 1 at player	
+								play sound "entity.generic.explode" with volume 20 and pitch 0.75 at player
+								energyboom609999({_pl2}, player)
+								loop 8 times:		  
+									energyboom60999({_pl2})
+									wait 3 ticks
+
+							if {fluxKinetic::%player's uuid%} is between 41 and 56:
+								set {fluxKinetic::%player's uuid%} to 0
+								play sound "item.axe.scrape" with volume 20 and pitch 0.5 at player
+								wait 0.25 seconds
+								play sound "item.axe.scrape" with volume 20 and pitch 0.5 at player
+								wait 0.7 seconds
+								set {_pl} to location 3 meters infront and 1.6 above player
+								set {_pl2} to location 1 meters infront and 1.6 above player
+								play sound "block.beacon.ambient" with volume 50 and pitch 1.6 at player
+								play sound "entity.warden.sonic_boom" with volume 20 and pitch 1 at player	
+								play sound "entity.generic.explode" with volume 20 and pitch 0.75 at player
+								energyboom609({_pl2}, player)
+								loop 8 times:		  
+									energyboom6099({_pl2})
+									wait 3 ticks
+
+							if {fluxKinetic::%player's uuid%} is between 56 and 65:
+								set {fluxKinetic::%player's uuid%} to 0
+								play sound "item.axe.scrape" with volume 20 and pitch 0.5 at player
+								wait 0.25 seconds
+								play sound "item.axe.scrape" with volume 20 and pitch 0.5 at player
+								wait 0.7 seconds
+								play sound "block.beacon.ambient" with volume 50 and pitch 1.6 at player
+								play sound "entity.warden.sonic_boom" with volume 20 and pitch 1 at player	
+								play sound "entity.generic.explode" with volume 20 and pitch 0.75 at player
+								play sound "entity.lightning_bolt.thunder" with volume 20 and pitch 0.8 at player
+								set {fluxShootingBeam.%player's uuid%} to true
+								set {_pl} to location 3 meters infront and 1.6 above player
+								set {_pl2} to location 1 meters infront and 1.6 above player
+								set {_pl3} to location 2 meters infront and 1.6 above and 3 right of player
+								energyboom314dmg({_pl2}, player)
+								energyboom314({_pl2}, player)
+								energyboom315({_pl2})
+								energyboom316({_pl2}, player)
+								energyboom1002({_pl2}, player)
+								wait 0.8 seconds
+								energyboom314({_pl2}, player)
+								energyboom315({_pl2})
+								energyboom317({_pl2}, player)
+								energyboom1002({_pl2}, player)
+								wait 0.2 seconds
+								play sound "block.beacon.ambient" with volume 50 and pitch 1.6 at player
+								wait 0.7 seconds
+								energyboom314({_pl2}, player)
+								energyboom315({_pl2})
+								energyboom318({_pl2}, player)
+								energyboom1002({_pl2}, player)
+								wait 0.2 seconds
+								set {fluxShootingBeam.%player's uuid%} to false
+
+							if {fluxKinetic::%player's uuid%} is between 65 and 76:
+								set {fluxKinetic::%player's uuid%} to 0
+								play sound "entity.warden.sonic_charge" with volume 10 and pitch 1 at player
+								play sound "item.axe.scrape" with volume 20 and pitch 0.5 at player
+								wait 0.21 seconds
+								play sound "item.axe.scrape" with volume 20 and pitch 0.5 at player
+								wait 0.21 seconds
+								play sound "item.axe.scrape" with volume 20 and pitch 0.5 at player
+								wait 1.3 seconds
+								play sound "block.amethyst_block.break" with volume 20 and pitch 1.2 at player
+								set {_pl} to location 3 meters infront and 1.6 above player
+								set {_pl2} to location 1 meters infront and 1.6 above player
+								energyboom314dmg({_pl2}, player)
+								energyboom314({_pl2}, player)
+								energyboom315({_pl2})
+								energyboom1002({_pl2}, player)
+								energyboom500({_pl2}, player)
+								wait 0.5 seconds
+								play sound "block.beacon.ambient" with volume 50 and pitch 1.6 at player
+								play sound "entity.warden.sonic_boom" with volume 20 and pitch 1 at player	
+								play sound "entity.generic.explode" with volume 20 and pitch 0.75 at player
+								play sound "entity.lightning_bolt.thunder" with volume 20 and pitch 0.8 at player
+								set {fluxShootingBeam.%player's uuid%} to true
+								energyboom314({_pl2}, player)
+								energyboom315({_pl2})
+								energyboom1002({_pl2}, player)
+								wait 0.8 seconds
+								energyboom314({_pl2}, player)
+								energyboom315({_pl2})
+								energyboom1002({_pl2}, player)
+								wait 0.2 seconds
+								play sound "block.beacon.ambient" with volume 50 and pitch 1.6 at player
+								wait 0.7 seconds
+								energyboom314({_pl2}, player)
+								energyboom315({_pl2})
+								energyboom500({_pl2}, player)
+								energyboom1002({_pl2}, player)
+								wait 0.2 seconds
+								set {fluxShootingBeam.%player's uuid%} to false
+
+							if {fluxKinetic::%player's uuid%} is between 76 and 85:
+								set {fluxKinetic::%player's uuid%} to 0
+								play sound "entity.warden.sonic_charge" with volume 10 and pitch 1 at player
+								play sound "item.axe.scrape" with volume 20 and pitch 0.5 at player
+								wait 0.21 seconds
+								play sound "item.axe.scrape" with volume 20 and pitch 0.5 at player
+								wait 0.21 seconds
+								play sound "item.axe.scrape" with volume 20 and pitch 0.5 at player
+								wait 1.3 seconds
+								play sound "block.amethyst_block.break" with volume 20 and pitch 1.2 at player
+								set {_pl} to location 3 meters infront and 1.6 above player
+								set {_pl2} to location 1 meters infront and 1.6 above player
+								energyboom3144dmg({_pl2}, player)
+								energyboom3144({_pl2}, player)
+								energyboom3155({_pl2})
+								energyboom1002({_pl2}, player)
+
+								wait 0.5 seconds
+								play sound "block.beacon.ambient" with volume 50 and pitch 1.6 at player
+								play sound "entity.warden.sonic_boom" with volume 20 and pitch 1 at player	
+								play sound "entity.generic.explode" with volume 20 and pitch 0.75 at player
+								play sound "entity.lightning_bolt.thunder" with volume 20 and pitch 0.8 at player
+								set {fluxShootingBeam.%player's uuid%} to true
+								energyboom3144({_pl2}, player)
+								energyboom3155({_pl2})
+								energyboom500({_pl2}, player)
+								energyboom503({_pl2}, player)
+								energyboom504({_pl2}, player)
+								energyboom1002({_pl2}, player)
+
+								wait 0.8 seconds
+								energyboom3144({_pl2}, player)
+								energyboom3155({_pl2})
+								energyboom501({_pl2}, player)
+								energyboom502({_pl2}, player)
+								energyboom1002({_pl2}, player)
+
+								wait 0.2 seconds
+								play sound "block.beacon.ambient" with volume 50 and pitch 1.6 at player
+
+								wait 0.7 seconds
+								energyboom3144({_pl2}, player)
+								energyboom3155({_pl2})
+								energyboom1002({_pl2}, player)
+
+								wait 0.4 seconds
+								play sound "block.beacon.ambient" with volume 50 and pitch 1.6 at player
+
+								wait 0.4 seconds
+								energyboom3144({_pl2}, player)
+								energyboom3155({_pl2})
+								energyboom1002({_pl2}, player)
+								wait 0.2 seconds
+								set {fluxShootingBeam.%player's uuid%} to false
+
+							if {fluxKinetic::%player's uuid%} is between 85 and 100.1:
+								set {fluxKinetic::%player's uuid%} to 0
+								play sound "entity.warden.sonic_charge" with volume 10 and pitch 1 at player
+								play sound "item.axe.scrape" with volume 20 and pitch 0.5 at player
+								wait 0.21 seconds
+								play sound "item.axe.scrape" with volume 20 and pitch 0.5 at player
+								wait 0.21 seconds
+								play sound "item.axe.scrape" with volume 20 and pitch 0.5 at player
+								wait 1.3 seconds
+								play sound "block.amethyst_block.break" with volume 20 and pitch 1.2 at player
+								set {_pl} to location 3 meters infront and 1.6 above player
+								set {_pl2} to location 2 meters infront and 1.6 above player
+								set {_pl3} to location 1.3 meters infront and 1.6 above player
+								energyboom31444dmg({_pl2}, player)
+								energyboom31444({_pl2}, player)
+								energyboom3155({_pl3})
+								energyboom1002({_pl2}, player)
+								energyboom505({_pl2}, player)
+
+								wait 0.5 seconds
+								play sound "block.beacon.ambient" with volume 50 and pitch 1.6 at player
+								play sound "entity.warden.sonic_boom" with volume 20 and pitch 1 at player	
+								play sound "entity.generic.explode" with volume 20 and pitch 0.75 at player
+								play sound "entity.lightning_bolt.thunder" with volume 20 and pitch 0.8 at player
+								set {fluxShootingBeam.%player's uuid%} to true
+								energyboom31444({_pl2}, player)
+								energyboom3155({_pl3})
+								energyboom1002({_pl2}, player)
+
+								wait 0.8 seconds
+								energyboom31444({_pl2}, player)
+								energyboom3155({_pl3})
+								energyboom505({_pl2}, player)
+								energyboom506({_pl2}, player)
+								energyboom507({_pl2}, player)
+								energyboom508({_pl2}, player)
+								energyboom509({_pl2}, player)
+								energyboom1002({_pl2}, player)
+
+								wait 0.2 seconds
+								play sound "block.beacon.ambient" with volume 50 and pitch 1.6 at player
+
+								wait 0.7 seconds
+								energyboom31444({_pl2}, player)
+								energyboom3155({_pl3})
+								energyboom1002({_pl2}, player)
+								energyboom505({_pl2}, player)
+								energyboom506({_pl2}, player)
+								energyboom507({_pl2}, player)
+
+								wait 0.4 seconds
+								play sound "block.beacon.ambient" with volume 50 and pitch 1.6 at player
+
+								wait 0.4 seconds
+								energyboom31444({_pl2}, player)
+								energyboom3155({_pl3})
+								energyboom1002({_pl2}, player)
+								energyboom508({_pl2}, player)
+								energyboom509({_pl2}, player)
+								wait 0.2 seconds
+								set {fluxShootingBeam.%player's uuid%} to false
+
+							if {fluxKinetic::%player's uuid%} is between 100.1 and 199.99:
+								set {_s} to 0.5
+								set {fluxKinetic::%player's uuid%} to 0
+								set {_energy} to getEnergy(player's held item) - 1
+								SetEnergy(player, {_energy})
+								loop 20 times:
+									add 0.5 to {_s}
+									FluxCircle({_s}, player)
+									wait 1 tick
+
+							if {fluxKinetic::%player's uuid%} is 200:
+								set {fluxShootingBeam.%player's uuid%} to true
+								set {fluxKinetic::%player's uuid%} to 0
+								play sound "entity.warden.sonic_charge" with volume 10 and pitch 1 at player
+								play sound "item.axe.scrape" with volume 20 and pitch 0.5 at player
+								wait 0.21 seconds
+								play sound "item.axe.scrape" with volume 20 and pitch 0.5 at player
+								wait 0.21 seconds
+								play sound "item.axe.scrape" with volume 20 and pitch 0.75 at player
+								wait 1.4 seconds
+								damage player by 0.001 hearts
+								set player's health to 0.1
+								play sound "block.amethyst_block.break" with volume 20 and pitch 1.2 at player
+								set {_pl} to location 3 meters infront and 1.6 above player
+								set {_pl2} to location 2 meters infront and 1.6 above player
+								energyboom313({_pl2}, player)
+								energyboom312({_pl}, player)
+								push player up at speed 2
+								push player backwards at speed 4
+								wait 0.5 seconds
+								energyboom313({_pl2}, player) # END ROD
+								energyboom312({_pl}, player) # DUST
+								energyboom1001({_pl2}, player) # WARDEN BEAM
+								energyboom513({_pl2}, player) # SWAVY END ROD 3
+								energyboom5132({_pl2}, player) # SWAVY END ROD 3
+								play sound "block.beacon.ambient" with volume 50 and pitch 1.6 at player
+								play sound "entity.warden.sonic_boom" with volume 20 and pitch 1 at player	
+								play sound "entity.generic.explode" with volume 20 and pitch 0.75 at player
+
+								wait 0.7 second
+								energyboom313({_pl2}, player)
+								energyboom312({_pl}, player)
+								energyboom1001({_pl2}, player)
+								energyboom510({_pl2}, player) # SWAVY END ROD 3
+								energyboom5102({_pl2}, player) # SWAVY END ROD 3
+								energyboom513({_pl2}, player) # SWAVY END ROD 3
+								energyboom5132({_pl2}, player) # SWAVY END ROD 3
+
+
+								wait 0.4 second
+								play sound "block.beacon.power_select" with volume 20 and pitch 1.6 at player
+								play sound "block.beacon.deactivate" with volume 20 and pitch 2 at player
+								play sound "block.beacon.ambient" with volume 50 and pitch 1.6 at player
+
+								wait 0.2 seconds
+								energyboom313({_pl2}, player)
+								energyboom312({_pl}, player)
+								energyboom1001({_pl2}, player)
+
+								energyboom510({_pl2}, player) # SWAVY END ROD 3
+								energyboom5102({_pl2}, player) # SWAVY END ROD 3
+								energyboom511({_pl2}, player) # SWAVY END ROD 3
+								energyboom5112({_pl2}, player) # SWAVY END ROD 3
+								energyboom513({_pl2}, player) # SWAVY END ROD 3
+								energyboom5132({_pl2}, player) # SWAVY END ROD 3
+
+
+								wait 0.7 seconds
+								energyboom313({_pl2}, player)
+								energyboom312({_pl}, player)
+								energyboom1001({_pl2}, player)
+								energyboom510({_pl2}, player) # SWAVY END ROD 
+								energyboom5102({_pl2}, player) # SWAVY END ROD 3
+								energyboom511({_pl2}, player) # SWAVY END ROD 3
+								energyboom5112({_pl2}, player) # SWAVY END ROD 3
+								energyboom513({_pl2}, player) # SWAVY END ROD 3
+								energyboom5132({_pl2}, player) # SWAVY END ROD 3
+								energyboom5132({_pl2}, player) # SWAVY END ROD 3
+
+								wait 0.2 seconds
+
+								play sound "block.beacon.power_select" with volume 20 and pitch 1.6 at player
+								play sound "block.beacon.deactivate" with volume 20 and pitch 2 at player
+								play sound "block.beacon.ambient" with volume 50 and pitch 1.6 at player
+
+								wait 0.4 seconds
+								energyboom313({_pl2}, player)
+								energyboom312({_pl}, player)
+								energyboom1001({_pl2}, player)
+								energyboom510({_pl2}, player) # SWAVY END ROD 3
+								energyboom5102({_pl2}, player) # SWAVY END ROD 3
+								energyboom511({_pl2}, player) # SWAVY END ROD 3
+								energyboom5112({_pl2}, player) # SWAVY END ROD 3
+								energyboom513({_pl2}, player) # SWAVY END ROD 3
+								energyboom5132({_pl2}, player) # SWAVY END ROD 3
+
+
+								wait 0.7 seconds
+								energyboom313({_pl2}, player)
+								energyboom312({_pl}, player)
+								energyboom1001({_pl2}, player)
+								energyboom510({_pl2}, player) # SWAVY END ROD 3
+								energyboom5102({_pl2}, player) # SWAVY END ROD 3
+								energyboom511({_pl2}, player) # SWAVY END ROD 3
+								energyboom5112({_pl2}, player) # SWAVY END ROD 3
+								energyboom513({_pl2}, player) # SWAVY END ROD 3
+								energyboom5132({_pl2}, player) # SWAVY END ROD 3
+								play sound "block.beacon.power_select" with volume 20 and pitch 1.6 at player
+								play sound "block.beacon.deactivate" with volume 20 and pitch 2 at player
+								play sound "block.beacon.ambient" with volume 50 and pitch 1.6 at player
+
+
+								wait 0.2 seconds
+								set {fluxShootingBeam.%player's uuid%} to false
+
+
+					else:
+						delete {-player_dropping::%player%}
+
+
+
+
+
+
+on inventory close:
+	if name of event-inventory is "&9Watt Deposit (%{-fluxcharge::%player's uuid%}% watts)":
+		loop all items in event-inventory:
+		# Diamond block
+			if loop-item is diamond block:
+				set {_wattdiablomount} to item amount of loop-item
+				set {_wattdiablodd} to {_wattdiablomount} * 17352
+				add {_wattdiablodd} to {-fluxcharge::%player's uuid%}
+				set {-fluxchargepercent::%player's uuid%} to {-fluxcharge::%player's uuid%} / 20000
+		set {-fluxchargepercent::%player's uuid%} to {-fluxcharge::%player's uuid%} / 20000
+		send "&f🔮 You now have %{-fluxcharge::%player's uuid%}% watts, up to %Format({-fluxchargepercent::%player's uuid%})%%% charge." to player
+		
+on inventory click:
+	if inventory action is drop one from slot:
+		if getGem(event-item) is "flux":
+			if getTier(event-item) is 2:
+				if getEnergy(event-item) is not 0:
+					set {-invdropping::%player%} to true
+					set {_FluxChargeGUI} to a new chest inventory with 3 row with name "&9Watt Deposit (%{-fluxcharge::%player's uuid%}% watts)"
+					open {_FluxChargeGUI} to player
+					wait 2 seconds
+					set {-invdropping::%player%} to false
+		
+on drop:
+	if getGem(event-item) is "flux":
+		if getTier(event-item) is 2:
+			if getEnergy(event-item) is not 0:
+				set {-player_dropping::%player%} to true
+				if {-fluxchargepercent::%player's uuid%} > 0:
+					if {-fluxCharging::%player's uuid%} is not true:
+						send "&aCharging started!" to player
+						set {-fluxCharging::%player's uuid%} to true
+						set {fluxDrop.%player's uuid%} to true
+						set {-fluxOvercharging::%player's uuid%} to false
+						wait 2 seconds
+						set {fluxDrop.%player's uuid%} to false
+					else:
+						send "&cCharging paused!" to player
+						set {-fluxCharging::%player's uuid%} to false
+				else:
+					send "&cYou don't have enough energy to charge!" to player
+
+command /startcharging:
+	trigger:
+		if {-fluxchargepercent::%player's uuid%} > 0:
+			send "&aCharging started!" to player
+			set {-fluxCharging::%player's uuid%} to true
+			set {-fluxOvercharging::%player's uuid%} to false
+		else:
+			send "&cYou don't have enough energy to charge!" to player
+
+command /watts:
+	trigger:
+		send "&f🔮 You now have %{fluxcharge.%player's uuid%}% watts, up to %Format({fluxchargepercent.%player's uuid%})%%% charge." to player
+
+command /hiddenwatts:
+	trigger:
+		send "<#03eaff>🔮 You now have %{fluxchargeHidden.%player's uuid%}% hidden watts, up to %Format({fluxchargepercent.%player's uuid%})%%% charge." to player
+
+command /maxwatts:
+	trigger:
+		set {fluxcharge.%player's uuid%} to 2000000
+		set {fluxchargepercent.%player's uuid%} to {fluxcharge.%player's uuid%} / 2000000 * 100
+
+command /resetwatts:
+	trigger:
+		set {fluxcharge.%player's uuid%} to 0
+		set {fluxchargepercent.%player's uuid%} to {fluxcharge.%player's uuid%} / 2000000 * 100
+
+command /stopcharging:
+	trigger:
+		send "&cCharging Stopped!" to player
+		set {-fluxCharging::%player's uuid%} to false
+		set {-fluxOvercharging::%player's uuid%} to false
+
+
+
+every 1 second:
+	loop all players:
+		if getGem(loop-player's held item) is "flux":
+			if getTier(loop-player's held item) is 2:
+				if {-fluxCharging::%loop-player's uuid%} is true:
+					draw 16 of dust using dustOption(rgb(94, 215, 255), 1) at location 1 block above loop-player with offset vector(0.4 ,0.4 ,0.4) with extra 0 with force
+					draw 4 of smoke at location 1 block above loop-player with offset vector(0.5, 0.5, 0.5) with extra 0 with force
+					if {-fluxchargepercent::%loop-player's uuid%} > 0.667:
+						if {fluxKinetic::%loop-player's uuid%} > 100:
+							set {fluxOverChargeTime.%loop-player's uuid%} to 3
+							set {-fluxOvercharging::%loop-player's uuid%} to true
+							set {-fluxCharging::%loop-player's uuid%} to false
+							#Overcharge activation
+						else:
+							set {fluxOverChargeTime.%loop-player's uuid%} to 0
+							add 0.667 to {fluxKinetic::%loop-player's uuid%}
+							add 1 to progress of the custom advancement "bliss/flux" for loop-player
+							remove 0.667 from {-fluxchargepercent::%loop-player's uuid%}
+
+					else:
+						add {-fluxchargepercent::%loop-player's uuid%} to {fluxKinetic::%loop-player's uuid%}
+						set {-fluxchargepercent::%loop-player's uuid%} to 0
+						set {-fluxCharging::%loop-player's uuid%} to false
+						set {-fluxcharge::%loop-player's uuid%} to 0
+						send "&f🔮 You ran out of watts, your gem is charged at %Format({fluxKinetic::%loop-player's uuid%})%%%" to loop-player
+						if {fluxKinetic::%loop-player's uuid%} > 100:
+							set {-fluxCharging::%loop-player's uuid%} to false
+							set {-fluxOvercharging::%loop-player's uuid%} to true
+							set {-fluxcharge::%loop-player's uuid%} to 0
+		
+		if getGem(loop-player's offhand item) is "flux":
+			if getTier(loop-player's offhand item) is 2:
+				if {-fluxCharging::%loop-player's uuid%} is true:
+					draw 16 of dust using dustOption(rgb(94, 215, 255), 1) at location 1 block above loop-player with offset vector(0.4 ,0.4 ,0.4) with extra 0 with force
+					draw 4 of smoke at location 1 block above loop-player with offset vector(0.5, 0.5, 0.5) with extra 0 with force
+					if {-fluxchargepercent::%loop-player's uuid%} > 0.667:
+						if {fluxKinetic::%loop-player's uuid%} > 100:
+							set {fluxOverChargeTime.%loop-player's uuid%} to 3
+							set {-fluxOvercharging::%loop-player's uuid%} to true
+							set {-fluxCharging::%loop-player's uuid%} to false
+
+						else:
+							set {fluxOverChargeTime.%loop-player's uuid%} to 0
+							add 0.667 to {fluxKinetic::%loop-player's uuid%}
+							remove 0.667 from {-fluxchargepercent::%loop-player's uuid%}
+							add 1 to progress of the custom advancement "bliss/flux" for loop-player
+
+					else:
+						add {-fluxchargepercent::%loop-player's uuid%} to {fluxKinetic::%loop-player's uuid%}
+						set {-fluxchargepercent::%loop-player's uuid%} to 0
+						set {-fluxCharging::%loop-player's uuid%} to false
+						set {-fluxcharge::%loop-player's uuid%} to 0
+						send "&f🔮 You ran out of watts, your gem is charged at %Format({fluxKinetic::%loop-player's uuid%})%%%" to loop-player
+						if {fluxKinetic::%loop-player's uuid%} > 100:
+							set {-fluxCharging::%loop-player's uuid%} to false
+							set {-fluxOvercharging::%loop-player's uuid%} to true
+							set {-fluxcharge::%loop-player's uuid%} to 0
+		
+
+		if getGem(loop-player's held item) is not "flux":
+			if getGem(loop-player's offhand item) is not "flux":
+				if {-fluxCharging::%loop-player's uuid%} is true:
+					if {fluxDrop.%loop-player's uuid%} is not true:
+						set {-fluxCharging::%loop-player's uuid%} to false
+						send "&cCharging paused!" to loop-player
+
+
+
+on death:
+	if victim is a player:
+		set {fluxKinetic::%victim's uuid%} to 0
+		set {-fluxtrueOvercharging::%victim's uuid%} to false
+		set {-fluxCharging::%victim's uuid%} to false
+
+every 1.5 seconds:
+	loop all players:
+		if {-fluxOvercharging::%loop-player's uuid%} is true:
+			set {-fluxOvercharging::%loop-player's uuid%} to false
+			set {fluxOverChargeTime.%loop-player's uuid%} to 0
+			send "&cᴡᴀʀɴɪɴɢ: ᴅᴏ ɴᴏᴛ ʀᴇʟᴇᴀsᴇ ʙᴇᴀᴍ ᴜɴᴛɪʟ 200%%" to loop-player
+			draw 16 of dust using dustOption(rgb(94, 215, 255), 1) at location 1 block above loop-player with offset vector(0.4 ,0.4 ,0.4) with extra 0 with force
+			send title "&c&lWARNING" with subtitle "&6Overcharging begins in... 5" to loop-player
+			wait 1 second
+			draw 16 of dust using dustOption(rgb(94, 215, 255), 1) at location 1 block above loop-player with offset vector(0.4 ,0.4 ,0.4) with extra 0 with force
+			send title "&c&lWARNING" with subtitle "&6Overcharging begins in... 4" to loop-player
+			wait 1 second
+			draw 16 of dust using dustOption(rgb(94, 215, 255), 1) at location 1 block above loop-player with offset vector(0.4 ,0.4 ,0.4) with extra 0 with force
+			send title "&c&lWARNING" with subtitle "&6Overcharging begins in... 3" to loop-player
+			wait 1 second
+			draw 16 of dust using dustOption(rgb(94, 215, 255), 1) at location 1 block above loop-player with offset vector(0.4 ,0.4 ,0.4) with extra 0 with force
+			send title "&c&lWARNING" with subtitle "&6Overcharging begins in... 2" to loop-player
+			wait 1 second
+			draw 16 of dust using dustOption(rgb(94, 215, 255), 1) at location 1 block above loop-player with offset vector(0.4 ,0.4 ,0.4) with extra 0 with force
+			send title "&c&lWARNING" with subtitle "&6Overcharging begins in... 1" to loop-player for 1 second
+			wait 1 second
+			set {-fluxtrueOvercharging::%loop-player's uuid%} to true
+		if {-fluxtrueOvercharging::%loop-player's uuid%} is true:
+			if {fluxKinetic::%loop-player's uuid%} < 115:
+				add 0.666666666667 to {fluxKinetic::%loop-player's uuid%}
+				add 1 to progress of the custom advancement "bliss/flux" for loop-player
+				draw 16 of dust using dustOption(rgb(94, 215, 255), 1) at location 1 block above loop-player with offset vector(0.4 ,0.4 ,0.4) with extra 0 with force
+				draw 4 of smoke at location 1 block above loop-player with offset vector(0.5, 0.5, 0.5) with extra 0 with force
+				if {fluxKinetic::%loop-player's uuid%} > 101:
+					if {fluxKinetic::%loop-player's uuid%} < 121:
+						damage loop-player by 1 hearts
+				if {fluxKinetic::%loop-player's uuid%} > 121:
+					if {fluxKinetic::%loop-player's uuid%} < 140:
+						damage loop-player by 2 hearts
+				if {fluxKinetic::%loop-player's uuid%} > 141:
+					if {fluxKinetic::%loop-player's uuid%} < 161:
+						damage loop-player by 3 hearts
+				if {fluxKinetic::%loop-player's uuid%} > 161:
+					if {fluxKinetic::%loop-player's uuid%} < 181:
+						damage loop-player by 4 hearts
+				if {fluxKinetic::%loop-player's uuid%} > 181:
+					if {fluxKinetic::%loop-player's uuid%} < 201:
+						damage loop-player by 5 hearts
+			if {fluxKinetic::%loop-player's uuid%} >= 115:
+				draw 15 of dust using dustOption(rgb(94, 215, 255), 0.8) at location 1 block above loop-player with offset vector(0.4, 0.4, 0.4) with extra 0 with force
+				draw 4 of smoke at location 1 block above loop-player with offset vector(0.5, 0.5, 0.5) with extra 0 with force
+				damage loop-player by 5 hearts
+				set {fluxKinetic::%loop-player's uuid%} to 200
+				set {-fluxcharge::%loop-player's uuid%} to 0
+				set {-fluxchargepercent::%loop-player's uuid%} to 0
+
+on right click:
+	if getGem(player's offhand item) is "flux":
+		if getTier(player's offhand item) is 2:
+			if {-fluxcharge::%player's uuid%} is set:
+				if player's held item is a diamond block:
+					if {-fluxcharge::%player's uuid%} < 2000000:
+						set {_potentialCharge} to {-fluxcharge::%player's uuid%} + 17352
+
+						if {_potentialCharge} > 2000000:
+							set {_neededCharge} to 2000000 - {-fluxcharge::%player's uuid%}
+							add {_neededCharge} to {-fluxcharge::%player's uuid%}
+						else:
+							add 17352 to {-fluxcharge::%player's uuid%}
+
+						remove 1 of diamond block from player's inventory
+						set {-fluxchargepercent::%player's uuid%} to {-fluxcharge::%player's uuid%} / 2000000 * 100
+						set {-fluxchargeHidden::%player's uuid%} to {-fluxcharge::%player's uuid%}
+						send "&f🔮 You now have %{-fluxcharge::%player's uuid%}% watts, up to %Format({-fluxchargepercent::%player's uuid%})%%% charge." to player
+
+
+						set {-fluxchargepercent::%player's uuid%} to {-fluxcharge::%player's uuid%} / 2000000 * 100
+
+						send "&f🔮 You now have %{-fluxcharge::%player's uuid%}% watts, up to %Format({-fluxchargepercent::%player's uuid%})%%% charge." to player
+						
+			else:
+				set {-fluxcharge::%player's uuid%} to 0
+
+on right click:
+	if isDisabled(player) is not true:
+		if player's tool is a sword or an axe or air:
+			if getGem(player's offhand item) is "flux":
+				if getEnergy(player's offhand item) is not 0:
+					if {-DoubleClick::%player's uuid%} is not set:
+						set {-DoubleClick::%player's uuid%} to true
+					else:
+						delete {-DoubleClick::%player's uuid%}
+						set {_uuid} to uuid of player
+						if canUsePower("KineticBurst::%uuid of player%") is true:
+							if getEnergy(player's offhand item) > 0:
+								blissSetcooldown("KineticBurst::%uuid of player%", toMilliseconds(0, 35), player)
+							send "<#03eaff>🔮 You have activated <##FF686F>Kinetic Burst" to player
+
+							set {_fluxholder} to player
+							loop all entities within 5 blocks of the player:
+								if loop-entity is not {_fluxholder}:
+									if IsTrusted(player, loop-entity) is not true:
+										set {_direction} to vector between {_fluxholder} and loop-entity
+										set {_d} to {damage::%player's uuid%} *5 percent of loop-entity's health
+										set {_d1} to {_d} / 2
+										realDamage(loop-entity, {_d1})
+										push loop-entity {_direction} at speed 2
+
+									else:
+										send "<##FFD773>🔮 &fYou cannot cast negative powers on allies!" to {_fluxholder}
+
+							set {_s} to 1
+							set {_loc} to player's location
+							loop 10 times:
+
+								if loop-value is not 10:
+									FluxCircle({_s}, {_loc})
+									wait 1 tick
+									add 0.5 to {_s}
+
+								else:
+									FluxCirclelast({_s}, {_loc})
+									set {damage::%player's uuid%} to 0
+
+						else:
+							set {_message} to getCooldownSeconds("KineticBurst::%uuid of player%")
+							send "<#03eaff>🔮 <##FF686F> Kinetic Burst is on cooldown for <##0EC912>%{_message}%s" to player
+
+	   
+on damage:
+	if attacker is set:
+		if {-KinOvALT::%attacker's uuid%} is true:
+			loop all players:
+				if attacker is not loop-player:
+					if {-KinOvMAIN::%loop-player's uuid%} is true:
+						add 1 to {-KinOvMAINCOUNTER::%loop-player's uuid%}
+						if {-KinOvMAINCOUNTER::%loop-player's uuid%} is 3:
+							send "&7You have &b3 &cATTACK &7points. &7Your next hit will do &b1.1x damage." to loop-player
+						else if {-KinOvMAINCOUNTER::%loop-player's uuid%} is 6:
+							send "&7You have &b6 &cATTACK &7points. &7Your next hit will do &b1.2x damage." to loop-player
+						else if {-KinOvMAINCOUNTER::%loop-player's uuid%} is 9:
+							send "&7You have &b9 &cATTACK &7points. &7Your next hit will do &b1.3x damage." to loop-player
+						else if {-KinOvMAINCOUNTER::%loop-player's uuid%} is 12:
+							send "&7You have &b12 &cATTACK &7points. &7Your next hit will do &b1.4x damage." to loop-player
+						else if {-KinOvMAINCOUNTER::%loop-player's uuid%} is 15:
+							send "&7You have &b15 &cATTACK &7points. &7Your next hit will do &b1.5x damage." to loop-player
+
+					
+on damage:
+	if {-KinOvMAIN::%attacker's uuid%} is true:
+		if {-KinOvMAINCOUNTER::%attacker's uuid%} is between 3 and 6:
+			cancel event
+			damage victim by damage * 1.1
+			knock victim (vector from attacker to victim) with strength 0.7
+			set {-KinOvMAINCOUNTER::%attacker's uuid%} to 0
+		if {-KinOvMAINCOUNTER::%attacker's uuid%} is between 6 and 9:
+			cancel event
+			damage victim by damage * 1.2
+			knock victim (vector from attacker to victim) with strength 0.7
+			set {-KinOvMAINCOUNTER::%attacker's uuid%} to 0
+		if {-KinOvMAINCOUNTER::%attacker's uuid%} is between 9 and 12:
+			cancel event
+			damage victim by damage * 1.3
+			knock victim (vector from attacker to victim) with strength 0.7
+			set {-KinOvMAINCOUNTER::%attacker's uuid%} to 0
+		if {-KinOvMAINCOUNTER::%attacker's uuid%} is between 12 and 15:
+			cancel event
+			damage victim by damage * 1.4
+			knock victim (vector from attacker to victim) with strength 0.7
+			set {-KinOvMAINCOUNTER::%attacker's uuid%} to 0
+		if {-KinOvMAINCOUNTER::%attacker's uuid%} is between 15 and 15:
+			cancel event
+			damage victim by damage * 1.5
+			knock victim (vector from attacker to victim) with strength 0.7
+			set {-KinOvMAINCOUNTER::%attacker's uuid%} to 0
+
+on break:
+	if {-KinOvALT::%player's uuid%} is true:
+		loop all players:
+			if player is not loop-player:
+				if {-KinOvMAIN::%loop-player's uuid%} is true:
+					add 1 to {fluxBroken.%loop-player's uuid%}
+					if {fluxBroken.%loop-player's uuid%} is 5:
+						send "&7You have &b1 &eMINING &7point, giving you Haste level &b1 &7for &b20s&7." to loop-player
+						apply haste 1 without particles to loop-player for 20 seconds replacing the existing effect
+					if {fluxBroken.%loop-player's uuid%} is 10:
+						send "&7You have &b2 &eMINING &7points, giving you Haste level &b2 &7for &b40s&7." to loop-player
+						apply haste 2 without particles to loop-player for 40 seconds replacing the existing effect
+					if {fluxBroken.%loop-player's uuid%} is 15:
+						send "&7You have &b3 &eMINING &7points, giving you Haste level &b3 &7for &b60s&7." to loop-player
+						apply haste 3 without particles to loop-player for 60 seconds replacing the existing effect
+					if {fluxBroken.%loop-player's uuid%} is 20:
+						send "&7You have &b4 &eMINING &7points, giving you Haste level &b4 &7for &b80s&7." to loop-player
+						apply haste 4 without particles to loop-player for 80 seconds replacing the existing effect
+					if {fluxBroken.%loop-player's uuid%} is 25:
+						send "&7You have &b5 &eMINING &7points, giving you Haste level &b5 &7for &b100s&7." to loop-player
+						apply haste 5 without particles to loop-player for 100 seconds replacing the existing effect
+ 
+ 
+on right click on entity:
+	if isDisabled(player) is not true:
+		if getGem(player's held item) is "flux":
+			if getTier(player's held item) is 2:
+				if canUsePower("KineticOverdrive::%uuid of player%") is true:
+					if getEnergy(player's held item) is 0:
+						stop
+					if getEnergy(player's held item) is 1:
+						blissSetcooldown("KineticOverdrive::%uuid of player%", toMilliseconds(2, 40), player)
+						set {_num} to 0
+					if getEnergy(player's held item) is 2:
+						blissSetcooldown("KineticOverdrive::%uuid of player%", toMilliseconds(2, 30), player)
+						set {_num} to 0.5
+					if getEnergy(player's held item) is 3:
+						blissSetcooldown("KineticOverdrive::%uuid of player%", toMilliseconds(2, 20), player)
+						set {_num} to 0.5
+					if getEnergy(player's held item) is 4:
+						blissSetcooldown("KineticOverdrive::%uuid of player%", toMilliseconds(2, 10), player)
+						set {_num} to 1.5
+					if getEnergy(player's held item) > 4:
+						blissSetcooldown("KineticOverdrive::%uuid of player%", toMilliseconds(2, 0), player)
+						set {_num} to 1.5
+					set {_loc} to location of player
+					send "<#03eaff>🔮 You have activated Kinetic Overdrive!" to player
+					set {-KinOvMAIN::%player's uuid%} to true
+					set {-KinOvALT::%target entity of player's uuid%} to true
+					set {-KinOvMAINCOUNTER::%player's uuid%} to 0
+					send "<#03eaff>🔮 You have been affected with %player%'s Kinetic Overdrive! &7Radius %{_num}%" to target entity of player
+					set {_loc} to location of target entity of player
+					loop 5 times:
+						FluxCircleReal({_num}, {_loc})
+						add 0.5 to {_num}
+						wait 1 tick
+					FluxCircleRealLast({_num}, {_loc})
+					set {_p} to player
+					loop all players within {_num} blocks of player:
+						if loop-player is not {_p}:
+							if IsTrusted(player, loop-player) is false:
+								set {-KinOvALT::%loop-player's uuid%} to true
+								send "<#03eaff>🔮 You have been affected with %player%'s Kinetic Overdrive! &7Radius %{_num}%" to loop-player
+								wait 30 seconds
+								set {-KinOvALT::%loop-player's uuid%} to false
+					wait 30 seconds
+					set {-KinOvALT::%target entity of player's uuid%} to false
+					set {-KinOvMAIN::%player's uuid%} to false
+					delete {-KinOvMAINCOUNTER::%player's uuid%}
+					remove haste from the player
+					set {fluxBroken.%player's uuid%} to 0			
+
+				else:
+					set {_bb} to getActionBarCooldown("KineticOverdrive::%uuid of player%")							
+					send "<#03eaff>🔮 <##FF686F>Your Kinetic Energy is on cooldown for <##0EC912>%{_bb}%" to player
+
+
+
+function FluxCircleReal(s: number, pl: location):
+	loop 360 times:
+		set {_v} to spherical vector with radius {_s}, yaw loop-value and pitch 0
+		make 1 of dust using dustOption(rgb(94, 215, 255), 0.9) at {_pl} ~ {_v} with extra 0 with force
+		draw 1 of happy villager at {_pl} ~ {_v} with extra 0 with force
+
+function FluxCircleRealLast(s: number, pl: location):
+	loop 10 times:
+		loop 360 times:
+			set {_v} to spherical vector with radius {_s}, yaw loop-value-2 and pitch 0
+			make 1 of dust using dustOption(rgb(94, 215, 255), 0.9) at {_pl} ~ {_v} with extra 0 with force
+			draw 1 of happy villager at {_pl} ~ {_v} with extra 0 with force
+		wait 0.3 seconds
+
+
+on damage:
+	if all:
+		{-Options::FluxGroundForNonPlayers} is false
+		victim is not a player
+	then:
+		stop
+	if isDisabled(attacker) is not true:
+		if getGem(attacker's held item) is "flux":
+			if getTier(attacker's held item) is 2:
+				if canUsePower("EnergyBeam::%uuid of attacker%") is true:
+					set {_uuid} to uuid of attacker
+					if attacker is not victim:
+						if IsTrusted(attacker, victim) is true:
+							send "<##FFD773>🔮 &fYou cannot cast negative powers on allies!" to attacker
+						else:
+							if victim is invisible:
+								send "<#03eaff>🔮 You have used Ground on <##0EC912>&k???" to attacker
+							else:
+								send "<#03eaff>🔮 You have used Ground on <##0EC912>%victim.getName()%" to attacker
+
+							if attacker is invisible:
+								send "<#03eaff>🔮 You have been affected with Ground by <##0EC912>&b&k???" to victim
+							else:
+								send "<#03eaff>🔮 You have been affected with Ground by <##0EC912>&b%attacker.getName()%" to victim
+							if getEnergy(attacker's held item) is 1:
+								blissSetcooldown("EnergyBeam::%uuid of attacker%", toMilliseconds(0, 50), attacker)
+							if getEnergy(attacker's held item) is 2:
+								blissSetcooldown("EnergyBeam::%uuid of attacker%", toMilliseconds(0, 45), attacker)
+							if getEnergy(attacker's held item) is 3:
+								blissSetcooldown("EnergyBeam::%uuid of attacker%", toMilliseconds(0, 40), attacker)
+							if getEnergy(attacker's held item) is 4:
+								blissSetcooldown("EnergyBeam::%uuid of attacker%", toMilliseconds(0, 35), attacker)
+							if getEnergy(attacker's held item) > 4:
+								blissSetcooldown("EnergyBeam::%uuid of attacker%", toMilliseconds(0, 30), attacker)
+							wait 5 ticks
+							if {fluxKinetic::%attacker's uuid%} is more than or equal to 100:
+								GroundShuffle(victim)
+							set {-fluxKiller} to attacker
+							Stun(victim, 4)
+							set {_d} to {fluxKinetic::%attacker's uuid%} percent of victim's health
+							set {_d1} to {_d} / 2
+							realDamage(victim, {_d1})
+							if {-Options::FluxGroundDamage} is true:
+								ticklessDamage(victim)
+							set {-ground::%victim's uuid%} to true
+							loop all entities within 3 blocks of victim:
+								loop-entity is not attacker
+								loop-entity is not victim
+								IsTrusted(attacker, loop-entity) is not true
+								groundEntity(loop-entity, attacker)
+							wait 1 second
+							delete {-fluxKiller}
+							delete {-ground::%victim's uuid%}
+							set {fluxKinetic::%attacker's uuid%} to 0
+							delete {-fluxLine::%victim's uuid%}
+
+				else:
+					set {_message} to getActionBarCooldown("EnergyBeam::%uuid of attacker%")
+					send "<#03eaff>🔮 <##FF686F>Your Ground is on cooldown for <##0EC912>%{_message}%" to attacker
+	
+function groundLine(attacker: entity, victim: entity):
+	set {_distance} to distance between {_attacker} and {_victim}
+	if {_distance} > 20:
+		set {_distance} to 20
+
+	set {_loc} to location 0.8 blocks above {_attacker}
+	set {_v} to vector from {_loc} to location 0.8 blocks above {_victim}
+	set vector length of {_v} to 0.1
+	loop {_distance} / 0.1 times:
+		make 3 of dust using dustOption(rgb(94, 215, 255), 1) at {_loc}
+		make 1 of smoke at {_loc} with extra 0
+		set {_loc} to {_loc} ~ {_v}
+	
+
+
+function groundEntity(entity: entity, caster: player):
+	set {-ground::%{_entity}'s uuid%} to true
+	Stun({_entity}, 3)
+	ticklessDamage({_entity})
+	wait 1 second
+	delete {-ground::%{_entity}'s uuid%}
+	set {fluxKinetic::%{_caster}'s uuid%} to 0
+
+function Stun(entity: entity, n: number):
+	set {_loc} to location of {_entity}
+	loop ({_n} * 20) times:
+		if any:
+			abs(x coord of {_entity} - x coord of {_loc}) > 0.005
+			abs(y coord of {_entity} - y coord of {_loc}) > 0.005
+			abs(z coord of {_entity} - z coord of {_loc}) > 0.005
+		then:
+			set yaw of {_loc} to yaw of {_entity}
+			set pitch of {_loc} to pitch of {_entity}
+			teleport {_entity} to {_loc}
+		wait 1 tick
+
+
+function ticklessDamage(p: entity):
+	#loop 1 times: #this is how it is in real bliss gng
+	set invulnerability ticks of {_p} to 0
+	damage {_p} by 0.001
+	wait 1 tick
+
+
+on join:
+	if {fluxKinetic::%player's uuid%} is not set:
+		set {fluxKinetic::%player's uuid%} to 0
+
+on death of player:
+	if {-damaged::%victim's uuid%} is true:
+		if {-fluxKiller} is invisible:
+			set death message to "%victim% was obliterated by &k???"
+		else:
+			set death message to "%victim% was obliterated by %{-fluxKiller}%"
+
+on death of player:
+	if {-ground::%victim's uuid%} is true:
+		if {-fluxKiller} is invisible:
+			set death message to "%victim% experienced high voltage from &k???"
+		else:
+			set death message to "%victim% experienced high voltage from %{-fluxKiller}%"
+
+function realDamage(p: entity, a: number):
+	damage {_p} by 0.001
+	if {_p}'s health < {_num}:
+		if any:
+			{_p}'s held item is a totem of undying
+			{_p}'s offhand item is a totem of undying
+		then:
+			damage {_p} by 151515
+		else:
+			set {_p}'s health to {_p}'s health - {_a}
+			add {_p} to {-dontdmgagain::*}
+	else:
+		set {_p}'s health to {_p}'s health - {_a}
+
+command /reset-charge:
+	permission: op
+	trigger:
+		loop all offlineplayers:
+			set {fluxKinetic::%loop-offlineplayer's uuid%} to 0
+
+
+function FluxCircle(s: number, p: location):
+	set {_pl} to location of {_p}
+	loop all players:
+		if {particlelvl::%loop-player's uuid%} is "default":
+			
+			set {_spacing} to 0.1
+			set {_circumference} to 2 * pi * {_s} # Calculate the number of particles based on the spacing
+			set {_numParticles} to floor({_circumference} / {_spacing}) # Spawn the exact number of particles needed
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(94, 215, 255), 1) at {_pl} ~ {_v} for loop-player
+				draw 1 of smoke at {_pl} ~ {_v} with extra 0 with force for loop-player
+
+		if {particlelvl::%loop-player's uuid%} is "less":
+
+			set {_spacing} to 0.15
+			set {_circumference} to 2 * pi * {_s}
+			set {_numParticles} to floor({_circumference} / {_spacing})
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(94, 215, 255), 1) at {_pl} ~ {_v} for loop-player
+		if {particlelvl::%loop-player's uuid%} is "none":
+
+			set {_spacing} to 0.5
+			set {_circumference} to 2 * pi * {_s}
+			set {_numParticles} to floor({_circumference} / {_spacing})
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(94, 215, 255), 1) at {_pl} ~ {_v} for loop-player
+
+
+function FluxCirclelast(s: number, p: location):
+	set {_pl} to location of {_p}
+	loop 7 times:
+		FluxCircle({_s}, {_pl})
+		wait 0.3 seconds
+
+function FluxCircleEXP(s: number, p: player):
+	set {_pl} to location of {_p}
+	set {_step} to 3 # Set a larger step value here
+	set {_iterations} to 360 * {_s} / {_step}
+	loop {_iterations} times:
+		set {_angle} to loop-value * {_step}
+		set {_v} to spherical vector radius {_s}, yaw {_angle}, pitch (0) # Pitch is set to 0 to make it around the {_p}
+		draw 1 of happy_villager at {_pl} ~ {_v} with extra 0.000000001 with force
+
+
+on damage:
+	if getGem(victim's offhand item) is "flux":
+		set {_finaldmg} to final damage / 3
+		add {_finaldmg} to {damage::%victim's uuid%}
+		set {timesHit::%victim's uuid%} to 0	
+		wait 15 seconds
+		remove {_finaldmg} from {damage::%victim's uuid%}
+
+
+
+function GroundShuffle(player: player):
+
+	set {_i} to random number between 1 and 9
+	loop {_i} times:
+		set {_slot.%loop-number%} to slot (loop-number - 1) of {_player}'s inventory
+
+		add {_slot.%loop-number%} to {_shuffle::*}
+
+	set {_shuffle::*} to shuffled {_shuffle::*}
+
+	loop {_i} times:
+		set slot (loop-number - 1) of {_player}'s inventory to {_shuffle::%loop-number%}

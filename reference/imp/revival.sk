@@ -1,0 +1,1447 @@
+command /Restoraionitems <text>:
+	aliases: /blissgems:Restoraionitems
+	permission: op
+	trigger:
+		if arg-1 is set:
+			if arg-1 is "RestoraionTomb0":
+				give 1 of {-Bliss.Revive.0} to player
+			if arg-1 is "RestoraionTomb1":
+				give 1 of {-Bliss.Revive.1} to player
+			if arg-1 is "RestoraionTomb2":
+				give 1 of {-Bliss.Revive.2} to player
+			if arg-1 is "RestoraionTomb3":
+				give 1 of {-Bliss.Revive.3} to player
+			if arg-1 is "Repairkit":
+				give 1 of {-Bliss.Repair.4} to player
+			if arg-1 is "GemFragment":
+				give 1 of {-Bliss.Fragment} to player
+
+
+on tab complete for "/Restoraionitems":
+	set tab completions for position 1 to "RestoraionTomb0" and "RestoraionTomb1" and "RestoraionTomb2" and "RestoraionTomb3" and "Repairkit" and "GemFragment"
+
+
+
+command /pedestal <text>:
+	aliases: /blissgems:pedestal
+	permission: op
+	trigger:
+		if arg-1 is "set":
+			set {PedestalLoc} to location 1 block below player
+			wait 10 ticks
+			set {ParticleLoc} to location 1 block above {PedestalLoc}
+			set {Gems} to location 4 blocks below {PedestalLoc}
+			# Ancient Debris
+			delete {-rt}
+			set {DebrisLoc} to location 2 blocks below player
+			set {PedestalLoc1} to location 1 block above {PedestalLoc}
+			set {PedestalGilded1} to location 1 block north of {PedestalLoc}
+			set {PedestalGilded2} to location 1 block south of {PedestalLoc}
+			set {PedestalGilded3} to location 1 block east of {PedestalLoc}
+			set {PedestalGilded4} to location 1 block west of {PedestalLoc}
+			set {PedestalGold1} to location 1 block north and 1 block east of {PedestalLoc}
+			set {PedestalGold2} to location 1 block south and 1 block east of {PedestalLoc}
+			set {PedestalGold3} to location 1 block north and 1 block west of {PedestalLoc}
+			set {PedestalGold4} to location 1 block south and 1 block west of {PedestalLoc}
+			# RAW GOLD
+			set {PedestalRawGold1} to location 2 block north and 1 block west of {PedestalLoc}
+			set {PedestalRawGold2} to location 2 block north and 1 block east of {PedestalLoc}
+			set {PedestalRawGold3} to location 2 block west and 1 block south of {PedestalLoc}
+			set {PedestalRawGold4} to location 2 block west and 1 block north of {PedestalLoc}
+			set {PedestalRawGold5} to location 2 block south and 1 block east of {PedestalLoc}
+			set {PedestalRawGold6} to location 2 block south and 1 block west of {PedestalLoc}
+			set {PedestalRawGold7} to location 2 block east and 1 block north of {PedestalLoc}
+			set {PedestalRawGold8} to location 2 block east and 1 block south of {PedestalLoc}
+			# CHERRY LOGS
+			set {Cherry1} to location 2 blocks east of {PedestalLoc}
+			set {Cherry2} to location 2 blocks west of {PedestalLoc}
+			set {Cherry3} to location 2 blocks north of {PedestalLoc}
+			set {Cherry4} to location 2 blocks south of {PedestalLoc}
+			# CHERRY PLANKS
+			set {Plank1} to location 3 block east of {PedestalLoc}
+			set {Plank2} to location 3 block west of {PedestalLoc}
+			set {Plank3} to location 3 block north of {PedestalLoc}
+			set {Plank4} to location 3 block south of {PedestalLoc}
+			# Cherry Planks East
+			set {Plank5} to location 3 block east and 2 block north of {PedestalLoc}
+			set {Plank6} to location 3 block east and 2 block south of {PedestalLoc}
+			# Cheryy Planks West
+			set {Plank7} to location 3 block west and 2 block north of {PedestalLoc}
+			set {Plank8} to location 3 block west and 2 block south of {PedestalLoc}
+			# Cherry Plank North
+			set {Plank9} to location 3 block north and 2 block east of {PedestalLoc}
+			set {Plank10} to location 3 block north and 2 block west of {PedestalLoc}
+			# Cherry Plank South
+			set {Plank11} to location 3 block south and 2 block east of {PedestalLoc}
+			set {Plank12} to location 3 block south and 2 block west of {PedestalLoc}
+			# Stripped Chery Log east
+			set {stripped1} to location 3 block east and 1 block north of {PedestalLoc}
+			set {stripped2} to location 3 block east and 1 block south of {PedestalLoc}
+			# Stripped Cherry log west
+			set {stripped3} to location 3 block west and 1 block north of {PedestalLoc}
+			set {stripped4} to location 3 block west and 1 block south of {PedestalLoc}
+			# stripped cherry logs north
+			set {stripped5} to location 3 blocks north and 1 block east of {PedestalLoc}
+			set {stripped6} to location 3 blocks north and 1 block west of {PedestalLoc}
+			# stripped cherry logs south
+			set {stripped7} to location 3 blocks south and 1 block east of {PedestalLoc}
+			set {stripped8} to location 3 blocks south and 1 block west of {PedestalLoc}
+			# Stripped cherry Logs More :sob: east
+			set {stripped9} to location 2 blocks east and 2 blocks north of {PedestalLoc}
+			set {stripped10} to location 2 blocks east and 2 blocks south of {PedestalLoc}
+			# stripped log more west
+			set {stripped11} to location 2 blocks west and 2 blocks north of {PedestalLoc}
+			set {stripped12} to location 2 blocks west and 2 blocks south of {PedestalLoc}
+			# Quartz Bricks east west north south
+			set {brick1} to location 4 blocks east of {PedestalLoc}
+			set {brick2} to location 4 blocks west of {PedestalLoc}
+			set {brick3} to location 4 blocks north of {PedestalLoc}
+			set {brick4} to location 4 blocks south of {PedestalLoc}
+			# more quartz east
+			set {brick5} to location 4 blocks east and 1 block north of {PedestalLoc}
+			set {brick6} to location 4 blocks east and 2 block north of {PedestalLoc}
+			set {brick7} to location 4 blocks east and 1 block south of {PedestalLoc}
+			set {brick8} to location 4 blocks east and 2 block south of {PedestalLoc}
+			# more quartz west
+			set {brick9} to location 4 blocks west and 1 block north of {PedestalLoc}
+			set {brick10} to location 4 blocks west and 2 block north of {PedestalLoc}
+			set {brick11} to location 4 blocks west and 1 block south of {PedestalLoc}
+			set {brick12} to location 4 blocks west and 2 block south of {PedestalLoc}
+			# more quartz north 
+			set {brick13} to location 4 blocks north and 1 block east of {PedestalLoc}
+			set {brick14} to location 4 blocks north and 2 block east of {PedestalLoc}
+			set {brick15} to location 4 blocks north and 1 block west of {PedestalLoc}
+			set {brick16} to location 4 blocks north and 2 block west of {PedestalLoc}
+			# more quartz south
+			set {brick17} to location 4 blocks south and 1 block east of {PedestalLoc}
+			set {brick18} to location 4 blocks south and 2 block east of {PedestalLoc}
+			set {brick19} to location 4 blocks south and 1 block west of {PedestalLoc}
+			set {brick20} to location 4 blocks south and 2 block west of {PedestalLoc}
+			# last part east
+			set {brick21} to location 3 blocks east and 3 blocks north of {PedestalLoc}
+			set {brick22} to location 3 blocks east and 3 blocks south of {PedestalLoc}
+			set {brick23} to location 3 blocks west and 3 blocks north of {PedestalLoc}
+			set {brick24} to location 3 blocks west and 3 blocks south of {PedestalLoc}
+			# Quartz stairs east
+			set {stairs.east1} to location 5 blocks east of {PedestalLoc}
+			set {stairs.east2} to location 5 blocks east and 1 block north of {PedestalLoc}
+			set {stairs.east3} to location 5 blocks east and 1 block south of {PedestalLoc}
+			# Quartz stairs west
+			set {stairs.west1} to location 5 blocks west of {PedestalLoc}
+			set {stairs.west2} to location 5 blocks west and 1 block north of {PedestalLoc}
+			set {stairs.west3} to location 5 blocks west and 1 block south of {PedestalLoc}
+			# quartz stairs north
+			set {stairs.north1} to location 5 blocks north of {PedestalLoc}
+			set {stairs.north2} to location 5 blocks north and 1 block east of {PedestalLoc}
+			set {stairs.north3} to location 5 blocks north and 1 block west of {PedestalLoc}
+			# Quartz stairs south
+			set {stairs.south1} to location 5 blocks south of {PedestalLoc}
+			set {stairs.south2} to location 5 blocks south and 1 block east of {PedestalLoc}
+			set {stairs.south3} to location 5 blocks south and 1 block west of {PedestalLoc}
+			set {Beacon} to false
+			set {Debris} to false
+			set {PedestalRepair} to false
+			set {PedestalCount} to 0
+			set {PedestalTimer} to 0
+			set {PedestalRevive} to false
+			set {RevivalProgress} to false
+			set {-Reviving} to false
+		if arg-1 is "activate":
+			pedestalactiveEmbed()
+			delete {-rt}
+			set {PedestalBreakTimer} to 0
+			set {PedestalDura} to 0
+			set {PedestalActive} to true
+			play sound "block.beacon.ambient" with volume 40 and pitch 1.6 at {PedestalLoc}
+			set block at location at {PedestalLoc} to air
+			# debrie
+			set block at location at {DebrisLoc} to air
+			set block at location 1 block below {DebrisLoc} to bedrock
+			# The Rest yk
+			set block at location at {PedestalGilded1} to gilded blackstone
+			set block at location at {PedestalGilded2} to gilded blackstone
+			set block at location at {PedestalGilded3} to gilded blackstone
+			set block at location at {PedestalGilded4} to gilded blackstone
+			set block at location at {PedestalGold1} to gold block
+			set block at location at {PedestalGold2} to gold block
+			set block at location at {PedestalGold3} to gold block
+			set block at location at {PedestalGold4} to gold block
+			# RAW GOLD
+			set block at location at {PedestalRawGold1} to block of raw gold
+			set block at location at {PedestalRawGold2} to block of raw gold
+			set block at location at {PedestalRawGold3} to block of raw gold
+			set block at location at {PedestalRawGold4} to block of raw gold
+			set block at location at {PedestalRawGold5} to block of raw gold
+			set block at location at {PedestalRawGold6} to block of raw gold
+			set block at location at {PedestalRawGold7} to block of raw gold
+			set block at location at {PedestalRawGold8} to block of raw gold
+			# CHERRY LOG
+			set block at location at {Cherry1} to cherry log[axis=x]
+			set block at location at {Cherry2} to cherry log[axis=x]
+			set block at location at {Cherry3} to cherry log[axis=z]
+			set block at location at {Cherry4} to cherry log[axis=z]
+			# CHERRY PLANK
+			set block at location at {Plank1} to cherry plank
+			set block at location at {Plank2} to cherry plank
+			set block at location at {Plank3} to cherry plank
+			set block at location at {Plank4} to cherry plank
+			set block at location at {Plank5} to cherry plank
+			set block at location at {Plank6} to cherry plank
+			set block at location at {Plank7} to cherry plank
+			set block at location at {Plank8} to cherry plank
+			set block at location at {Plank9} to cherry plank
+			set block at location at {Plank10} to cherry plank
+			set block at location at {Plank11} to cherry plank
+			set block at location at {Plank12} to cherry plank
+			# Stripped Cherry log
+			set block at location at {stripped1} to stripped cherry log[axis=x]
+			set block at location at {stripped2} to stripped cherry log[axis=x]
+			set block at location at {stripped3} to stripped cherry log[axis=x]
+			set block at location at {stripped4} to stripped cherry log[axis=x]
+			set block at location at {stripped5} to stripped cherry log[axis=z]
+			set block at location at {stripped6} to stripped cherry log[axis=z]
+			set block at location at {stripped7} to stripped cherry log[axis=z]
+			set block at location at {stripped8} to stripped cherry log[axis=z]
+			set block at location at {stripped9} to stripped cherry log[axis=x]
+			set block at location at {stripped10} to stripped cherry log[axis=x]
+			set block at location at {stripped11} to stripped cherry log[axis=x]
+			set block at location at {stripped12} to stripped cherry log[axis=x]
+			# Quartz bricks
+			set block at location at {brick1} to quartz bricks
+			set block at location at {brick2} to quartz bricks
+			set block at location at {brick3} to quartz bricks
+			set block at location at {brick4} to quartz bricks
+			set block at location at {brick5} to quartz bricks
+			set block at location at {brick6} to quartz bricks
+			set block at location at {brick7} to quartz bricks
+			set block at location at {brick8} to quartz bricks
+			set block at location at {brick9} to quartz bricks
+			set block at location at {brick10} to quartz bricks
+			set block at location at {brick11} to quartz bricks
+			set block at location at {brick12} to quartz bricks
+			set block at location at {brick13} to quartz bricks
+			set block at location at {brick14} to quartz bricks
+			set block at location at {brick15} to quartz bricks
+			set block at location at {brick16} to quartz bricks
+			set block at location at {brick17} to quartz bricks
+			set block at location at {brick18} to quartz bricks
+			set block at location at {brick19} to quartz bricks
+			set block at location at {brick20} to quartz bricks
+			set block at location at {brick21} to quartz bricks
+			set block at location at {brick22} to quartz bricks
+			set block at location at {brick23} to quartz bricks
+			set block at location at {brick24} to quartz bricks
+			# East
+			set block at location at {stairs.east1} to smooth quartz stairs[facing=west]
+			set block at location at {stairs.east2} to smooth quartz stairs[facing=west]
+			set block at location at {stairs.east3} to smooth quartz stairs[facing=west]
+			# west
+			set block at location at {stairs.west1} to smooth quartz stairs[facing=east]
+			set block at location at {stairs.west2} to smooth quartz stairs[facing=east]
+			set block at location at {stairs.west3} to smooth quartz stairs[facing=east]
+			# north
+			set block at location at {stairs.north1} to smooth quartz stairs[facing=south]
+			set block at location at {stairs.north2} to smooth quartz stairs[facing=south]
+			set block at location at {stairs.north3} to smooth quartz stairs[facing=south]
+			# south
+			set block at location at {stairs.south1} to smooth quartz stairs[facing=north]
+			set block at location at {stairs.south2} to smooth quartz stairs[facing=north]
+			set block at location at {stairs.south3} to smooth quartz stairs[facing=north]
+			set {PedestalRepair} to false
+			set {PedestalCount} to 0
+			set {PedestalTimer} to 0
+			set {PedestalRevive} to false
+			set {RevivalProgress} to false
+			set {-Reviving} to false
+			set {Beacon} to false
+			set {Debris} to false
+			set {PedestalBusy} to false
+			loop all players:
+				set {RevivalLocked.%loop-player%} to false
+				set {-attempts.%loop-player's uuid%} to 0
+			broadcast "<##FE8120>Pedestal has &2 Opened"
+		if arg-1 is "deactivate":
+			pedestaldeactiveEmbed()
+			delete {-rt}
+			set {PedestalActive} to false
+			set block at location at {PedestalLoc} to bedrock
+			# Debris
+			set block at location at {DebrisLoc} to air
+			set block at location at {PedestalGilded1} to blackstone
+			set block at location at {PedestalGilded2} to blackstone
+			set block at location at {PedestalGilded3} to blackstone
+			set block at location at {PedestalGilded4} to blackstone
+			set block at location at {PedestalGold1} to netherite block
+			set block at location at {PedestalGold2} to netherite block
+			set block at location at {PedestalGold3} to netherite block
+			set block at location at {PedestalGold4} to netherite block
+			# BASALT
+			set block at location at {PedestalRawGold1} to basalt[axis=x]
+			set block at location at {PedestalRawGold2} to basalt[axis=x]
+			set block at location at {PedestalRawGold3} to basalt[axis=x]
+			set block at location at {PedestalRawGold4} to basalt[axis=x]
+			set block at location at {PedestalRawGold5} to basalt[axis=z]
+			set block at location at {PedestalRawGold6} to basalt[axis=z]
+			set block at location at {PedestalRawGold7} to basalt[axis=x]
+			set block at location at {PedestalRawGold8} to basalt[axis=x]
+			# POLISHED BASALT
+			set block at location at {Cherry1} to polished basalt[axis=x]
+			set block at location at {Cherry2} to polished basalt[axis=x]
+			set block at location at {Cherry3} to polished basalt[axis=z]
+			set block at location at {Cherry4} to polished basalt[axis=z]
+			# Polished deepslate
+			set block at location at {Plank1} to polished deepslate
+			set block at location at {Plank2} to polished deepslate
+			set block at location at {Plank3} to polished deepslate
+			set block at location at {Plank4} to polished deepslate
+			set block at location at {Plank5} to polished deepslate
+			set block at location at {Plank6} to polished deepslate
+			set block at location at {Plank7} to polished deepslate
+			set block at location at {Plank8} to polished deepslate
+			set block at location at {Plank9} to polished deepslate
+			set block at location at {Plank10} to polished deepslate
+			set block at location at {Plank11} to polished deepslate
+			set block at location at {Plank12} to polished deepslate
+			# Deepslate Tiles
+			set block at location at {stripped1} to deepslate tiles
+			set block at location at {stripped2} to deepslate tiles
+			set block at location at {stripped3} to deepslate tiles
+			set block at location at {stripped4} to deepslate tiles
+			set block at location at {stripped5} to deepslate tiles
+			set block at location at {stripped6} to deepslate tiles
+			set block at location at {stripped7} to deepslate tiles
+			set block at location at {stripped8} to deepslate tiles
+			set block at location at {stripped9} to deepslate tiles
+			set block at location at {stripped10} to deepslate tiles
+			set block at location at {stripped11} to deepslate tiles
+			set block at location at {stripped12} to deepslate tiles
+			# Polished black stone bricks
+			set block at location at {brick1} to polished blackstone bricks
+			set block at location at {brick2} to polished blackstone bricks
+			set block at location at {brick3} to polished blackstone bricks
+			set block at location at {brick4} to polished blackstone bricks
+			set block at location at {brick5} to polished blackstone bricks
+			set block at location at {brick6} to polished blackstone bricks
+			set block at location at {brick7} to polished blackstone bricks
+			set block at location at {brick8} to polished blackstone bricks
+			set block at location at {brick9} to polished blackstone bricks
+			set block at location at {brick10} to polished blackstone bricks
+			set block at location at {brick11} to polished blackstone bricks
+			set block at location at {brick12} to polished blackstone bricks
+			set block at location at {brick13} to polished blackstone bricks
+			set block at location at {brick14} to polished blackstone bricks
+			set block at location at {brick15} to polished blackstone bricks
+			set block at location at {brick16} to polished blackstone bricks
+			set block at location at {brick17} to polished blackstone bricks
+			set block at location at {brick18} to polished blackstone bricks
+			set block at location at {brick19} to polished blackstone bricks
+			set block at location at {brick20} to polished blackstone bricks
+			set block at location at {brick21} to polished blackstone bricks
+			set block at location at {brick22} to polished blackstone bricks
+			set block at location at {brick23} to polished blackstone bricks
+			set block at location at {brick24} to polished blackstone bricks
+			# East
+			set block at location at {stairs.east1} to blackstone stairs[facing=west]
+			set block at location at {stairs.east2} to blackstone stairs[facing=west]
+			set block at location at {stairs.east3} to blackstone stairs[facing=west]
+			# west
+			set block at location at {stairs.west1} to blackstone stairs[facing=east]
+			set block at location at {stairs.west2} to blackstone stairs[facing=east]
+			set block at location at {stairs.west3} to blackstone stairs[facing=east]
+			# north
+			set block at location at {stairs.north1} to blackstone stairs[facing=south]
+			set block at location at {stairs.north2} to blackstone stairs[facing=south]
+			set block at location at {stairs.north3} to blackstone stairs[facing=south]
+			# south
+			set block at location at {stairs.south1} to blackstone stairs[facing=north]
+			set block at location at {stairs.south2} to blackstone stairs[facing=north]
+			set block at location at {stairs.south3} to blackstone stairs[facing=north]
+			set {PedestalRepair} to false
+			set {PedestalCount} to 0
+			set {PedestalTimer} to 0
+			set {PedestalRevive} to false
+			set {-Reviving} to false
+			broadcast "<##FE8120>Pedestal has &cClosed"
+			execute console command "weather clear"
+			set {Beacon} to false
+			set {Debris} to false
+			loop all players:
+				set {-attempts.%loop-player's uuid%} to 0
+
+on tab complete for "/pedestal":
+	set tab completions for position 1 to "set" and "activate" and "deactivate"
+
+function revivalPing(p: player):
+	create a new embed:
+		title: "%{_p}%'s has started a restoration Ritual"
+		description: "`%{_p}% is trying to restore their gem`"
+		color: "#00aeff"
+		timestamp: true
+		footer: {_footer}
+		thumbnail: "https://static.wikia.nocookie.net/blisssmp/images/2/29/Mugm.png/revision/latest/scale-to-width-down/350?cb=20230307142110"
+		author: {_author}
+		fields: {_field}, {_field2}
+		saveInto: {_embed}
+	create a new webhook message:
+		message: "@everyone"
+		webhook: "%{-webhook}%" # <--------- [Embed's variable (don't forget to add your url from embed.sk)]
+		username: "Smp Leaks 🥶"
+		avatar: "https://static.wikia.nocookie.net/blisssmp/images/3/39/Site-community-image/revision/latest?cb=20230524102827"
+		embed: {_embed}
+
+
+function repairlPing(p: player):
+	create a new embed:
+		title: "%{_p}%'s has started a repair Ritual"
+		description: "`%{_p}% is trying to repair their gem`"
+		color: "#00334b"
+		timestamp: true
+		footer: {_footer}
+		thumbnail: "https://static.wikia.nocookie.net/blisssmp/images/2/29/Mugm.png/revision/latest/scale-to-width-down/350?cb=20230307142110"
+		author: {_author}
+		fields: {_field}, {_field2}
+		saveInto: {_embed}
+	create a new webhook message:
+		message: "@everyone"
+		webhook: "%{-webhook}%" # <--------- [Embed's variable (don't forget to add your url from embed.sk)]
+		username: "Smp Leaks 🥶"
+		avatar: "https://static.wikia.nocookie.net/blisssmp/images/3/39/Site-community-image/revision/latest?cb=20230524102827"
+		embed: {_embed}
+
+every 7 seconds:
+	if {Debris} is false:
+		if {Beacon} is false:
+			set block at location at {DebrisLoc} to black stained glass
+
+
+# Revival Start
+on drop:
+	if player is within 3 blocks around {PedestalLoc}:
+		if event-item is {-Bliss.Revive.3}:
+			if {Beacon} is true:
+				if {Debris} is true:
+					set {-attempts.%player's uuid%} to 3
+					if {PedestalActive} is true:
+						loop all items in player's inventory:
+							if IsGem(loop-item) is true:
+								if getEnergy(loop-item) is 0:
+									if {PedestalRepair} is false:
+										set {PedestalActive} to true
+										set {-Reviving} to player
+										set {PedestalRevive} to true
+										set {PedestalRepair} to false
+										wait 1 second
+										set {PedestalDura} to 3
+										delete event-dropped item
+										play sound "block.beacon.activate" with volume 30 at all players
+										broadcast "&d%player% has started a restoration ritual!"
+										revivalPing(player)
+
+				else:
+					send "&4You Must Place Ancient Debris First" to player
+
+			else:
+				send "&4You Must Place Beacon First" to player
+
+		# Restoraion 2 Attempts
+		else if event-item is {-Bliss.Revive.2}:
+			if {Beacon} is true:
+				if {Debris} is true:
+					set {-attempts.%player's uuid%} to 2
+					if {PedestalActive} is true:
+						loop all items in player's inventory:
+							if IsGem(loop-item) is true:
+								if getEnergy(loop-item) is 0:
+									if {PedestalRepair} is false:
+										set {PedestalActive} to true
+										set {-Reviving} to player
+										set {PedestalRevive} to true
+										set {PedestalRepair} to false
+										wait 1 second
+										set {PedestalDura} to 3
+										delete event-dropped item
+										play sound "block.beacon.activate" with volume 30 at all players
+										broadcast "&d%player% has started a restoration ritual!"
+										revivalPing(player)
+
+				else:
+					send "&4You Must Place Ancient Debris First" to player
+
+			else:
+				send "&4You Must Place Beacon First" to player
+
+		# Restoraion 1 Attempt
+		else if event-item is {-Bliss.Revive.1}:
+			if {Beacon} is true:
+				if {Debris} is true:
+					set {-attempts.%player's uuid%} to 1
+					if {PedestalActive} is true:
+						if {PedestalRepair} is false:
+							loop all items in player's inventory:
+								if IsGem(loop-item) is true:
+									if getEnergy(loop-item) is 0:
+										set {PedestalActive} to true
+										set {-Reviving} to player
+										set {PedestalRevive} to true
+										set {PedestalRepair} to false
+										wait 1 second
+										set {PedestalDura} to 3
+										delete event-dropped item
+										play sound "block.beacon.activate" with volume 30 at all players
+										broadcast "&d%player% has started a restoration ritual!"
+										revivalPing(player)
+										
+
+				else:
+					send "&4You Must Place Ancient Debris First" to player
+
+			else:
+				send "&4You Must Place Beacon First" to player
+
+		# Repair Toggle
+		else if event-item is {-Bliss.Repair.4}:
+			if {Beacon} is true:
+				if {Debris} is true:
+					if {-Reviving} is false:
+						if {PedestalActive} is true:
+							set {PedestalRepair} to true
+							loop all items in player's inventory:
+								if IsGem(loop-item-1) is true:
+									if getEnergy(loop-item-1) is not 0:
+										set {-Reviving} to false
+										wait 1 second
+										set {PedestalDura} to 5
+										play sound "block.beacon.activate" with volume 30 at all players
+										broadcast "&d%player% has started a repair ritual!"
+										repairlPing(player)
+										loop 10 times:
+											if {PedestalRepair} is true:
+												wait 10 seconds
+												loop all players within 7 blocks around {PedestalLoc}:
+													loop all items in loop-player's inventory:
+														if IsGem(loop-item-2) is true:
+															if getEnergy(loop-item-2) > 0:
+																if getEnergy(loop-item-2) < 5:
+																	add 1 to {_en}
+																	SetEnergy(loop-player, {_en})
+																	set {_energy} to getEnergy(loop-item-2)
+																	if {_energy} is 5:
+																		set {_energymsg} to "<##57FFC7>Pristine"
+																	else if {_energy} is 4:
+																		set {_energymsg} to "<##57FF8F>Scratched"
+																	else if {_energy} is 3:
+																		set {_energymsg} to "<##7958DB>Cracked"
+																	else if {_energy} is 2:
+																		set {_energymsg} to "<##FFC929>Damaged"
+																	else if {_energy} is 1:
+																		set {_energymsg} to "<##FF1111>Ruined"
+																if {_energy} is not 5:
+																	broadcast "<##FFD773>Healed %loop-player%'s gem. They are not at %{_energymsg}%"
+																	set {-replenished} to false
+																	play sound "minecraft:ui.toast.challenge_complete" at volume 1 at pitch 1 to all players
+																if {_energy} is 5:
+																	if {-replenished} is false:
+																		add 1 to progress of the custom advancement "bliss/repair" for loop-player
+																		broadcast "<##FFD773>Replenished %loop-player%'s gem. They are not at %{_energymsg}%"
+																		set {-replenished} to true
+																		play sound "minecraft:ui.toast.challenge_complete" at volume 1 at pitch 1 to all players
+											else:
+												stop
+										
+										execute console command "pedestal activate"
+										delete event-dropped item
+										
+
+on pickup:
+	if event-item is {-Bliss.Repair.4}:
+		if {PedestalRepair} is true:
+			cancel event
+
+
+# Break Attempts
+on block break:
+	if event-block is within 0.8 blocks around {PedestalLoc}:
+		if {PedestalRepair} is false:
+			if event-block is beacon:
+				if {PedestalActive} is true:
+					if player's gamemode is not creative:
+						if {PedestalDura} > 1:
+							if {PedestalBreakTimer} is 0:
+								cancel event
+								set {PedestalBreakTimer} to 1
+								remove 1 from {PedestalDura}
+								broadcast "&cPedestal break attempt, durability is %{PedestalDura}%"
+							else:
+								send "&cPedestal break cooldown! %{PedestalBreakTimer}% &a Seconds" to player
+								cancel event
+						else:
+							set {Beacon} to false
+							if {-Reviving} is not false:
+								broadcast "&cPedestal was broken! %{-Reviving}%'s Restoraion Ritual was interrupted"
+								play sound "block.beacon.deactivate" with volume 2 and pitch 0.5 at all players
+								set {PedestalActive} to true
+								set {PedestalRevive} to false
+								set {PedestalTimer} to 0
+								set {PedestalBreakTimer} to 0
+								set {PedestalDura} to 0
+								wait 10 ticks
+								drop {PedestalCount} of {-energyitem::%{-Reviving}%::60}
+								loop all entities within 500 blocks of location {PedestalLoc}:
+									if loop-entity is a end crystal:
+										kill loop-entity
+								wait 1 second
+								if {-attempts.%{-Reviving}'s uuid%} is 3:
+									drop 1 of {-Bliss.Revive.2} at location at {PedestalLoc}
+									delete {-attempts.%{-Reviving}'s uuid%}
+								if {-attempts.%{-Reviving}'s uuid%} is 2:
+									drop 1 of {-Bliss.Revive.1} at location at {PedestalLoc}
+									delete {-attempts.%{-Reviving}'s uuid%}
+								if {-attempts.%{-Reviving}'s uuid%} is 1:
+									drop 1 of {-Bliss.Revive.0} at location at {PedestalLoc}
+									delete {-attempts.%{-Reviving}'s uuid%}
+								execute console command "weather clear"
+								set {PedestalCount} to 0
+								set {-Reviving} to false
+								execute console command "pedestal activate"
+							else:
+								broadcast "&cPedestal was broken!"
+								play sound "block.beacon.deactivate" with volume 2 and pitch 0.5 at all players
+								set {PedestalActive} to true
+								set {PedestalRevive} to false
+								set {PedestalCount} to 0
+								set {PedestalTimer} to 0
+								set {PedestalBreakTimer} to 0
+								set {PedestalDura} to 0
+								set {-Reviving} to false
+								loop all players:
+									set {-attempts.%loop-player's uuid%} to 0
+								execute console command "pedestal activate"
+								drop 1 beacon at location at {PedestalLoc}
+								loop all entities within 500 blocks of location {PedestalLoc}:
+									if loop-entity is a end crystal:
+										kill loop-entity
+				else:
+					cancel event
+
+
+		else:
+			if event-block is beacon:
+				if {PedestalActive} is true:
+					if player's gamemode is not creative:
+						if {PedestalDura} > 1:
+							if {PedestalBreakTimer} is 0:
+								cancel event
+								set {PedestalBreakTimer} to 1
+								remove 1 from {PedestalDura}
+								broadcast "&cPedestal break attempt, durability is %{PedestalDura}%"
+							else:
+								send "&cPedestal break cooldown! %{PedestalBreakTimer}% &a Seconds" to player
+								cancel event
+						else:
+							set {Beacon} to false
+							if {PedestalRepair} is not false:
+								broadcast "&cPedestal was broken! %{Repair}%'s Restoraion Ritual was interrupted"
+								play sound "block.beacon.deactivate" with volume 2 and pitch 0.5 at all players
+								set {PedestalActive} to true
+								set {PedestalRevive} to false
+								set {PedestalTimer} to 0
+								set {PedestalBreakTimer} to 0
+								set {PedestalDura} to 0
+								wait 10 ticks
+								drop {PedestalCount} of {-energyitem::%{Ritual}%::60}
+								loop all entities within 500 blocks of location {PedestalLoc}:
+									if loop-entity is a end crystal:
+										kill loop-entity
+								wait 1 second
+								execute console command "weather clear"
+								set {PedestalCount} to 0
+								set {-Reviving} to false
+								set {PedestalRepair} to false
+								execute console command "pedestal activate"
+							else:
+								broadcast "&cPedestal was broken!"
+								play sound "block.beacon.deactivate" with volume 2 and pitch 0.5 at all players
+								set {PedestalActive} to true
+								set {PedestalRevive} to false
+								set {PedestalCount} to 0
+								set {PedestalTimer} to 0
+								set {PedestalBreakTimer} to 0
+								set {PedestalDura} to 0
+								set {-Reviving} to false
+								execute console command "pedestal activate"
+								drop 1 beacon at location at {PedestalLoc}
+								loop all entities within 500 blocks of location {PedestalLoc}:
+									if loop-entity is a end crystal:
+										kill loop-entity
+
+
+
+	if event-block is within 0.8 blocks around {DebrisLoc}:
+		if event-block is ancient debris:
+			if {Debris} is true:
+				if {PedestalActive} is true:
+					if player's gamemode is not creative:
+						if {PedestalDura} > 1:
+							if {PedestalBreakTimer} is 0:
+								cancel event
+								set {PedestalBreakTimer} to 1
+								remove 1 from {PedestalDura}
+								broadcast "&cPedestal break attempt, durability is %{PedestalDura}%"
+							else:
+								send "&cPedestal break cooldown! %{PedestalBreakTimer}% &a Seconds" to player
+								cancel event
+						else:
+							set {Debris} to false
+							if {PedestalRepair} is not false:
+								broadcast "&cPedestal was broken! %{Repair}%'s Restoraion Ritual was interrupted"
+								play sound "block.beacon.deactivate" with volume 2 and pitch 0.5 at all players
+								set {PedestalActive} to true
+								set {PedestalRevive} to false
+								set {PedestalTimer} to 0
+								set {PedestalBreakTimer} to 0
+								set {PedestalDura} to 0
+								wait 10 ticks
+								drop {PedestalCount} of {-energyitem::%{Repair}%::60}
+								loop all entities within 500 blocks of location {PedestalLoc}:
+									if loop-entity is a end crystal:
+										kill loop-entity
+								wait 1 second
+								drop 1 beacon at {PedestalLoc}
+								execute console command "weather clear"
+								set {PedestalCount} to 0
+								set {-Reviving} to false
+								execute console command "pedestal activate"
+							else:
+								broadcast "&cPedestal was broken!"
+								play sound "block.beacon.deactivate" with volume 2 and pitch 0.5 at all players
+								set {PedestalActive} to true
+								set {PedestalRevive} to false
+								set {PedestalCount} to 0
+								set {PedestalTimer} to 0
+								set {PedestalBreakTimer} to 0
+								set {PedestalDura} to 0
+								set {-Reviving} to false
+								if {Beacon} is true:
+									drop 1 beacon at {PedestalLoc}
+								wait 1 second
+								execute console command "pedestal activate"
+								loop all entities within 500 blocks of location {PedestalLoc}:
+									if loop-entity is a end crystal:
+										kill loop-entity
+				else:
+					cancel event
+
+
+
+
+on block break:
+	if event-block is within 10 blocks of {PedestalLoc}:
+		if event-block is gold block or gilded blackstone or block of raw gold:
+			cancel event
+		if event-block is cherry stairs or cherry log or cherry plank:
+			cancel event
+		if event-block is stripped cherry log or quartz bricks or smooth quartz stairs:
+			cancel event
+		if event-block is blackstone or netherite block or basalt:
+			cancel event
+		if event-block is polished basalt or polished deepslate or deepslate tiles:
+			cancel event
+		if event-block is polished blackstone bricks or blackstone stairs:
+			cancel event
+		if event-block is reinforced deepslate or deepslate bricks or polished deepslate:
+			cancel event
+		if event-block is deepslate tile slabs or deepslate tile stairs:
+			cancel event
+
+on block place:
+	if event-block is within 10 blocks of {PedestalLoc}:
+		if event-block is gold block or gilded blackstone or block of raw gold:
+			cancel event
+		if event-block is cherry stairs or cherry log or cherry plank:
+			cancel event
+		if event-block is stripped cherry log or quartz bricks or smooth quartz stairs:
+			cancel event
+		if event-block is blackstone or netherite block or basalt:
+			cancel event
+		if event-block is polished basalt or polished deepslate or deepslate tiles:
+			cancel event
+		if event-block is polished blackstone bricks or blackstone stairs:
+			cancel event
+		if event-block is reinforced deepslate or deepslate bricks or polished deepslate:
+			cancel event
+		if event-block is deepslate tile slabs or deepslate tile stairs:
+			cancel event
+
+on block explode:
+	if event-location is within 30 blocks of {PedestalLoc}:
+		cancel event
+
+
+
+# Beacon System
+on block place:
+	if event-block is within 0.8 block of {PedestalLoc}:
+		if event-item is not ancient debris:
+			if event-block is beacon:
+				if {Debris} is true:
+					if {Beacon} is true:
+						cancel event
+					else if {Beacon} is false:
+						if {PedestalActive} is true:
+							play sound "minecraft:block.beacon.power_select" with volume 5 and pitch 2 at all players
+							set {PedestalDura} to 0
+							wait 10 ticks
+							set {Beacon} to true
+							set {_x} to x-coords of {PedestalLoc}
+							set {_y} to y-coords of {PedestalLoc}
+							set {_z} to z-coords of {PedestalLoc}
+							execute console command "/summon minecraft:end_crystal %{_x}% 319 %{_z}% {BeamTarget:{X:%{_x}%, Y:%{_y}%, Z:%{_z}%}, Tags:""RestorationTag%uuid of player%""}"
+						else:
+							cancel event
+					else:
+						send "&4Place a beacon" to player
+				else:
+					cancel event
+					send "&4Place Ancient Debris First" to player
+
+# Ancient Debris System
+on block place:
+	if event-block is within 0.8 block of {DebrisLoc}:
+		if event-block is ancient debris:
+			if {Debris} is true:
+				cancel event
+			else if {Debris} is false:
+				if {PedestalActive} is true:
+					play sound "minecraft:block.beacon.power_select" with volume 5 and pitch 2 at all players
+					set {PedestalDura} to 0
+					wait 10 ticks
+					set {Debris} to true
+					execute console command "/summon minecraft:end_crystal %event-block's x coordinate% 319 %event-block's z coordinate% {BeamTarget:{X:%event-block's x coordinate%, Y:%event-block's y coordinate%, Z:%event-block's z coordinate%}, Tags:""RestorationTag%uuid of player%""}"
+				else:
+					cancel event
+		else:
+			send "&cYou Need A &7 Ancient debris &fDummy!" to player
+
+every 1 second:
+	if {PedestalTimer} > 1:
+		remove 1 from {PedestalTimer}
+	if {PedestalTimer} is 1:
+		remove 1 from {PedestalTimer}
+		broadcast "&6Pedestal cooldown is over. <##96FFD9>Please deposit 1 &lᴇɴᴇʀɢʏ!"
+	if {PedestalBreakTimer} > 0:
+		remove 1 from {PedestalBreakTimer}
+
+on drop:
+	if {Beacon} is true:
+		if {Debris} is true:
+			if {PedestalRepair} is false:
+				if player is within 3 blocks around {PedestalLoc}:
+					if event-item is a nautilus shell with custom model data 300:
+						if {PedestalTimer} is 0:
+							execute console command "weather thunder 200s"
+							play sound "block.beacon.ambient" with volume 40 and pitch 1.6 at {PedestalLoc}
+							if {PedestalCount} is 4:
+								if {-Reviving} is not false:
+									execute console command "weather set thunder 200s"
+									wait 1 seconds
+									delete event-dropped item
+									play sound "item.axe.scrape" with volume 10 and pitch 0.5 at {PedestalLoc}
+									play sound "block.amethyst_block.break" with volume 20 and pitch 1.2 at {PedestalLoc}
+									execute console command "/weather set thunder 100"
+									loop 3 times:
+										set {_loc} to {PedestalLoc}
+										set {_rand1} to a random integer between 7 and 15
+										set {_rand2} to a random integer between 7 and 15
+										set {_rand3} to a random integer between 7 and 15
+										set {_rand4} to a random integer between 7 and 15
+										set {_loc1} to location {_rand2} blocks left and {_rand4} blocks infront of {_loc}
+										set {_loc2} to location {_rand1} blocks right and {_rand3} blocks behind {_loc}				
+										set {_loc3} to location {_rand1} blocks right and {_rand4} blocks infront of {_loc}
+										set {_loc4} to location {_rand2} blocks left and {_rand3} blocks behind {_loc}
+										strike lightning effect at {_loc1} or {_loc2} or {_loc3} or {_loc4}
+									wait 1 tick
+									add 1 to {PedestalCount}
+									loop all players within 8 blocks around {PedestalLoc}:
+										send "<##FFD773>Energy deposit requirement has been fulfilled!" to loop-player
+										send "<##96FFD9>Please stand on the pedestal center!" to loop-player
+
+							else if {PedestalCount} is 3:
+								wait 1 second
+								delete event-dropped item
+								play sound "item.axe.scrape" with volume 10 and pitch 0.5 at {PedestalLoc}
+								play sound "block.amethyst_block.break" with volume 20 and pitch 1.2 at {PedestalLoc}
+								wait 1 tick
+								add 1 to {PedestalCount}
+								set {PedestalTimer} to 5
+								loop all players within 8 blocks around {PedestalLoc}:
+									loop 3 times:
+										set {_loc} to {PedestalLoc}
+										set {_rand1} to a random integer between 7 and 15
+										set {_rand2} to a random integer between 7 and 15
+										set {_rand3} to a random integer between 7 and 15
+										set {_rand4} to a random integer between 7 and 15
+										set {_loc1} to location {_rand2} blocks left and {_rand4} blocks infront of {_loc}
+										set {_loc2} to location {_rand1} blocks right and {_rand3} blocks behind {_loc}				
+										set {_loc3} to location {_rand1} blocks right and {_rand4} blocks infront of {_loc}
+										set {_loc4} to location {_rand2} blocks left and {_rand3} blocks behind {_loc}
+										strike lightning effect at {_loc1} or {_loc2} or {_loc3} or {_loc4}
+									send "<##96FFD9>%{PedestalCount}%/5 energy deposited!" to loop-player
+									send "&cPlease wait for pedestal cooldown..." to loop-player
+							else if {PedestalCount} is 2:
+								wait 1 second
+								delete event-dropped item
+								play sound "item.axe.scrape" with volume 10 and pitch 0.5 at {PedestalLoc}
+								play sound "block.amethyst_block.break" with volume 20 and pitch 1.2 at {PedestalLoc}
+								wait 1 tick
+								add 1 to {PedestalCount}
+								set {PedestalTimer} to 5
+								loop all players within 8 blocks around {PedestalLoc}:
+									loop 3 times:
+										set {_loc} to {PedestalLoc}
+										set {_rand1} to a random integer between 7 and 15
+										set {_rand2} to a random integer between 7 and 15
+										set {_rand3} to a random integer between 7 and 15
+										set {_rand4} to a random integer between 7 and 15
+										set {_loc1} to location {_rand2} blocks left and {_rand4} blocks infront of {_loc}
+										set {_loc2} to location {_rand1} blocks right and {_rand3} blocks behind {_loc}				
+										set {_loc3} to location {_rand1} blocks right and {_rand4} blocks infront of {_loc}
+										set {_loc4} to location {_rand2} blocks left and {_rand3} blocks behind {_loc}
+										strike lightning effect at {_loc1} or {_loc2} or {_loc3} or {_loc4}
+									send "<##96FFD9>%{PedestalCount}%/5 energy deposited!" to loop-player
+									send "&cPlease wait for pedestal cooldown..." to loop-player
+							else if {PedestalCount} is 1:
+								wait 1 second
+								delete event-dropped item
+								play sound "item.axe.scrape" with volume 10 and pitch 0.5 at {PedestalLoc}
+								play sound "block.amethyst_block.break" with volume 20 and pitch 1.2 at {PedestalLoc}
+								wait 1 tick
+								add 1 to {PedestalCount}
+								set {PedestalTimer} to 5
+								loop all players within 8 blocks around {PedestalLoc}:
+									loop 3 times:
+										set {_loc} to {PedestalLoc}
+										set {_rand1} to a random integer between 7 and 15
+										set {_rand2} to a random integer between 7 and 15
+										set {_rand3} to a random integer between 7 and 15
+										set {_rand4} to a random integer between 7 and 15
+										set {_loc1} to location {_rand2} blocks left and {_rand4} blocks infront of {_loc}
+										set {_loc2} to location {_rand1} blocks right and {_rand3} blocks behind {_loc}				
+										set {_loc3} to location {_rand1} blocks right and {_rand4} blocks infront of {_loc}
+										set {_loc4} to location {_rand2} blocks left and {_rand3} blocks behind {_loc}
+										strike lightning effect at {_loc1} or {_loc2} or {_loc3} or {_loc4}
+									send "<##96FFD9>%{PedestalCount}%/5 energy deposited!" to loop-player
+									send "&cPlease wait for pedestal cooldown..." to loop-player
+							else if {PedestalCount} is 0:
+								wait 1 second
+								delete event-dropped item
+								play sound "item.axe.scrape" with volume 10 and pitch 0.5 at {PedestalLoc}
+								play sound "block.amethyst_block.break" with volume 20 and pitch 1.2 at {PedestalLoc}
+								wait 1 tick
+								add 1 to {PedestalCount}
+								set {PedestalTimer} to 5
+								loop all players within 8 blocks around {PedestalLoc}:
+									loop 3 times:
+										set {_loc} to {PedestalLoc}
+										set {_rand1} to a random integer between 7 and 15
+										set {_rand2} to a random integer between 7 and 15
+										set {_rand3} to a random integer between 7 and 15
+										set {_rand4} to a random integer between 7 and 15
+										set {_loc1} to location {_rand2} blocks left and {_rand4} blocks infront of {_loc}
+										set {_loc2} to location {_rand1} blocks right and {_rand3} blocks behind {_loc}				
+										set {_loc3} to location {_rand1} blocks right and {_rand4} blocks infront of {_loc}
+										set {_loc4} to location {_rand2} blocks left and {_rand3} blocks behind {_loc}
+										strike lightning effect at {_loc1} or {_loc2} or {_loc3} or {_loc4}
+									send "<##96FFD9>%{PedestalCount}%/5 energy deposited!" to loop-player
+									send "&cPlease wait for pedestal cooldown..." to loop-player
+									execute console command "weather set thunder 20s"
+
+on swap hand items:
+	if {RevivalLocked.%player%} is true:
+		cancel event
+
+on inventory click:
+	if {RevivalLocked.%player%} is true:
+		cancel event
+
+import:
+	org.bukkit.Bukkit
+	com.hyperdondon.glowingEntitiesLib.GlowingEntitiesLib
+	org.bukkit.ChatColor
+
+every 5 ticks:
+	if {-rt} is set:
+		loop all players:
+			if loop-player is {-Reviving}:
+				loop all items in loop-player's inventory:
+					if IsGem(loop-item) is true:
+						if custom model data of loop-item is 1:
+							loop all players:
+								GlowingEntitiesLib.setGlowing(loop-player-1, loop-player-2, ChatColor.YELLOW)
+						if custom model data of loop-item is 3:
+							loop all players:
+								GlowingEntitiesLib.setGlowing(loop-player-1, loop-player-2, ChatColor.LIGHT_PURPLE)
+						if custom model data of loop-item is 5:
+							loop all players:
+								GlowingEntitiesLib.setGlowing(loop-player-1, loop-player-2, ChatColor.WHITE)
+						if custom model data of loop-item is 7:
+							loop all players:
+								GlowingEntitiesLib.setGlowing(loop-player-1, loop-player-2, ChatColor.GOLD)
+						if custom model data of loop-item is 9:
+							loop all players:
+								GlowingEntitiesLib.setGlowing(loop-player-1, loop-player-2, ChatColor.RED)
+						if custom model data of loop-item is 11:
+							loop all players:
+								GlowingEntitiesLib.setGlowing(loop-player-1, loop-player-2, ChatColor.GREEN)
+						if custom model data of loop-item is 13:
+							loop all players:
+								GlowingEntitiesLib.setGlowing(loop-player-1, loop-player-2, ChatColor.DARK_PURPLE)
+						if custom model data of loop-item is 15:
+							loop all players:
+								GlowingEntitiesLib.setGlowing(loop-player-1, loop-player-2, ChatColor.AQUA)
+
+	else:
+		if {Prog2} is not true:
+			loop all players:
+				set {_i} to loop-player
+				loop all players:
+					GlowingEntitiesLib.unsetGlowing(loop-player-1, loop-player-2)
+
+
+on player move:
+	if player is {-Reviving}:
+		set {-rt} to true
+		if {PedestalCount} is 5:
+			if {PedestalBusy} is not true:
+				if player is within 1.5 blocks around {PedestalLoc1}:
+					set {-rt} to true
+					set {PedestalBusy} to true
+					set {RevivalLocked.%player%} to true
+					set {Rolling} to false
+					set gravity of player to false
+					set {-Disabled::%player's uuid%} to 15
+					setTier(player, 1)
+					# Spawning Gems
+					
+					# Puff
+					spawn armor stand at location 6 blocks south of {Gems}
+					set {-puffArmor.%player's uuid%} to last spawned armor stand
+					set gravity of {-puffArmor.%player's uuid%} to off
+					set visibility of {-puffArmor.%player's uuid%} to false
+					
+					
+					set helmet of {-puffArmor.%player's uuid%} to a prismarine shard with custom model data 6
+					
+					# flux
+					spawn armor stand at location 6 blocks east of {Gems}
+					set {-fluxArmor.%player's uuid%} to last spawned armor stand
+					set gravity of {-fluxArmor.%player's uuid%} to off
+					set visibility of {-fluxArmor.%player's uuid%} to false
+					
+					
+					set helmet of {-fluxArmor.%player's uuid%} to a prismarine shard with custom model data 16
+					
+
+					# Astra
+					spawn armor stand at location 6 blocks north of {Gems}
+					set {-astraArmor.%player's uuid%} to last spawned armor stand
+					set gravity of {-astraArmor.%player's uuid%} to off
+					
+					
+					set visibility of {-astraArmor.%player's uuid%} to false
+					set helmet of {-astraArmor.%player's uuid%} to a prismarine shard with custom model data 14
+					
+					# Strength
+					spawn armor stand at location 4 blocks west and 4 block south of {Gems}
+					set {-strengthArmor.%player's uuid%} to last spawned armor stand
+					set gravity of {-strengthArmor.%player's uuid%} to off
+					set visibility of {-strengthArmor.%player's uuid%} to false
+					
+					
+					set helmet of {-strengthArmor.%player's uuid%} to a prismarine shard with custom model data 10
+
+					# life
+					spawn armor stand at location 4 blocks east and 4 block south of {Gems}
+					set {-lifeArmor.%player's uuid%} to last spawned armor stand
+					set gravity of {-lifeArmor.%player's uuid%} to off
+					
+
+					set visibility of {-lifeArmor.%player's uuid%} to false
+					set helmet of {-lifeArmor.%player's uuid%} to a prismarine shard with custom model data 4
+					
+					# Speed
+					spawn armor stand at location 4 blocks west and 4 block north of {Gems}
+					set {-speedArmor.%player's uuid%} to last spawned armor stand
+					set gravity of {-speedArmor.%player's uuid%} to off
+					
+					
+					set visibility of {-speedArmor.%player's uuid%} to false
+					set helmet of {-speedArmor.%player's uuid%} to a prismarine shard with custom model data 8
+
+					# Fire
+					spawn armor stand at location 4 blocks east and 4 block north of {Gems}
+					set {-fireArmor.%player's uuid%} to last spawned armor stand
+					set gravity of {-fireArmor.%player's uuid%} to off
+					
+					
+					set visibility of {-fireArmor.%player's uuid%} to false
+					set helmet of {-fireArmor.%player's uuid%} to a prismarine shard with custom model data 2
+
+					# Wealth
+					spawn armor stand at location 6 blocks west of {Gems}
+					set {-wealthArmor.%player's uuid%} to last spawned armor stand
+					set gravity of {-wealthArmor.%player's uuid%} to off
+					
+
+					set visibility of {-wealthArmor.%player's uuid%} to false
+					set helmet of {-wealthArmor.%player's uuid%} to a prismarine shard with custom model data 12
+					wait 1 second
+					loop 60 times:
+						teleport {-lifeArmor.%player's uuid%} to location 0.07 blocks above {-lifeArmor.%player's uuid%}'s location
+						teleport {-puffArmor.%player's uuid%} to location 0.07 blocks above {-puffArmor.%player's uuid%}'s location
+						teleport {-speedArmor.%player's uuid%} to location 0.07 blocks above {-speedArmor.%player's uuid%}'s location
+						teleport {-strengthArmor.%player's uuid%} to location 0.07 blocks above {-strengthArmor.%player's uuid%}'s location
+						teleport {-fluxArmor.%player's uuid%} to location 0.05 blocks above {-fluxArmor.%player's uuid%}'s location
+						teleport {-astraArmor.%player's uuid%} to location 0.07 blocks above {-astraArmor.%player's uuid%}'s location
+						teleport {-wealthArmor.%player's uuid%} to location 0.07 blocks above {-wealthArmor.%player's uuid%}'s location
+						teleport {-fireArmor.%player's uuid%} to location 0.07 blocks above {-fireArmor.%player's uuid%}'s location
+						teleport player at location 1 block above {PedestalLoc}
+						wait 1 tick
+					loop 10 times:
+						teleport player at location 1 block above {PedestalLoc}
+						set {_pl} to location 1 block above {PedestalLoc}
+						wait 10 ticks
+					loop all items in player's inventory:
+						if IsGem(loop-value-1) is true:
+							set {_newGem} to loop-value-1
+							set {_pl} to player
+							loop 25 times:
+								lifegemsCircle(7, {_pl})
+								firegemsCircle(7, {_pl})
+								puffgemsCircle(7, {_pl})
+								strengthgemsCircle(7, {_pl})
+								fluxgemsCircle(7, {_pl})
+								astragemsCircle(7, {_pl})
+								wealthgemsCircle(7, {_pl})
+								speedgemsCircle(7, {_pl})
+							wait 3.5 seconds
+							loop 238 times:
+								set {-Disabled::%player's uuid%} to 5
+								set {_uuid} to player's uuid
+								set {-Disabled::%{_uuid}%} to 1
+								set {-armorStands.%{_uuid}%} to true
+								set {_loc} to location 1 block below player's location
+								apply levitation to player for 10 ticks replacing the existing effect
+								wait 1 ticks
+								if loop-iteration-2 is 100:
+									SetEnergy(player, 1)
+								if loop-iteration-2 is 118:
+									SetEnergy(player, 1)
+								if loop-iteration-2 is 134:
+									SetEnergy(player, 2)
+								if loop-iteration-2 is 148:
+									SetEnergy(player, 2)
+								if loop-iteration-2 is 160:
+									SetEnergy(player, 3)
+								if loop-iteration-2 is 170:
+									SetEnergy(player, 3)
+								if loop-iteration-2 is 178:
+									SetEnergy(player, 4)
+								if loop-iteration-2 is 184:
+									SetEnergy(player, 5)
+								if loop-iteration-2 is 189:
+									SetEnergy(player, 5)
+								if loop-iteration-2 is 192:
+									kill {-lifeArmor.%player's uuid%}
+									kill {-puffArmor.%player's uuid%}
+									kill {-speedArmor.%player's uuid%}
+									kill {-strengthArmor.%player's uuid%} 
+									kill {-fluxArmor.%player's uuid%}
+									kill {-astraArmor.%player's uuid%}
+									kill {-wealthArmor.%player's uuid%}
+									kill {-fireArmor.%player's uuid%}
+								if loop-iteration-2 is 193:
+									set {_newGem}'s custom model data to 1
+									set loop-value-1 to {_newGem}
+									play sound "block.amethyst_block.break" with volume 20 and pitch 2 for player
+									play sound "entity.player.levelup" for player
+									wait 1 tick
+								if loop-iteration-2 is 200:
+									
+									set {_newGem}'s custom model data to 3
+									set loop-value-1 to {_newGem}
+									play sound "block.amethyst_block.break" with volume 20 and pitch 2 for player
+									play sound "entity.player.levelup" for player
+									wait 1 tick
+								if loop-iteration-2 is 210:
+									
+									set {_newGem}'s custom model data to 5
+									set loop-value-1 to {_newGem}
+									play sound "block.amethyst_block.break" with volume 20 and pitch 2 for player
+									play sound "entity.player.levelup" for player
+									wait 1 tick
+								if loop-iteration-2 is 216:
+									
+									set {_newGem}'s custom model data to 7
+									set loop-value-1 to {_newGem}
+									play sound "block.amethyst_block.break" with volume 20 and pitch 2 for player
+									play sound "entity.player.levelup" for player
+									wait 1 tick
+								if loop-iteration-2 is 220:
+									
+									set {_newGem}'s custom model data to 9
+									set loop-value-1 to {_newGem}
+									play sound "block.amethyst_block.break" with volume 20 and pitch 2 for player
+									play sound "entity.player.levelup" for player
+									wait 1 tick
+								if loop-iteration-2 is 226:
+									
+									set {_newGem}'s custom model data to 11 or 13 or 15
+									set loop-value-1 to {_newGem}
+									play sound "block.amethyst_block.break" with volume 20 and pitch 2 for player
+									play sound "entity.player.levelup" for player
+									wait 1 tick
+									set {-rt} to true
+								if loop-iteration-2 is 232:
+									restoreGem(player)
+									play sound "block.amethyst_block.break" with volume 20 and pitch 2 for player
+							loop all items in player's inventory:
+								if getGem(loop-value-2) is "strength":
+									loop all players:
+										GlowingEntitiesLib.setGlowing(player, loop-player, ChatColor.RED)
+									draw 350 of dust using dustOption(rgb(241, 3, 3), 4) at location 1 blocks above player with offset vector(1.5, 1.5, 1.5) with extra 0 with force
+
+								if getGem(loop-value-2) is "fire":
+									loop all players:
+										GlowingEntitiesLib.setGlowing(player, loop-player, ChatColor.YELLOW)
+									draw 350 of dust using dustOption(rgb(254, 129, 32), 4) at location 1 blocks above player with offset vector(1.5, 1.5, 1.5) with extra 0 with force
+
+								else if getGem(loop-value-2) is "wealth":
+									loop all players:
+										GlowingEntitiesLib.setGlowing(player, loop-player, ChatColor.GREEN)
+									draw 350 of dust using dustOption(rgb(0, 166, 44), 4) at location 1 blocks above player with offset vector(1.5, 1.5, 1.5) with extra 0 with force
+
+								else if getGem(loop-value-2) is "speed":
+									loop all players:
+										GlowingEntitiesLib.setGlowing(player, loop-player, ChatColor.GOLD)
+									draw 350 of dust using dustOption(rgb(254, 253, 23), 4) at location 1 blocks above player with offset vector(1.5, 1.5, 1.5) with extra 0 with force
+
+								else if getGem(loop-value-2) is "puff":
+									loop all players:
+										GlowingEntitiesLib.setGlowing(player, loop-player, ChatColor.WHITE)
+									draw 350 of dust using dustOption(rgb(239, 239, 239), 4) at location 1 blocks above player with offset vector(1.5, 1.5, 1.5) with extra 0 with force
+
+								else if getGem(loop-value-2) is "astra":
+									loop all players:
+										GlowingEntitiesLib.setGlowing(player, loop-player, ChatColor.DARK_PURPLE)
+									draw 350 of dust using dustOption(rgb(160, 31, 255), 4) at location 1 blocks above player with offset vector(1.5, 1.5, 1.5) with extra 0 with force
+
+								else if getGem(loop-value-2) is "life":
+									loop all players:
+										GlowingEntitiesLib.setGlowing(player, loop-player, ChatColor.LIGHT_PURPLE)
+									draw 350 of dust using dustOption(rgb(255, 20, 147), 4) at location 1 blocks above player with offset vector(1.5, 1.5, 1.5) with extra 0 with force
+
+								else if getGem(loop-value-2) is "flux":
+									loop all players:
+										GlowingEntitiesLib.setGlowing(player, loop-player, ChatColor.AQUA)
+									draw 350 of dust using dustOption(rgb(94, 215, 255), 4) at location 1 blocks above player with offset vector(1.5, 1.5, 1.5) with extra 0 with force
+								teleport player to location 10 block above {PedestalLoc}
+								set {PedestalRevive} to false
+								set {PedestalCount} to 0
+								set {-Reviving} to false
+								set {PedestalBusy} to false
+								set {-armorStands.%player's uuid%} to false
+							loop all entities within 10 blocks of {PedestalLoc1}:
+								if loop-entity is a player:
+									set {_v} to vector between {PedestalLoc1} and loop-entity
+									push loop-entity up at speed 1.5
+									push loop-entity {_v} at speed 2.5
+									loop 5 times:
+										teleport player to location 10 block above {PedestalLoc}
+										wait 10 ticks
+							loop all players:
+								send "&a%player% has succesfully completed their Restoration ritual!" to loop-player
+								add 1 to progress of the custom advancement "bliss/restoration" for player
+								play sound "entity.warden.sonic_boom" with volume 2 and pitch 1 at player
+								play sound "entity.ender_dragon.growl" with volume 2 and pitch 1 at player
+								play sound "block.bell.resonate" with volume 2 and pitch 1 at player
+								play sound "block.beacon.activate" with volume 2 and pitch 1 at player
+								play sound "entity.generic.explode" with volume 2 and pitch 1 at player
+								play sound "entity.wither.spawn" with volume 0.5 and pitch 0.5 at player
+								play sound "entity.experience_orb.pickup" with volume 1 and pitch 0.5 to player
+								set block at location at {PedestalLoc} to air
+								set {Beacon} to false
+								set {PedestalRevive} to false
+							execute console command "pedestal activate"
+							teleport player to location 10 block above {PedestalLoc}
+							set gravity of player to true
+							execute console command "/weather clear"
+							set {RevivalLocked.%player%} to false
+							delete {-rt}
+
+
+
+function lifegemsCircle(s: number, p: player):
+	set {_uuid} to {_p}'s uuid
+	set {_spacing} to 0
+	set {_circumference} to 2 * pi * {_s}
+	set {_numarm} to floor({_circumference} / {_spacing})
+	loop 1500 times:
+		set {_angle} to loop-value-2 * 360 / {_numarm}
+		set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch -1.5
+		set {_pl} to location 0.5 block below {_p}
+		if {_s} > 0.1:
+			remove 0.00677 from {_s}
+		else:
+			set {_s} to 0
+		teleport {-lifeArmor.%{_uuid}%} at location at {_pl} ~ {_v}
+		wait 1 tick if mod(loop-iteration, 4) is 0
+
+function puffgemsCircle(s: number, p: player):
+	set {_uuid} to {_p}'s uuid
+	set {_spacing} to 3
+	set {_circumference} to 2 * pi * {_s}
+	set {_numarm} to floor({_circumference} / {_spacing})
+	loop 1500 times:
+		set {_angle} to loop-value-2 * 360 / {_numarm}
+		set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch -1.5
+		set {_pl} to location 0.5 block below {_p}
+		if {_s} > 0.1:
+			remove 0.00667 from {_s}
+		else:
+			set {_s} to 0
+		teleport {-puffArmor.%{_uuid}%} at location at {_pl} ~ {_v}
+		wait 1 tick if mod(loop-iteration, 4) is 0
+
+
+function speedgemsCircle(s: number, p: player):
+	set {_uuid} to {_p}'s uuid
+	set {_spacing} to 5
+	set {_circumference} to 2 * pi * {_s}
+	set {_numarm} to floor({_circumference} / {_spacing})
+	loop 1500 times:
+		set {_angle} to loop-value-2 * 360 / {_numarm}
+		set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch -1.5
+		set {_pl} to location 0.5 block below {_p}
+		if {_s} > 0.1:
+			remove 0.00667 from {_s}
+		else:
+			set {_s} to 0
+		teleport {-speedArmor.%{_uuid}%} at location at {_pl} ~ {_v}
+		wait 1 tick if mod(loop-iteration, 4) is 0
+
+
+function strengthgemsCircle(s: number, p: player):
+	set {_uuid} to {_p}'s uuid
+	set {_spacing} to 7
+	set {_circumference} to 2 * pi * {_s}
+	set {_numarm} to floor({_circumference} / {_spacing})
+	loop 1500 times:
+		set {_angle} to loop-value-2 * 360 / {_numarm}
+		set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch -1.5
+		set {_pl} to location 0.5 block below {_p}
+		if {_s} > 0.1:
+			remove 0.00667 from {_s}
+		else:
+			set {_s} to 0
+		teleport {-strengthArmor.%{_uuid}%} at location at {_pl} ~ {_v}
+		wait 1 tick if mod(loop-iteration, 4) is 0
+
+function fluxgemsCircle(s: number, p: player):
+	set {_uuid} to {_p}'s uuid
+	set {_spacing} to 9
+	set {_circumference} to 2 * pi * {_s}
+	set {_numarm} to floor({_circumference} / {_spacing})
+	loop 1500 times:
+		set {_angle} to loop-value-2 * 360 / {_numarm}
+		set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch -1.5
+		set {_pl} to location 0.5 block below {_p}
+		if {_s} > 0.1:
+			remove 0.00667 from {_s}
+		else:
+			set {_s} to 0
+		teleport {-fluxArmor.%{_uuid}%} at location at {_pl} ~ {_v}
+		wait 1 tick if mod(loop-iteration, 4) is 0
+
+
+function astragemsCircle(s: number, p: player):
+	set {_uuid} to {_p}'s uuid
+	set {_spacing} to 11
+	set {_circumference} to 2 * pi * {_s}
+	set {_numarm} to floor({_circumference} / {_spacing})
+	loop 1500 times:
+		set {_angle} to loop-value-2 * 360 / {_numarm}
+		set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch -1.5
+		set {_pl} to location 0.5 block below {_p}
+		if {_s} > 0.1:
+			remove 0.00667 from {_s}
+		else:
+			set {_s} to 0
+		teleport {-astraArmor.%{_uuid}%} at location at {_pl} ~ {_v}
+		wait 1 tick if mod(loop-iteration, 4) is 0
+
+
+function wealthgemsCircle(s: number, p: player):
+	set {_uuid} to {_p}'s uuid
+	set {_spacing} to -3
+	set {_circumference} to 2 * pi * {_s}
+	set {_numarm} to floor({_circumference} / {_spacing})
+	loop 1500 times:
+		set {_angle} to loop-value-2 * 360 / {_numarm}
+		set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch -1.5
+		set {_pl} to location 0.5 block below {_p}
+		if {_s} > 0.1:
+			remove 0.00667 from {_s}
+		else:
+			set {_s} to 0
+		teleport {-wealthArmor.%{_uuid}%} at location at {_pl} ~ {_v}
+		wait 1 tick if mod(loop-iteration, 4) is 0
+
+function firegemsCircle(s: number, p: player):
+	set {_uuid} to {_p}'s uuid
+	set {_spacing} to -5
+	set {_circumference} to 2 * pi * {_s}
+	set {_numarm} to floor({_circumference} / {_spacing})
+	set {_yaw} to 0
+	loop 1500 times:
+		set {_angle} to loop-value-2 * 360 / {_numarm}
+		set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch -1.5
+		set {_pl} to location 0.5 block below {_p}
+		if {_s} > 0.1:
+			remove 0.00667 from {_s}
+		else:
+			set {_s} to 0
+		teleport {-fireArmor.%{_uuid}%} at location at {_pl} ~ {_v}
+		wait 1 tick if mod(loop-iteration, 4) is 0
+
+
+every 5 seconds:
+	if {PedestalCount} > 0:
+		loop 3 times:
+			set {_loc} to {PedestalLoc}
+			set {_rand1} to a random integer between 7 and 15
+			set {_rand2} to a random integer between 7 and 15
+			set {_rand3} to a random integer between 7 and 15
+			set {_rand4} to a random integer between 7 and 15
+			set {_loc1} to location {_rand2} blocks left and {_rand4} blocks infront of {_loc}
+			set {_loc2} to location {_rand1} blocks right and {_rand3} blocks behind {_loc}				
+			set {_loc3} to location {_rand1} blocks right and {_rand4} blocks infront of {_loc}
+			set {_loc4} to location {_rand2} blocks left and {_rand3} blocks behind {_loc}
+			strike lightning effect at {_loc1} or {_loc2} or {_loc3} or {_loc4}
+			draw 3 of campfire cosy smoke at location 1 block above {PedestalLoc} with offset vector(0.8,0.5,0.6) with extra 0 with force
+			wait 1 tick
+		loop 5 times:
+			set {_clusterLoc} to {_loc}
+			add a random number between -3 and 3 to {_clusterLoc}'s x-coordinate
+			add a random number between -3 and 3 to {_clusterLoc}'s z-coordinate
+			set {_cozyrandom} to a random integer between 1 and 3
+			set {_clusterLoc}'s y-coordinate to {_loc}'s y-coordinate + {_cozyrandom}
+			loop 5 times:
+				set {_randX} to a random number between -1 and 1
+				set {_randZ} to a random number between -1 and 1
+				set {_loc3} to {_clusterLoc}
+				add {_randX} to {_loc3}'s x-coordinate
+				add {_randZ} to {_loc3}'s z-coordinate
+				draw 5 of campfire cosy smoke at location 2 block above {PedestalLoc} with offset vector(0.8,0.5,0.6) with extra 0 with force
+				wait 1 tick
+
+#coded by hyperdondonreal on discord

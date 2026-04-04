@@ -1,0 +1,644 @@
+import:
+	java.time.Duration
+	java.lang.System
+	org.bukkit.Particle
+	java.lang.String
+	org.bukkit.event.inventory.InventoryClickEvent
+	org.bukkit.inventory.PlayerInventory
+	org.bukkit.entity.Fireball
+	org.bukkit.util.Vector
+	org.bukkit.Location
+	org.bukkit.potion.PotionEffect
+	org.bukkit.potion.PotionEffectType
+	org.bukkit.Material
+	org.bukkit.block.data.BlockData
+	org.bukkit.block.Block
+	org.bukkit.block.data.Waterlogged
+	org.bukkit.event.world.GenericGameEvent
+	org.bukkit.Bukkit
+	org.bukkit.block.BlockFace
+
+
+left click:
+	if isDisabled(player) is not true:
+		if getGem(player's held item) is "life":
+			if getTier(player's held item) is 2:
+				if getEnergy(player's held item) is not 0:
+					if canUsePower("HeartLock::%uuid of player%") is true:
+
+						if getEnergy(player's held item) > 4:
+							blissSetcooldown("HeartLock::%uuid of player%", toMilliseconds(2, 0), player)
+							set {_num} to 3
+						else if getEnergy(player's held item) is 4:
+							blissSetcooldown("HeartLock::%uuid of player%", toMilliseconds(2, 10), player)
+							set {_num} to 2.5
+						else if getEnergy(player's held item) is 3:
+							blissSetcooldown("HeartLock::%uuid of player%", toMilliseconds(2, 20), player)
+							set {_num} to 2.5
+						else if getEnergy(player's held item) is 2:
+							blissSetcooldown("HeartLock::%uuid of player%", toMilliseconds(2, 30), player)
+							set {_num} to 1.5
+						else if getEnergy(player's held item) is 1:
+							blissSetcooldown("HeartLock::%uuid of player%", toMilliseconds(2, 35), player)
+							set {_num} to 1.5
+
+						send "<##FE04B4>🔮 <##B8FFFB>You used &8💘<##FE04B4>Heart Drainer" to player
+						set {_s} to 1
+						set {_loc} to player's location
+						loop {_num} + {_num} times:
+
+							if loop-value is not {_num} + {_num}:
+								LifeCircle({_s}, {_loc})
+					
+								add 0.5 to {_s}
+								wait 1 tick
+
+							else:
+								LifeCirclelast({_s}, {_loc})
+
+						set {_lifeholder} to player
+						loop all entities within {_num} blocks of the player:
+							if loop-entity is not {_lifeholder}:
+								if IsTrusted(player, loop-entity) is false:
+									send "<##FE04B4>🔮 &0💘<##B8FFFB>Your heart count has been reduced by &e15%% <##B8FFFB>for <##FE04B4>60 seconds <##B8FFFB>by <##FE04B4>%{_lifeholder}%" to loop-entity
+									set {_h} to loop-entity's max health
+									remove 2 from {_h}
+									set loop-entity's max health to {_h}
+									set {lifeblessed::%loop-entity's uuid%} to true
+									wait 1 minute
+									set loop-entity's max health to 10
+									delete {lifeblessed::%loop-entity's uuid%}
+
+
+			else:
+				send "&f🔺 <##FD8988>You need tier 2 gem to cast this skill!" to player
+
+
+
+on damage:
+	if isDisabled(attacker) is not true:
+		if getGem(attacker's held item) is "life":
+			if getTier(attacker's held item) is 2:
+				if canUsePower("HeartLock::%uuid of attacker%") is true:
+					if getEnergy(attacker's held item) is not 0:
+						if victim's max health > 3:
+							if IsTrusted(attacker, victim) is not true:
+								if getEnergy(attacker's held item) > 4:
+									blissSetcooldown("HeartLock::%uuid of attacker%", toMilliseconds(2, 0), attacker)
+								else if getEnergy(attacker's held item) is 4:
+									blissSetcooldown("HeartLock::%uuid of attacker%", toMilliseconds(2, 10), attacker)
+								else if getEnergy(attacker's held item) is 3:
+									blissSetcooldown("HeartLock::%uuid of attacker%", toMilliseconds(2, 20), attacker)
+								else if getEnergy(attacker's held item) is 2:
+									blissSetcooldown("HeartLock::%uuid of attacker%", toMilliseconds(2, 30), attacker)
+								else if getEnergy(attacker's held item) is 1:
+									blissSetcooldown("HeartLock::%uuid of attacker%", toMilliseconds(2, 35), attacker)
+								LifeLine(attacker, victim)
+								set {-lifeLine::%victim's uuid%} to true
+
+								if victim is not invisible:
+									send "<##FE04B4>🔮 <##B8FFFB>You used &8💘<##FE04B4>Heart Lock <##B8FFFB>on <##FE04B4>%victim.getName()%" to attacker
+								else:
+									send "<##FE04B4>🔮 <##B8FFFB>You used &8💘<##FE04B4>Heart Lock <##B8FFFB>on <##FE04B4>&k???" to attacker
+									
+								if attacker is not invisible:
+									send "<##FE04B4>🔮 <##B8FFFB>Your heart count has been locked for <##FE04B4>20 seconds <##B8FFFB>by <##FE04B4>%attacker%" to victim
+								else:
+									send "<##FE04B4>🔮 <##B8FFFB>Your heart count has been locked for <##FE04B4>20 seconds <##B8FFFB>by <##FE04B4>&k???" to victim
+								set {HeartLocked::%victim's uuid%} to true
+								set {_heal} to victim's health
+								set victim's max health to {_heal}
+								wait 20 seconds
+								set victim's max health to 10
+								set {HeartLocked::%victim's uuid%} to false
+							else:
+								send "<##FFD773>🔮 <##FFE4AB>You cannot cast negative skills on allies!" to attacker
+
+			else:
+				send "&f🔺 <##FD8988>You need tier 2 gem to cast this skill!" to attacker
+
+on death:
+	set victim's max health to 10
+	execute console command "attribute %victim% minecraft:generic.attack_speed base set 4"
+
+on drop:
+	if event-item is dragon egg:
+		if {lifeblessed::%player's uuid%} is not set:
+			if {HeartLocked::%player's uuid%} is false:
+				if {dragongames::%player's uuid%} is true:
+					set {_h} to player's max health
+					set {_li} to {hearts::%player's uuid%}
+					add {_li} to {_h}
+					set player's max health to {_h}
+				else:
+					set player's max health to 10
+
+every 4 seconds:
+	#done by smp remakers
+	loop all players:
+		if {lifeblessed::%loop-player's uuid%} is not set:
+			if {HeartLocked::%loop-player's uuid%} is false:
+				if loop-player has 1 of dragon egg:
+					if {dragongames::%loop-player's uuid%} is true:
+						set {_h} to 20
+						set {_li} to {hearts::%loop-player's uuid%}
+						add {_li} to {_h}
+						set loop-player's max health to {_h}
+						set loop-player's tab name to "&a%loop-player%"
+					else:
+						set loop-player's max health to 20
+				else:
+					if {dragongames::%loop-player's uuid%} is true:
+						set loop-player's tab name to "&a%loop-player%"
+						set {_h} to 10
+						set {_li} to {hearts::%loop-player's uuid%}
+						add {_li} to {_h}
+						set loop-player's max health to {_h}
+					else:
+						set loop-player's max health to 10
+
+on pickup:
+	if event-item is dragon egg:
+		if {lifeblessed::%player's uuid%} is not set:
+			if {HeartLocked::%player's uuid%} is false:
+				if {dragongames::%player's uuid%} is true:
+					set {_h} to player's max health
+					set {_li} to {hearts::%player's uuid%}
+					add {_li} to {_h}
+					set player's max health to {_h}
+				else:
+					set player's max health to 20
+
+
+on join:
+	delete {lifeblessed::%player's uuid%}
+	if player has 1 of dragon egg:
+		set player's max health to 20
+		if {dragongames::%player's uuid%} is true:
+			set {_h} to player's max health
+			set {_li} to {hearts::%player's uuid%}
+			add {_li} to {_h}
+			set player's max health to {_h}
+	else:
+		set player's max health to 10
+		if {dragongames::%player's uuid%} is true:
+			set {_h} to player's max health
+			set {_li} to {hearts::%player's uuid%}
+			add {_li} to {_h}
+			set player's max health to {_h}
+
+on join:
+	set {HeartLocked::%player's uuid%} to false
+	execute console command "attribute %player% minecraft:generic.attack_speed base set 4"
+	if {HeartLocked::%player's uuid%} is false:
+		if player has 1 of dragon egg:
+			set player's max health to 20
+		else:
+			set player's max health to 10
+
+
+
+
+on right click on entity:
+	if isDisabled(player) is not true:
+		if getGem(player's held item) is "life":
+			if getTier(player's held item) is 2:
+				if getEnergy(player's held item) is not 0:
+					if canUsePower("LifeCircle::%uuid of player%") is true:
+						if getEnergy(player's held item) > 4:
+							blissSetcooldown("LifeCircle::%uuid of player%", toMilliseconds(3, 0), player)
+							set {_num} to 2
+						else if getEnergy(player's held item) is 4:
+							blissSetcooldown("LifeCircle::%uuid of player%", toMilliseconds(3, 10), player)
+							set {_num} to 2
+						else if getEnergy(player's held item) is 3:
+							blissSetcooldown("LifeCircle::%uuid of player%", toMilliseconds(3, 20), player)
+							set {_num} to 2
+						else if getEnergy(player's held item) is 2:
+							blissSetcooldown("LifeCircle::%uuid of player%", toMilliseconds(3, 30), player)
+							set {_num} to 1
+						else if getEnergy(player's held item) is 1:
+							blissSetcooldown("LifeCircle::%uuid of player%", toMilliseconds(3, 35), player)
+							set {_num} to 1
+						set {_h1} to player's max health
+						add 5 to {_h1}
+						set player's max health to {_h1}
+						send "<##FE04B4>🔮 <##B8FFFB>You have activated &f💖<##FE04B4>Privilege Precinct &r&7(radius 3)" to player
+						send "<##FE04B4>🔮 <##B8FFFB>You have recieved additional <##FE04B4>hearts <##B8FFFB>by <##FE04B4>%player%" to player
+						set {_loc} to target entity of player's location
+						loop {_num} + {_num} times:
+							LifeCircleReal({_num}, {_loc})
+							add 0.5 to {_num}
+						LifeCircleRealLast({_num}, {_loc})
+						loop all players within {_num} blocks of target entity of player:
+							if loop-player is not player:
+								if {lifeblessed::%loop-player's uuid%} is not set:
+									if IsTrusted(player, loop-player) is true:
+										send "<##FE04B4>🔮 <##B8FFFB>You have recieved additional <##FE04B4>hearts <##B8FFFB>by <##FE04B4>%player%" to loop-player
+										set {_health} to loop-player's max health
+										add 4 to {_health}
+										set loop-player's max health to {_health}
+										wait 90 seconds
+										set loop-player's max health to 10
+										delete {lifeblessed::%loop-player's uuid%}
+						wait 90 seconds
+						set player's max health to 10
+				
+on right click:
+	#poopsfart on discord did this
+	if isDisabled(player) is not true:
+		if getGem(player's held item) is "life":
+			if getTier(player's held item) is 2:
+				if getEnergy(player's held item) is not 0:
+					if canUsePower("LifeCircle::%uuid of player%") is true:
+						if getEnergy(player's held item) > 4:
+							blissSetcooldown("LifeCircle::%uuid of player%", toMilliseconds(3, 0), player)
+							set {_num} to 3.5
+						else if getEnergy(player's held item) is 4:
+							blissSetcooldown("LifeCircle::%uuid of player%", toMilliseconds(3, 10), player)
+							set {_num} to 3.5
+						else if getEnergy(player's held item) is 3:
+							blissSetcooldown("LifeCircle::%uuid of player%", toMilliseconds(3, 20), player)
+							set {_num} to 2.5
+						else if getEnergy(player's held item) is 2:
+							blissSetcooldown("LifeCircle::%uuid of player%", toMilliseconds(3, 30), player)
+							set {_num} to 2.5
+						else if getEnergy(player's held item) is 1:
+							blissSetcooldown("LifeCircle::%uuid of player%", toMilliseconds(3, 35), player)
+							set {_num} to 1.5
+						
+						send "<##FE04B4>🔮 <##B8FFFB>Activated &f💖<##FE04B4>Life Circle" to player
+						loop 12 times:
+							set durability of player's helmet to durability of player's helmet + 1
+							set durability of player's chestplate to durability of player's chestplate + 1
+							set durability of player's leggings to durability of player's leggings + 1
+							set durability of player's boots to durability of player's boots + 1
+							make 1 of happy_villager at location 1 block above player with offset vector(0.3, 0.4, 0.3) with extra 0 with force
+							LifeCircle1({_num}, player)
+							loop 10 times:
+								LifeCircle1({_num}, player)
+								loop all players:
+									if loop-player is not player:
+										if loop-player is within {_num} blocks of player:
+											if loop-player's max health is not 8:
+												if {HeartLocked::%loop-player's uuid%} is not true:
+													if {lifeblessed::%loop-player's uuid%} is not set:
+														if IsTrusted(player, loop-player) is true:
+															set {_hh} to loop-player's max health
+															add 4 to {_hh}
+															set loop-player's max health to {_hh}
+															set {lifeblessed::%loop-player's uuid%} to true
+														else:
+															set {_h12} to loop-player's max health
+															remove 4 from {_h12}
+															set {lifeblessed::%loop-player's uuid%} to true
+															set loop-player's max health to {_h12}
+										else:
+											if {HeartLocked::%loop-player's uuid%} is not true:
+												if loop-player has 1 of dragon egg:
+													set loop-player's max health to 20
+													delete {lifeblessed::%loop-player's uuid%}
+												else:
+													set loop-player's max health to 10
+													delete {lifeblessed::%loop-player's uuid%}
+								wait 5 ticks
+								loop all players:
+									if loop-player's max health is not 8:
+										if {HeartLocked::%loop-player's uuid%} is not true:
+											if loop-player has 1 of dragon egg:
+												set loop-player's max health to 20
+												delete {lifeblessed::%loop-player's uuid%}
+											else:
+												set loop-player's max health to 10
+												delete {lifeblessed::%loop-player's uuid%}
+					
+
+
+function LifeCircleReal(s: number, p: entity):
+	set {_pl} to location of {_p}
+	loop all players:
+		if {particlelvl::%loop-player's uuid%} is "default":
+			loop 360 times:
+				set {_v} to spherical vector with radius {_s}, yaw loop-value-2 and pitch 0
+				make 1 of dust using dustOption(rgb(254, 4, 180), 0.9) at {_pl} ~ {_v} with extra 0 with force for loop-player
+				draw 1 of happy villager at {_pl} ~ {_v} with extra 0 with force for loop-player
+		if {particlelvl::%loop-player's uuid%} is "less":
+			loop 360 times:
+				set {_v} to spherical vector with radius {_s}, yaw loop-value-2 and pitch 0
+				make 1 of dust using dustOption(rgb(254, 4, 180), 0.4) at {_pl} ~ {_v} with extra 0 with force for loop-player
+		if {particlelvl::%loop-player's uuid%} is "none":
+			loop 360 times:
+				set {_v} to spherical vector with radius {_s}, yaw loop-value-2 and pitch 0
+				make 0 of dust using dustOption(rgb(254, 4, 180), 0.5) at {_pl} ~ {_v} with extra 0 with force for loop-player
+		
+
+function LifeCircleRealLast(s: number, p: entity):
+	set {_pl} to location of {_p}
+	loop 10 times:
+		loop 360 times:
+			set {_v} to spherical vector with radius {_s}, yaw loop-value-2 and pitch 0
+			make 1 of dust using dustOption(rgb(254, 4, 180), 0.9) at {_pl} ~ {_v} with extra 0 with force
+			draw 1 of happy villager at {_pl} ~ {_v} with extra 0 with force
+		wait 0.3 seconds
+
+function LifeCircle(s: number, p: location):
+	set {_pl} to location of {_p}
+
+	loop all players:
+		if {particlelvl::%loop-player's uuid%} is "default":
+			
+			set {_spacing} to 0.1
+			set {_circumference} to 2 * pi * {_s} # Calculate the number of particles based on the spacing
+			set {_numParticles} to floor({_circumference} / {_spacing}) # Spawn the exact number of particles needed
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(255, 20, 147), 1) at {_pl} ~ {_v} for loop-player
+				draw 1 of smoke at {_pl} ~ {_v} with extra 0 with force for loop-player
+
+		else if {particlelvl::%loop-player's uuid%} is "less":
+
+			set {_spacing} to 0.15
+			set {_circumference} to 2 * pi * {_s}
+			set {_numParticles} to floor({_circumference} / {_spacing})
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(255, 20, 147), 1) at {_pl} ~ {_v} for loop-player
+
+		else if {particlelvl::%loop-player's uuid%} is "none":
+
+			set {_spacing} to 0.5
+			set {_circumference} to 2 * pi * {_s}
+			set {_numParticles} to floor({_circumference} / {_spacing})
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(255, 20, 147), 1) at {_pl} ~ {_v} for loop-player
+		
+function LifeCircle1(s: number, p: location):
+	set {_pl} to location of {_p}
+
+	loop all players:
+		if {particlelvl::%loop-player's uuid%} is "default":
+			
+			set {_spacing} to 0.1
+			set {_circumference} to 2 * pi * {_s} # Calculate the number of particles based on the spacing
+			set {_numParticles} to floor({_circumference} / {_spacing}) # Spawn the exact number of particles needed
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(255, 20, 147), 1) at {_pl} ~ {_v} for loop-player
+				draw 1 of smoke at {_pl} ~ {_v} with extra 0 with force for loop-player
+
+		else if {particlelvl::%loop-player's uuid%} is "less":
+
+			set {_spacing} to 0.15
+			set {_circumference} to 2 * pi * {_s}
+			set {_numParticles} to floor({_circumference} / {_spacing})
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(255, 20, 147), 1) at {_pl} ~ {_v} for loop-player
+
+		else if {particlelvl::%loop-player's uuid%} is "none":
+
+			set {_spacing} to 0.5
+			set {_circumference} to 2 * pi * {_s}
+			set {_numParticles} to floor({_circumference} / {_spacing})
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(255, 20, 147), 1) at {_pl} ~ {_v} for loop-player
+
+function LifeCirclelast(s: number, p: location):
+	set {_pl} to location of {_p}
+	loop 7 times:
+		LifeCircle({_s}, {_pl})
+		wait 0.3 seconds
+
+
+			
+
+on consume:
+	if isDisabled(player) is not true:
+		if event-item is not golden apple or enchanted golden apple:
+			if getGem(player's offhand item) is "life":
+				if getEnergy(player's offhand item) > 2:
+					wait 1 tick
+					if getTier(player's offhand item) is 1:
+						add player's saturation / 2 to player's saturation
+					if getTier(player's offhand item) is 2:
+						add player's saturation to player's saturation
+				
+on eat golden apple:
+	if isDisabled(player) is not true:
+		if getGem(player's offhand item) is "life":
+			if getEnergy(player's offhand item) > 2:
+				remove absorption from player
+				apply absorption 2 to player for 1 minute
+				wait 1 tick
+				set player's saturation to 20
+			
+on eat enchanted golden apple:
+	if isDisabled(player) is not true:
+		if getGem(player's offhand item) is "life":
+			if getEnergy(player's offhand item) > 2:
+				remove absorption from player
+				apply absorption 5 to player for 1 minute
+				wait 1 tick
+				set player's saturation to 20
+			
+			
+
+
+on right click:
+	if isDisabled(player) is not true:
+		if getGem(player's offhand item) is "life":
+			if getEnergy(player's offhand item) > 1:
+				if clicked block is not grass block or sand or gravel or moss block:
+					player is sneaking
+					apply 1 bonemeal to event-block
+
+on damage:
+	if isDisabled(attacker) is not true:
+		if getGem(attacker's offhand item) is "life":
+			if getEnergy(attacker's offhand item) > 4:
+				if getTier(attacker's offhand item) is 2:
+					if victim is a wither skeleton or a wither or a zombie or a stray or a husk or a drowned or a phantom or a skeleton or a zoglin or a zombie villager or a zombified piglin:
+						draw 10 of dust using dustOption(rgb(254, 4, 180), 1) at location 1 block above victim with offset vector(0.3, 0.4, 0.3) with extra 0 with force
+						add damage to damage
+				if getTier(attacker's offhand item) is 1:
+					if victim is a wither skeleton or a wither or a zombie or a stray or a husk or a drowned or a phantom or a skeleton or a zoglin or a zombie villager or a zombified piglin:
+						draw 10 of dust using dustOption(rgb(254, 4, 180), 1) at location 1 block above victim with offset vector(0.3, 0.4, 0.3) with extra 0 with force
+						add damage / 2 to damage
+
+on damage:
+	if isDisabled(victim) is not true:
+		if getGem(victim's offhand item) is "life":
+			if getEnergy(victim's offhand item) > 3:
+				damage was caused by wither effect or wither potion effect
+				cancel event
+					
+		if getGem(victim's held item) is "life":
+			if getEnergy(victim's held item) > 3:
+				damage was caused by wither effect or wither potion effect
+				cancel event
+
+
+
+on rightclick:
+	if isDisabled(player) is not true:
+		if player's held item is air or a sword or an axe:
+			if difference between {-LifeDBC::%player%} and now is less than 0.2 seconds:
+				if getGem(player's offhand item) is "life":
+					if getEnergy(player's offhand item) is not 0:
+						if canUsePower("Vitality::%uuid of player%") is true:
+							setDCooldown("Vitality::%uuid of player%", toMilliseconds(0, 45))
+							send "<##FE04B4>🔮 You have activated &f💖<##FE04B4>Vitality Vortex" to player
+							set {-lifeActive} to true
+							set {_loc} to location of player
+							set {_radius} to 5
+							set {_blocks::*} to air
+							set {_blocks2::*} to air
+							set {_blocks3::*} to air
+							set {_blocks4::*} to air
+							set the player's food level to 20
+							apply absorption 2 to player for 1 minute
+							set player's saturation to 30
+							apply resistance to player for 15 seconds replacing the existing effect
+
+							loop blocks in radius {_radius} around {_loc}:
+								set {-unbreakable2::%loop-block%} to true
+								if loop-block is cornflower or poppy or sunflower or dandelion or blue orchid:
+									set {_originalType4} to loop-block's type
+									set {_block} to loop-block
+									set {_blockLoc4} to loop-block's location
+									add {_blockLoc4} to {_blocks4::*}
+									set {_blocks4::%{_blockLoc4}%} to {_originalType4}
+									set {_effectType} to PotionEffectType.REGENERATION
+									add 20 to {_effectDuration}
+									set {_effect} to new PotionEffect({_effectType}, {_effectDuration}, 1, false, false, true)
+									player.addPotionEffect({_effect}, true)
+
+									set loop-block to dead bubble coral fan or dead tube coral or dead brain coral
+								
+									set {_blockData} to {_block}.getBlockData()
+									if {_blockData} is Waterlogged:
+										set {_blockData} to {_blockData}.clone()
+										{_blockData}.setWaterlogged(false)
+				
+										{_block}.setBlockData({_blockData}, false)
+								if loop-block is allium or azure bluet or red tulip or orange tulip or white tulip or pink tulip or oxeye daisy:
+									set {_originalType4} to loop-block's type
+									set {_block} to loop-block
+									set {_blockLoc4} to loop-block's location
+									add {_blockLoc4} to {_blocks4::*}
+									set {_blocks4::%{_blockLoc4}%} to {_originalType4}
+									set {_effectType} to PotionEffectType.REGENERATION
+									add 20 to {_effectDuration}
+									set {_effect} to new PotionEffect({_effectType}, {_effectDuration}, 1, false, false, true)
+									player.addPotionEffect({_effect}, true)
+
+									set loop-block to dead bubble coral fan or dead tube coral or dead brain coral
+								
+									set {_blockData} to {_block}.getBlockData()
+									if {_blockData} is Waterlogged:
+										set {_blockData} to {_blockData}.clone()
+										{_blockData}.setWaterlogged(false)
+				
+										{_block}.setBlockData({_blockData}, false)
+								
+							loop blocks in radius {_radius} around {_loc}:
+								set {-unbreakable3::%loop-block%} to true  
+								if loop-block is oak leaves or spruce leaves or birch leaves or acacia leaves or cherry leaves or mangrove leaves or jungle leaves or dark oak leaves:
+									set {_originalType3} to loop-block's type
+									set {_blockLoc3} to loop-block's location
+									add {_blockLoc3} to {_blocks3::*}
+									set {_blocks3::%{_blockLoc3}%} to {_originalType3}
+									set {_effectType} to PotionEffectType.ABSORPTION
+									set {_effect} to new PotionEffect({_effectType}, 1800, 1, false, false, true)
+									player.addPotionEffect({_effect}, true)
+									set loop-block to tuff or dead tube coral block or dead bubble coral block
+							
+								if loop-block is grass block or stone or dirt or sand or sandstone or gravel or deepslate:
+									set {_originalType} to loop-block's type
+									set {_blockLoc} to loop-block's location
+									add {_blockLoc} to {_blocks::*}
+									set {_blocks::%{_blockLoc}%} to {_originalType}
+									set loop-block to tuff or dead tube coral block or dead bubble coral block or dead brain coral block or dead fire coral block or dead horn coral block
+								
+								if loop-block is oak log or spruce log or acacia log or dark oak log or cherry log or birch log or jungle log or mangrove log:
+									set {_originalType2} to loop-block's type
+									set {_blockLoc2} to loop-block's location
+									add {_blockLoc2} to {_blocks2::*}
+									set {_blocks2::%{_blockLoc2}%} to {_originalType2}
+									set loop-block to acacia log
+									if server is not at bukkit api change:
+										set {_effectType} to PotionEffectType.DAMAGE_RESISTANCE
+									else:
+										set {_effectType} to PotionEffectType.RESISTANCE
+									add 20 to {_effectDuration}
+									set {_effect} to new PotionEffect({_effectType}, {_effectDuration}, 0, false, false, true)
+									player.addPotionEffect({_effect}, true)
+					
+
+							set {_loc2} to location 0.3 blocks above {_loc}
+							loop 120 times:
+								VortexCircle(5,{_loc2})
+								wait 2 tick
+								loop all blocks in radius 5 around {_loc}:
+									if loop-block is stationary water or water:
+										set loop-block to air
+						
+							set {-lifeActive} to false
+							loop {_blocks::*}:
+								set {_blockLoc} to loop-value
+								set {_originalType} to {_blocks::%{_blockLoc}%}
+								if {_originalType} is not air:
+									set {-unbreakable::%block%} to false
+									set block at {_blockLoc} to {_originalType}
+								
+							loop {_blocks2::*}:
+								set {_blockLoc2} to loop-value
+								set {_originalType2} to {_blocks2::%{_blockLoc2}%}
+								if {_originalType2} is not air:
+									set {-unbreakable::%block%} to false
+									set block at {_blockLoc2} to {_originalType2}
+								
+							loop {_blocks3::*}:
+								set {_blockLoc3} to loop-value
+								set {_originalType3} to {_blocks3::%{_blockLoc3}%}
+								if {_originalType3} is not air:
+									set {-unbreakable::%block%} to false
+									set block at {_blockLoc3} to {_originalType3}
+								
+							loop {_blocks4::*}:
+								set {_blockLoc4} to loop-value
+								set {_originalType4} to {_blocks4::%{_blockLoc4}%}
+								if {_originalType4} is not air:
+									set {-unbreakable::%block%} to false
+									set block at {_blockLoc4} to {_originalType4}
+							loop blocks in radius {_radius} around {_loc}:
+								set {-unbreakable::%loop-block%} to false
+							delete {-lifeActive}
+							if getEnergy(player's offhand item) > 0:
+								blissSetcooldown("Vitality::%uuid of player%", toMilliseconds(0, 35), player)
+
+						else:
+							set {_message} to getCooldownSeconds("Vitality::%uuid of player%")
+							send "<##FE04B4>🔮 <##FF686F>Your &f💖<##FE04B4>Vitality Vortex <##FF686F>Ability is on cooldown for <##FE04B4>%{_message}%" to player
+			else:
+				set {-LifeDBC::%player%} to now

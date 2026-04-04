@@ -1,0 +1,99 @@
+# Made by Ccooked Mostly
+# Don't Forget to add ur embed's link in function
+
+on death of player:
+	wait 1 second
+	loop all items in victim's inventory:
+		if IsGem(loop-item) is true:
+			if getEnergy(loop-item) is 0:
+				if {send::%victim's uuid%} is not set:
+					sendEmbed(victim, attacker)
+					set {send::%victim's uuid%} to true
+				else:
+					set {send::%victim's uuid%} to true
+
+function sendEmbed(p: player, p2: entity):
+	create a new embed:
+		title: "%{_p}%'s gem was broken😭"
+		description: "`%{_p}% was slain by %{_p2}%`"
+		color: "#cc0b0b"
+		timestamp: true
+		footer: {_footer}
+		thumbnail: "https://static.wikia.nocookie.net/blisssmp/images/2/29/Mugm.png/revision/latest/scale-to-width-down/350?cb=20230307142110"
+		author: {_author}
+		fields: {_field}, {_field2}
+		saveInto: {_embed}
+	create a new webhook message:
+		message: "@everyone"
+		webhook: "%{-webhook}%" 
+		username: "SMP Leaks 🥶"
+		avatar: "https://static.wikia.nocookie.net/blisssmp/images/3/39/Site-community-image/revision/latest?cb=20230524102827"
+		embed: {_embed}
+
+on join:
+	loop all items in player's inventory:
+		if IsGem(loop-item) is true:
+			if getEnergy(loop-item) > 0:
+				delete {send::%player's uuid%}
+			else:
+				set {send::%player's uuid%} to true
+
+
+
+# Deactivate
+function pedestaldeactiveEmbed():
+	create a new embed:
+		title: "Pedestal has Closed"
+		description: "Pedestal is Closed"
+		color: "#4d4d4d"
+		timestamp: true
+		footer: {_footer}
+		thumbnail: "https://media.discordapp.net/attachments/1433997511395377203/1457511834998538321/image.png?ex=695c452c&is=695af3ac&hm=6b4d09c63a358bde180511570bfb63d22c5b57c3788b889bb7a3223bf4353eab&=&format=webp&quality=lossless&width=1232&height=693"
+		author: {_author}
+		fields: {_field}, {_field2}
+		saveInto: {_embed}
+	create a new webhook message:
+		message: "Smp notification"
+		webhook: "%{-webhook}%" 
+		username: "SMP Leaks 🥶"
+		avatar: "https://static.wikia.nocookie.net/blisssmp/images/3/39/Site-community-image/revision/latest?cb=20230524102827"
+		embed: {_embed}
+
+
+# ACtiave
+function pedestalactiveEmbed():
+	create a new embed:
+		title: "Pedestal has Opened"
+		description: "Pedestal is Open"
+		color: "#d6008f"
+		timestamp: true
+		footer: {_footer}
+		thumbnail: "https://media.discordapp.net/attachments/1433997511395377203/1457511816686080022/image.png?ex=695c4528&is=695af3a8&hm=15290646ba8348135c570b83fa87c76711d0e35b785014229d73f361db9d70e3&=&format=webp&quality=lossless&width=1232&height=693"
+		author: {_author}
+		fields: {_field}, {_field2}
+		saveInto: {_embed}
+	create a new webhook message:
+		message: "Smp notification"
+		webhook: "%{-webhook}%" 
+		username: "SMP Leaks 🥶"
+		avatar: "https://static.wikia.nocookie.net/blisssmp/images/3/39/Site-community-image/revision/latest?cb=20230524102827"
+		embed: {_embed}
+
+
+function upgradeEmbed(p: player):
+	create a new embed:
+		title: "%{_p}%'s has upgraded their gem to tier 2"
+		description: "`%{_p}% used upgrader`"
+		color: "#ff0000"
+		timestamp: true
+		footer: {_footer}
+		thumbnail: "https://static.wikia.nocookie.net/blisssmp/images/f/f8/Upgrader.webp/revision/latest?cb=20231230112313"
+		author: {_author}
+		fields: {_field}, {_field2}
+		saveInto: {_embed}
+	create a new webhook message:
+		message: "Smp notification"
+		webhook: "%{-webhook}%" 
+		username: "SMP Leaks 🥶"
+		avatar: "https://static.wikia.nocookie.net/blisssmp/images/3/39/Site-community-image/revision/latest?cb=20230524102827"
+		embed: {_embed}

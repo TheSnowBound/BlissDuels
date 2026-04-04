@@ -1,0 +1,179 @@
+command /menu:
+	aliases: /blissgems:menu
+	permission: op
+	trigger:
+		set {_Menu.GUI.Bliss} to a new chest inventory with 6 row with name "<##FFD773>&lMenu"
+		open {_Menu.GUI.Bliss} for player
+		set {_times} to 0
+		loop 54 times:
+			set slot {_times} of player's current inventory to dark gray stained glass pane named "&7."
+			add 1 to {_times}
+
+		set slot 10 of player's current inventory to an allay spawn egg named "<##23E1FF>&lCreative &7Mode" with lore "&7sets you in creative"
+		set slot 16 of player's current inventory to a slime spawn egg named "<##61B762>&lSurvival &7Mode" with lore "&7sets you in survival"
+		set slot 21 of player's current inventory to a prismarine shard named "<##FFD773>&lGems" with lore "&7quickly get gems" with custom model data 4
+		set slot 23 of player's current inventory to a netherite sword named "<##F63758>&lKits"
+		delete lore of slot 23 of player's current inventory
+		set slot 28 of player's current inventory to a spruce sapling named "<##ACFF82>&lRandom &fTP" with lore "&7fresh places for shots"
+		set slot 34 of player's current inventory to a totem of undying named "<##8EFFCB>&lTrust &7List"
+		set slot 49 of player's current inventory to a flower banner pattern named "&cClose&f❌" with lore "&7close the menu"
+
+on right click:
+	if player's held item is {-menu}:
+		execute player command "/menu"
+
+on inventory click:
+	if name of player's current inventory is "<##FFD773>&lMenu" or "<##FFD773>&lGems":
+		cancel event
+		if event-item's name contains "ʀᴀɴᴅᴏᴍ ᴛ2":
+			tradeGem1(player, 2, 5)
+		if event-item's name contains "ʀᴀɴᴅᴏᴍ ᴛ1":
+			tradeGem1(player, 1, 5)
+		if event-item is an amethyst shard:
+			set {_n} to 1
+			set {_e} to 10
+			set {_gem} to menuGem(event-item)
+			give {-gem::%{_gem}%::%{_n}%::%{_e}%} to player
+		if event-item is prismarine shard:
+			set {_n} to 2
+			set {_e} to 10
+			set {_gem} to menuGem(event-item)
+			give {-gem::%{_gem}%::%{_n}%::%{_e}%} to player
+		if all:
+			event-item's name contains "<##ACFF82>&lᴜᴘɢʀᴀᴅᴇʀ"
+			event-item's lore contains "<##96FFD9>Click to obtain"
+		then:
+			give 1 of {-upgrader} to player
+		if all:
+			event-item's name contains "<##E9C2FF>&lᴛʀᴀᴅᴇʀ"
+			event-item's lore contains "<##96FFD9>Click to obtain"
+		then:
+			give 1 of {-trader} to player
+		if all:
+			event-item's name contains "&7&lʀᴇᴘᴀɪʀ ᴋɪᴛ"
+			event-item's lore contains "<##96FFD9>Click to obtain"
+		then:
+			give 1 of {-Bliss.Repair.4} to player
+		if event-item is netherite sword:
+			execute player command "/kits"
+		if event-item is totem of undying:
+			execute player command "/trust list"
+		if event-item is allay spawn egg:
+			set player's gamemode to creative
+		if event-item is slime spawn egg:
+			set player's gamemode to survival
+		if event-item is spruce sapling:
+			execute player command "/rtp"
+		if all:
+			name of player's current inventory contains "<##FFD773>&lGems"
+			event-item's lore contains "<##96FFD9>Click to obtain"
+			event-item's name contains "&dRestoration &fItem"
+		then:
+			give 1 of {-Bliss.Revive.3} to player
+	if all:
+		name of player's current inventory contains "<##FFD773>&lGems"
+		event-item is nautilus shell
+		event-item's lore contains "<##FFE4AB>Click to Obtain"
+	then:
+		give 1 of {-energyitem::none::5} to player
+
+function menuGem(i: item) :: string:
+	if name of {_i} contains "<##FE8120>&lғɪʀᴇ":
+		return "fire"
+	else if name of {_i} contains "<##5ED7FF>&lғʟᴜx":
+		return "flux"
+	else if name of {_i} contains "<##F10103>&lsᴛʀᴇɴɢᴛʜ":
+		return "strength"
+	else if name of {_i} contains "<##FE04B4>&lʟɪғᴇ":
+		return "life"
+	else if name of {_i} contains "<##FEFD17>&lsᴘᴇᴇᴅ":
+		return "speed"
+	else if name of {_i} contains "<##EFEFEF>&lᴘᴜғғ":
+		return "puff"
+	else if name of {_i} contains "<##0EC912>&lᴡᴇᴀʟᴛʜ":
+		return "wealth"
+	else if name of {_i} contains "<##A01FFF>&lᴀsᴛʀᴀ":
+		return "astra"
+
+on inventory click:
+	if all:
+		name of player's current inventory contains "<##FFD773>&lGems"
+		event-item is nautilus shell
+		event-item's lore contains "<##FFE4AB>Click to Obtain"
+	then:
+		give 1 of {-energyitem::none::5} to player
+
+function tradeGem1(p: player, t: number, en: integer):
+	set {_uuid} to {_p}'s uuid
+	set {_hasgem} to false
+	loop all items in {_p}'s inventory:
+		if {_hasgem} is false:
+			if IsGem(loop-item) is true:
+				set {_hasgem} to false
+
+	if {_hasgem} is false:
+		set {_Gemrandom} to a random integer between 1 and 8
+
+		if {_Gemrandom} is 1:
+			set {_gem} to "strength"
+		else if {_Gemrandom} is 2:
+			set {_gem} to "speed"
+		else if {_Gemrandom} is 3:
+			set {_gem} to "fire"
+		else if {_Gemrandom} is 4:
+			set {_gem} to "life"
+		else if {_Gemrandom} is 5:
+			set {_gem} to "puff"
+		else if {_Gemrandom} is 6:
+			set {_gem} to "wealth"
+		else if {_Gemrandom} is 7:
+			set {_gem} to "astra"
+		else if {_Gemrandom} is 8:
+			set {_gem} to "flux"
+
+		give {-gem::%{_gem}%::%{_t}%::%{_en}%} to {_p}
+
+on inventory click:
+	if event-item's lore contains "&7quickly get gems":
+		set {_Menu.GUI.Bliss.Gems} to a new chest inventory with 6 row with name "<##FFD773>&lGems"
+		open {_Menu.GUI.Bliss.Gems} for player
+		set {_times} to 0
+		loop 54 times:
+			set slot {_times} of player's current inventory to dark gray stained glass pane named "&7."
+			add 1 to {_times} 
+
+		set slot 9 of player's current inventory to a yellow glass pane named "ʀᴀɴᴅᴏᴍ ᴛ2"
+		
+		set slot 4 of player's current inventory to a prismarine shard with custom model data 16 named "<##5ED7FF>&lғʟᴜx"
+		set slot 10 of player's current inventory to a prismarine shard with custom model data 2 named "<##FE8120>&lғɪʀᴇ"
+		set slot 11 of player's current inventory to a prismarine shard with custom model data 4 named "<##FE04B4>&lʟɪғᴇ"
+		set slot 12 of player's current inventory to a prismarine shard with custom model data 8 named "<##FEFD17>&lsᴘᴇᴇᴅ"
+		set slot 13 of player's current inventory to a prismarine shard with custom model data 10 named "<##F10103>&lsᴛʀᴇɴɢᴛʜ"
+		set slot 14 of player's current inventory to a prismarine shard with custom model data 12 named "<##0EC912>&lᴡᴇᴀʟᴛʜ"
+		set slot 15 of player's current inventory to a prismarine shard with custom model data 6 named "<##EFEFEF>&lᴘᴜғғ"
+		set slot 16 of player's current inventory to a prismarine shard with custom model data 14 named "<##A01FFF>&lᴀsᴛʀᴀ"
+
+		set slot 17 of player's current inventory to a yellow glass pane named "ʀᴀɴᴅᴏᴍ ᴛ2"
+
+
+
+		set slot 27 of player's current inventory to a yellow glass pane named "ʀᴀɴᴅᴏᴍ ᴛ1"
+
+		set slot 22 of player's current inventory to a amethyst shard with custom model data 15 named "<##5ED7FF>&lғʟᴜx <##FFD773>ɢᴇᴍ"
+		set slot 28 of player's current inventory to a amethyst shard with custom model data 1 named "<##FE8120>&lғɪʀᴇ"
+		set slot 29 of player's current inventory to a amethyst shard with custom model data 3 named "<##FE04B4>&lʟɪғᴇ"
+		set slot 30 of player's current inventory to a amethyst shard with custom model data 7 named "<##FEFD17>&lsᴘᴇᴇᴅ"
+		set slot 31 of player's current inventory to a amethyst shard with custom model data 9 named "<##F10103>&lsᴛʀᴇɴɢᴛʜ"
+		set slot 32 of player's current inventory to a amethyst shard with custom model data 11 named "<##0EC912>&lᴡᴇᴀʟᴛʜ"
+		set slot 33 of player's current inventory to a amethyst shard with custom model data 5 named "<##EFEFEF>&lᴘᴜғғ"
+		set slot 34 of player's current inventory to a amethyst shard with custom model data 13 named "<##A01FFF>&lᴀsᴛʀᴀ"
+
+		set slot 35 of player's current inventory to a yellow glass pane named "ʀᴀɴᴅᴏᴍ ᴛ1"
+
+
+		set slot 37 of player's current inventory to {-Bliss.Repair.4} with lore "<##96FFD9>Click to obtain"
+		set slot 38 of player's current inventory to {-upgrader} with lore "<##96FFD9>Click to obtain"
+		set slot 40 of player's current inventory to a nautilus shell with custom model data 300 with lore "<##FFE4AB>Click to Obtain"
+		set slot 42 of player's current inventory to {-trader} with lore "<##96FFD9>ClicK To Obtain"
+		set slot 43 of player's current inventory to {-Bliss.Revive.3} with lore "<##96FFD9>Click to Obtain"
+		set slot 49 of player's current inventory to a flower banner pattern named "&c&lBack↩" with lore "&7return to main menu"

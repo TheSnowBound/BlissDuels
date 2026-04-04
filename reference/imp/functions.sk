@@ -1,0 +1,338 @@
+#Version HYPER-BLISS
+#Reminds the user to enable memory variables once they restart the server with the library for the first time and then later.
+on skript start:
+	if {-Memory_variable} is set:
+		send "&ePlease enable memory variables for much better performance and near 0 lag, they are easy to enable." to console
+		send "&ePlease read https://sovdee.gitbook.io/skript-tutorials/core-concepts/variables/memory-variables-metadata-and-alternatives" to console
+		send "&eIf you still don't know how to, DM hyperdondonreal on discord and ask for help." to console
+	set {-Memory_variable} to true
+# FUNCTIONS
+#Import Java classes to be able to use
+import:
+	java.time.Duration
+	java.lang.System
+	org.bukkit.Particle
+	java.lang.String
+	org.bukkit.event.inventory.InventoryClickEvent
+	org.bukkit.inventory.PlayerInventory
+	org.bukkit.entity.Fireball
+	org.bukkit.util.Vector
+	org.bukkit.Location
+	org.bukkit.potion.PotionEffect
+	org.bukkit.potion.PotionEffectType
+	org.bukkit.Material
+	org.bukkit.block.data.BlockData
+	org.bukkit.block.Block
+	org.bukkit.block.data.Waterlogged
+	org.bukkit.event.world.GenericGameEvent
+	org.bukkit.Bukkit
+	com.hyperdondon.glowingEntitiesLib.GlowingEntitiesLib
+	org.bukkit.ChatColor
+
+
+#Checks if version is 1.20.4 or lower. At 1.20.5, Mojang has changed the NBT formatDouble and so has the server APIs. The change to the Bukkit API have been drastic.
+function isAtAPIChange() :: boolean:
+	if any:
+		Bukkit.getBukkitVersion() contains "1.8"
+		Bukkit.getBukkitVersion() contains "1.9"
+		Bukkit.getBukkitVersion() contains "1.10"
+		Bukkit.getBukkitVersion() contains "1.11"
+		Bukkit.getBukkitVersion() contains "1.12"
+		Bukkit.getBukkitVersion() contains "1.13"
+		Bukkit.getBukkitVersion() contains "1.14"
+		Bukkit.getBukkitVersion() contains "1.15"
+		Bukkit.getBukkitVersion() contains "1.16"
+		Bukkit.getBukkitVersion() contains "1.17"
+		Bukkit.getBukkitVersion() contains "1.18"
+		Bukkit.getBukkitVersion() contains "1.19"
+		Bukkit.getBukkitVersion() contains "1.20.1"
+		Bukkit.getBukkitVersion() contains "1.20.2"
+		Bukkit.getBukkitVersion() contains "1.20.3"
+		Bukkit.getBukkitVersion() contains "1.20.4"
+	then:
+		return false
+	return true
+
+condition server[(-| )version] is at [bukkit(-| )](API|api) change:
+	check:
+		isAtAPIChange() is true
+		continue
+
+condition server[(-| )version] is not at [bukkit(-| )](API|api) change:
+	check:
+		isAtAPIChange() is false
+		continue
+	
+
+#Changes number without a decimal number to have one.
+function formatDouble(num: number) :: string:
+	if mod({_num}, 1) = 0:
+		return "%{_num}%.0"
+	else:
+		return "%{_num}%"
+
+#Gets the cooldown variable
+function getCooldown(cooldown: text) :: int:
+	return {-Cooldown::%{_cooldown}%}
+
+#Gets the cooldown's seconds, does not return the whole cooldown in seconds.
+function getCooldownSeconds(cooldown: text) :: int:
+	add Duration.ofMillis({-Cooldown::%{_cooldown}%} - System.currentTimeMillis()).toSecondsPart() to {_coo}
+	if {_coo} is 60:
+		set {_coo} to 0
+	return {_coo}
+
+#Gets the cooldown's minutes.
+function getCooldownMinutes(cooldown: text) :: int:
+	set {_coo} to Duration.ofMillis({-Cooldown::%{_cooldown}%} - System.currentTimeMillis()).toMinutes()
+	if Duration.ofMillis({-Cooldown::%{_cooldown}%} - System.currentTimeMillis()).toSecondsPart() is 60:
+		add 1 to {_coo}
+	return {_coo}
+	
+function blissSetcooldown(cooldown: text, value: int, p: player):
+	if {_p} has 1 of dragon egg:
+		set {_value} to floor({_value} / 2)
+		set {-Cooldown::%{_cooldown}%} to System.currentTimeMillis() + {_value}
+	else:
+		set {-Cooldown::%{_cooldown}%} to System.currentTimeMillis() + {_value}
+
+#Checks if a cooldown exists, what else?
+function doesCooldownExist(cooldown: text) :: boolean:
+	if {-Cooldown::%{_cooldown}%} is set:
+		return true
+	else:
+		return false
+
+function resetcooldown(p: player):
+	set {_uuid} to {_p}'s uuid
+	set {-Clouds::%{_uuid}%} to 3
+	blissSetcooldown("Unfortunate::%{_uuid}%", 0, {_p})
+	blissSetcooldown("RichRush::%{_uuid}%", 0, {_p})
+	blissSetcooldown("Blur::%{_uuid}%", 0, {_p})
+	blissSetcooldown("Thunder::%{_uuid}%", 0, {_p})
+	blissSetcooldown("SpeedStorm::%{_uuid}%", 0, {_p})
+	blissSetcooldown("DoubleJump::%{_uuid}%", 0, {_p})
+	blissSetcooldown("Dash::%{_uuid}%", 0, {_p})
+	blissSetcooldown("BreezyBash::%{_uuid}%", 0, {_p})
+	blissSetcooldown("Puff::Enchanting::%{_uuid}%", 0, {_p})
+	blissSetcooldown("Vitality::%{_uuid}%", 0, {_p})
+	blissSetcooldown("HeartLock::%{_uuid}%", 0, {_p})
+	blissSetcooldown("LifeCircle::%{_uuid}%", 0, {_p})
+	blissSetcooldown("Frailer::%{_uuid}%", 0, {_p})
+	blissSetcooldown("Bounty::%{_uuid}%", 0, {_p})
+	blissSetcooldown("ChadStrength::%{_uuid}%", 0, {_p})
+	blissSetcooldown("EnergyBeam::%{_uuid}%", 0, {_p})
+	blissSetcooldown("KineticBurst::%{_uuid}%", 0, {_p})
+	blissSetcooldown("KineticOverdrive::%{_uuid}%", 0, {_p})
+	blissSetcooldown("Fireball::%{_uuid}%", 0, {_p})
+	blissSetcooldown("Crisp::%{_uuid}%", 0, {_p})
+	blissSetcooldown("Campfire::%{_uuid}%", 0, {_p})
+	blissSetcooldown("CampfireActive::%{_uuid}%", 0, {_p})
+	blissSetcooldown("Daggers::%{_uuid}%", 0, {_p})
+	blissSetcooldown("Drift::%{_uuid}%", 0, {_p})
+	blissSetcooldown("Astral::%{_uuid}%", 0, {_p})
+	set {-Disabled::%{_uuid}%} to 0
+
+# Cooldown For no dragon egg
+function setDCooldown(cooldown: text, value: int):
+	set {-Cooldown::%{_cooldown}%} to System.currentTimeMillis() + {_value}
+
+
+#Checks if a cooldown is ready to use
+function isCooldownReady(cooldown: text) :: boolean:
+	if doesCooldownExist({_cooldown}) is false:
+		return true
+	if getCooldown({_cooldown}) - System.currentTimeMillis() <= 1000:
+		return true
+	else:
+		return false
+
+#Returns your value as in millseconds, used for cooldowns.
+function toMilliseconds(minutes: int, seconds: int) :: int:
+	set {_final} to 0
+	loop {_minutes} times:
+		add 60000 to {_final}
+	loop {_seconds} times:
+		add 1000 to {_final}
+
+	return {_final}
+
+# TRUSTED FUNCTION
+
+
+function IsTrusted(attacker: player, victim: player) :: boolean:
+	if {-Trusted::%uuid of {_attacker}%::*} contains uuid of {_victim}:
+		return true
+	else:
+		return false
+
+function restoreGem(p: player) :: int:
+	loop all items in {_p}'s inventory:
+		if IsGem(loop-item) is true:
+			set {_t} to 1
+			set {_energy} to 5
+			set {gemnames::%{_p}'s uuid%::*} to "strength", "fire", "speed", "wealth", "flux", "astra", "puff", "life"
+			set {_getGem} to random element out of {gemnames::%{_p}'s uuid%::*}
+			set loop-value to {-gem::%{_getGem}%::%{_t}%::%{_energy}%}
+	play sound "entity.player.levelup" to {_p}
+	loop all items in {_p}'s inventory:
+		if getGem(loop-value) is "astra":
+			set {_gem} to "<##A01FFF>&lᴀsᴛʀᴀ"
+		else if getGem(loop-value) is "wealth":
+			set {_gem} to "<##0EC912>&lᴡᴇᴀʟᴛʜ"
+		else if getGem(loop-value) is "puff":
+			set {_gem} to "<##EFEFEF>&lᴘᴜғғ"
+		else if getGem(loop-value) is "speed":
+			set {_gem} to "<##FEFD17>&lsᴘᴇᴇᴅ"
+		else if getGem(loop-value) is "life":
+			set {_gem} to "<##FE04B4>&lʟɪғᴇ"
+		else if getGem(loop-value) is "strength":
+			set {_gem} to "<##F10103>&lsᴛʀᴇɴɢᴛʜ"
+		else if getGem(loop-value) is "flux":
+			set {_gem} to "<##5ED7FF>&lғʟᴜx"
+		else if getGem(loop-value) is "fire":
+			set {_gem} to "<##FE8120>&lғɪʀᴇ"
+	set {-energyrequired::%{_p}'s uuid%} to 0
+
+
+
+
+function particlering(pl: location, h: number, radius: number, particletype: particle):
+	set {_spacing} to 0.1
+	set {_pl} to location of {_p}
+	set {_circumference} to 2 * pi * {_s}
+	
+	# Calculate the number of particles based on the spacing
+	set {_numParticles} to floor({_circumference} / {_spacing})
+	
+	# Spawn the exact number of particles needed
+
+	loop {_numParticles} times:
+		set {_angle} to loop-value * 360 / {_numParticles}
+		set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+		
+		make 1 of {_particletype} at {_pl} ~ {_v} with offset vector(0, 0, 0) with extra 0
+
+
+#Returns cooldown in how it would look like in an action bar.
+function getActionBarCooldown(cooldow: text, show_decimal: boolean = false) :: text:
+	if isCooldownReady({_cooldow}) is true:
+		set {_cooldown} to "&aReady!"
+	else:
+		if {_show_decimal} is false:
+			set {_cooldown_seconds} to getCooldownSeconds({_cooldow})
+
+			set {_cooldown_minutes} to getCooldownMinutes({_cooldow})
+		else:
+			set {_cooldown_seconds} to formatDouble(getCooldownSeconds({_cooldow}))
+
+			set {_cooldown_minutes} to formatDouble(getCooldownMinutes({_cooldow}))
+
+		
+		if {_cooldown_minutes} > 0:
+			if {_cooldown_seconds} < 1:
+				set {_cooldown} to "&b%{_cooldown_minutes}%m"
+			else:
+				set {_cooldown} to "&b%{_cooldown_minutes}%m %{_cooldown_seconds}%s"
+		if {_cooldown_minutes} < 1:
+			if {_cooldown_seconds} > 0:
+				set {_cooldown} to "&b%{_cooldown_seconds}%s"
+
+		if {_cooldown} is not set:
+			set {_cooldown} to "&aReady!"
+
+		if {_show_decimal} is true:
+			replace all "m" and "s" with "" in {_cooldown}
+			
+	
+	return {_cooldown}
+
+function addUnremovableItem(i: item, checkName: boolean = true, checkLore: boolean = true):
+	if {-UnremovableItems::*} is set:
+		set {_size} to size of {-UnremovableItems::*} + 1
+	else:
+		set {_size} to 1
+	set {-UnremovableItems::%{_size}%} to {_i}
+	set {-UnremovableItems::checkNames::%{_size}%} to {_checkName}
+	set {-UnremovableItems::checkLore::%{_size}%} to {_checkLore}
+
+function isUnremovable(i: item) :: boolean:
+	loop {-UnremovableItems::*}:
+		if loop-value is {_i}:
+			return true
+		if {-UnremovableItems::checkNames::%loop-iteration%} is true:
+			if name of loop-value is name of {_i}:
+				return true
+		if {-UnremovableItems::checkLore::%loop-iteration%} is true:
+			if lore of loop-value is lore of {_i}:
+				return true
+	return false
+
+on inventory click:
+	if player's open inventory = event-inventory:
+		if any:
+			click action is lmb
+			click action is rmb
+		then:
+			if isUnremovable(player's cursor slot) is true:
+				cancel event
+
+on inventory drag:
+	set {_slots::*} to event.getRawSlots()
+	loop {_slots::*}:
+		set {_slot} to "%loop-value%"
+		replace all "[" with "" in {_slot}
+		replace all "]" with "" in {_slot}
+		set {_list::*} to split {_slot} at ", "
+
+	loop {_list::*}:
+		set {_num} to loop-value parsed as integer
+		if player's open inventory = event.getView().getInventory({_num}):
+			if isUnremovable(past event-item) is true:
+				cancel event
+on drop:
+	isUnremovable(event-item) is true
+	cancel event
+
+on inventory click:
+	isUnremovable(event-item) is true
+	event-inventory is player's inventory
+	player cannot hold 1 water bucket #water buckets dont stack, good for this case
+	cancel event
+
+local function toSmallCaps(s: text) :: text:
+#---&7&lNormal no caps and caps
+	set {_Replace_NormalText::*} to "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y" and "Z" #!RAT was here, Added a Y, you dumbass hyper.
+#---&7&lSmall caps
+	set {_Replace_SmallText::*} to "ᴀ", "ʙ", "ᴄ", "ᴅ", "ᴇ", "ғ", "ɢ", "ʜ", "ɪ", "ᴊ", "ᴋ", "ʟ", "ᴍ", "ɴ", "ᴏ", "ᴘ", "ᴏ̨", "ʀ", "s", "ᴛ", "ᴜ", "ᴠ", "ᴡ", "x", "ʏ" and "ᴢ"
+	set {_newstring} to ""
+	set {_skip} to false
+	loop {_s}'s length times:
+		set {_value} to (loop-iteration-1) - 1
+		set {_skip} to false
+		set {_set} to char at {_value} in {_s}
+		loop {_Replace_NormalText::*}:
+			if {_skip} is true:
+				continue
+			if Character.isLetter({_set}.toUpperCase()) is not true: #&7&l<--Remove .toUpperCase() to make the skip capital letters work
+				add {_set} to {_newstring}
+				set {_skip} to true
+				continue
+			#if Character.isLowerCase({_set}) is not true: &7&l<--Skip capital letters
+				#add {_set} to {_newstring}
+				#set {_skip} to true
+				#continue
+			if loop-value-2 is {_set}:
+				add {_Replace_SmallText::%loop-iteration-2%} to {_newstring}
+		set {_skip} to false
+	return {_newstring}
+	
+expression small caps from %strings%:
+	get:
+		set {_strings::*} to expr-1
+		loop {_strings::*}:
+			add toSmallCaps(loop-value) to {_list::*}
+		return {_list::*}
+
+#Made by that.bear_ on discord
+#user id: 923415754873917440

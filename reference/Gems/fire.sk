@@ -1,0 +1,776 @@
+import:
+	java.time.Duration
+	java.lang.System
+	org.bukkit.Particle
+	java.lang.String
+	org.bukkit.event.inventory.InventoryClickEvent
+	org.bukkit.inventory.PlayerInventory
+	org.bukkit.entity.Fireball
+	org.bukkit.util.Vector
+	org.bukkit.Location
+	org.bukkit.potion.PotionEffect
+	org.bukkit.potion.PotionEffectType
+	org.bukkit.Material
+	org.bukkit.block.data.BlockData
+	org.bukkit.block.Block
+	org.bukkit.block.data.Waterlogged
+	org.bukkit.event.world.GenericGameEvent
+	org.bukkit.Bukkit
+
+
+on damage:
+	if isDisabled(attacker) is not true:
+		if getGem(attacker's offhand item) is "fire":
+			if getEnergy(attacker's offhand item) > 2:
+				if attacker is not victim:
+					chance of 15%
+					ignite the victim
+
+on shoot:
+	if isDisabled(shooter) is not true:
+		if projectile is an arrow:
+			if getGem(shooter's offhand item) is "fire":
+				if getEnergy(shooter's offhand item) > 3:
+					chance of 15%
+					ignite the event-projectile
+
+					
+
+
+					
+on death:
+	if {-Crisper} is set:
+		if {-Crisped::%victim's uuid%} is set:
+			if attacker is not set:
+				if victim is not invisible:
+					if {-Crisper} is not invisible:
+						set death message to "%victim% was set ablaze by %{-Crisper}%"
+					else:
+						set death message to "%victim% was set ablaze by &k???"
+				else:
+					if {-Crisper} is not invisible:
+						set death message to "&k??? &fwas set ablaze by %{-Crisper}%"
+					else:
+						set death message to "&k??? &fwas set ablaze by &k???"
+every 3 second:
+	loop all players:
+		if loop-player is within 4 blocks of {-CrispLoc::%loop-player's uuid%}:
+			if {-Crisped::%loop-player's uuid%} is true:
+				set {_foodlvl} to the loop-player's food level
+				set {foodlvl::%loop-player's uuid%} to {_foodlvl} - 0.5
+				set the loop-player's food level to {foodlvl::%loop-player's uuid%}
+
+
+on drop:
+	loop all players:
+		if last dropped item is within 4 blocks around {-CrispLoc::%loop-player's uuid%}:
+			set {_item} to last dropped item
+			set {_loc} to location of last dropped item
+			delete event-dropped item
+			if item of {_item} is raw iron:
+				remove entity from {_item}
+				drop 1 iron ingot at {_loc}
+			if item of {_item} is raw gold item:
+				remove entity from {_item}
+				drop 1 gold ingot at {_loc}
+			if item of {_item} is mutton:
+				remove entity from {_item}
+				drop 1 cooked mutton at {_loc}
+			if item of {_item} is cobblestone:
+				remove entity from {_item}
+				drop 1 stone at {_loc}
+			if item of {_item} is beef:
+				remove entity from {_item}
+				drop 1 cooked beef at {_loc}
+			if item of {_item} is pork:
+				remove entity from {_item}
+				drop 1 cooked pork at {_loc}
+			if item of {_item} is raw copper:
+				remove entity from {_item}
+				drop 1 copper ingot at {_loc}
+			if item of {_item} is sand:
+				remove entity from {_item}
+				drop 1 glass at {_loc}
+			if item of {_item} is ancient debris:
+				remove entity from {_item}
+				drop 1 netherite scrap at {_loc}
+			if item of {_item} is cobblestone:
+				remove entity from {_item}
+				drop 1 stone at {_loc}
+			if item of {_item} is cobbled deepslate:
+				remove entity from {_item}
+				drop 1 deepslate at {_loc}
+
+
+on join:
+	delete {-Crisped::%player's uuid%}
+
+
+on death:
+	if {-MeteorShowerCaster} is set:
+		if {-MeteorShower::%victim's uuid%} is set:
+			if attacker is not set:
+				if victim is not invisible:
+					if {-MeteorShowerCaster} is not invisible:
+						set death message to "%victim% was caught in %{-MeteorShowerCaster}%'s meteor shower"
+					else:
+						set death message to "%victim% was caught in &k???&f's meteor shower"
+				else:
+					if {-MeteorShowerCaster} is not invisible:
+						set death message to "&k??? &fwas caught in %{-MeteorShowerCaster}%'s meteor shower"
+					else:
+						set death message to "&k??? &fwas caught in &k???&f's meteor shower"
+
+
+
+left click:
+	if isDisabled(player) is not true:
+		if getGem(player's held item) is "fire":
+			if getTier(player's held item) is 2:
+				if getEnergy(player's held item) is not 0:
+					if canUsePower("Fireball::%uuid of player%") is true:
+						if {-ChargingFireball::%player's uuid%} is not true:
+							send "<##FE8120>🔮 <##B8FFFB>Charging &f🧨<##FE8120>fireball" to player
+
+							wait 1 tick
+							set {-ChargingFireball::%player's uuid%} to true
+							set bar progress of {-Fireball::Bar::%player's uuid%} to 0
+							set {-Fireball::Bar::%player's uuid%} to boss bar with id "%player's uuid%sfireball" with title "&fFireball Power" with color red with progress 0
+							set bar style of {-Fireball::Bar::%player's uuid%} to solid bar
+							add player to bossbar players of {-Fireball::Bar::%player's uuid%}
+							spawn armor stand 1 meter above and 0.4 meters behind player
+							set {-fireArmor::%player's uuid%} to last spawned armor stand
+							set visibility of {-fireArmor::%player's uuid%} to false
+							set helmet of {-fireArmor::%player's uuid%} to fire charge
+							make {-fireArmor::%player's uuid%} ride player
+							loop 6000 times:
+								if {-ChargingFireball::%player's uuid%} is true:
+									fireballTeleprt(player)
+									wait 2 tick
+									fireaballCharge(player)
+									wait 1 second
+								else:
+									stop
+					else:
+						set {_fb} to getActionBarCooldown("Fireball::%uuid of player%")
+						send "<##FE8120>🔮 <##FF686F>Your &f🧨<##FE8120>Fireball &cis on cooldown for &e%{_fb}%" to player
+
+
+function fireaballCharge(p: player):
+	set {_uuid} to {_p}'s uuid
+	if isDisabled({_p}) is not true:
+		if {-ChargingFireball::%{_uuid}%} is true:
+			if bar progress of {-Fireball::Bar::%{_uuid}%} is less than 100:
+				if the block below {_p} is obsidian or fire or lava or netherrack or magma:
+					add 4.66 to bar progress of {-Fireball::Bar::%{_uuid}%}
+					draw 10 of dust using dustOption(rgb(254, 129, 32), 1) at location 1 block above {_p} with offset vector(0.4, 0.4, 0.4) with extra 0 with force
+					draw 4 of smoke at location 1 block above {_p} with offset vector(0.5, 0.5, 0.5) with extra 0 with force
+				else:
+					add 2.77 to bar progress of {-Fireball::Bar::%{_uuid}%}
+					draw 10 of dust using dustOption(rgb(254, 129, 32), 1) at location 1 block above {_p} with offset vector(0.4, 0.4, 0.4) with extra 0 with force
+					draw 4 of smoke at location 1 block above {_p} with offset vector(0.5, 0.5, 0.5) with extra 0 with force
+
+
+
+function fireballTeleprt(p: player):
+	set {_uuid} to {_p}'s uuid
+	if {-ChargingFireball::%{_uuid}%} is true:
+		if IsGem({_p}'s offhand item) is false:
+			if IsGem({_p}'s held item) is false:
+				kill {-fireArmor::%{_uuid}%}
+				set {-ChargingFireball::%{_uuid}%} to false
+				remove {_p} from bossbar players of {-Fireball::Bar::%{_uuid}%}
+		else:
+			set {_loc} to location 0.65 meter above and 0.75 meter behind {_p}
+			set {_y} to yaw of {_p}
+			set yaw of {_loc} to {_y}
+			teleport {-fireArmor::%{_uuid}%} to {_loc} 
+
+on death:
+	remove victim from bossbar players of {-Fireball::Bar::%victim's uuid%}
+	set {-ChargingFireball::%victim's uuid%} to false
+	kill {-fireArmor::%victim's uuid%}
+
+left click:
+	if isDisabled(player) is not true:
+		if getGem(player's held item) is "fire":
+			if getTier(player's held item) is 2:
+				if canUsePower("Fireball::%uuid of player%") is true:
+					if {-ChargingFireball::%player's uuid%} is true:
+						if getEnergy(player's held item) > 0:
+							blissSetcooldown("Fireball::%uuid of player%", toMilliseconds(6, 30), player)
+						if getEnergy(player's held item) > 2:
+							blissSetcooldown("Fireball::%uuid of player%", toMilliseconds(5, 30), player)
+						if getEnergy(player's held item) > 4:
+							blissSetcooldown("Fireball::%uuid of player%", toMilliseconds(4, 30), player)
+						if getEnergy(player's held item) > 6:
+							blissSetcooldown("Fireball::%uuid of player%", toMilliseconds(3, 30), player)
+						if getEnergy(player's held item) > 8:
+							blissSetcooldown("Fireball::%uuid of player%", toMilliseconds(2, 30), player)
+						send "<##FE8120>🔮 <##B8FFFB>You have launched a <##FE8120>fireball!" to player
+						set {-ChargingFireball::%player's uuid%} to false
+						remove player from bossbar players of {-Fireball::Bar::%player's uuid%}
+						make player invulnerable
+						make player shoot a fireball at speed 4
+						kill {-fireArmor::%player's uuid%}
+						set {-Fireball} to player
+						wait 2 ticks
+						make player vulnerable
+						wait 5 seconds
+						make player vulnerable
+						delete {-Fireball}
+						
+on projectile hit:
+	if event-projectile is a large fireball:
+		if bar progress of {-Fireball::Bar::%shooter's uuid%} is between 0 and 10:
+			create an explosion of force 3 at projectile
+		if bar progress of {-Fireball::Bar::%shooter's uuid%} is between 10 and 20:
+			create an explosion of force 3.5 at projectile
+		if bar progress of {-Fireball::Bar::%shooter's uuid%} is between 20 and 30:
+			create an explosion of force 4 at projectile
+		if bar progress of {-Fireball::Bar::%shooter's uuid%} is between 30 and 40:
+			create an explosion of force 4.5 at projectile
+		if bar progress of {-Fireball::Bar::%shooter's uuid%} is between 40 and 50:
+			create an explosion of force 5 at projectile
+		if bar progress of {-Fireball::Bar::%shooter's uuid%} is between 50 and 60:
+			create an explosion of force 5.5 at projectile
+		if bar progress of {-Fireball::Bar::%shooter's uuid%} is between 60 and 70:
+			create an explosion of force 6 at projectile
+		if bar progress of {-Fireball::Bar::%shooter's uuid%} is between 70 and 80:
+			create an explosion of force 7.5 at projectile
+		if bar progress of {-Fireball::Bar::%shooter's uuid%} is between 80 and 100:
+			create an explosion of force 8 at projectile
+
+on damage:
+	if damage cause is block explosion:
+		if {-Fireball} is set:
+			cancel event
+			add {-Fireball} to {_dontdmgagain::*}
+			if victim is not {-Fireball}:
+				if IsTrusted({-Fireball}, victim) is not true:
+					if victim doesn't contain {_dontdmgagain::*}:
+						set {_uuid} to {-Fireball}'s uuid
+						cancel event
+						if bar progress of {-Fireball::Bar::%{_uuid}%} is between 0 and 10:
+							absoluteDamage(victim, 1.5)
+						if bar progress of {-Fireball::Bar::%{_uuid}%} is between 10 and 20:
+							absoluteDamage(victim, 2)
+						if bar progress of {-Fireball::Bar::%{_uuid}%} is between 20 and 30:
+							absoluteDamage(victim, 2.5)
+						if bar progress of {-Fireball::Bar::%{_uuid}%} is between 30 and 40:
+							absoluteDamage(victim, 3)
+						if bar progress of {-Fireball::Bar::%{_uuid}%} is between 40 and 50:
+							absoluteDamage(victim, 3.5)
+						if bar progress of {-Fireball::Bar::%{_uuid}%} is between 50 and 60:
+							absoluteDamage(victim, 4)
+						if bar progress of {-Fireball::Bar::%{_uuid}%} is between 60 and 70:
+							absoluteDamage(victim, 4)
+						if bar progress of {-Fireball::Bar::%{_uuid}%} is between 70 and 80:
+							absoluteDamage(victim, 4.5)
+						if bar progress of {-Fireball::Bar::%{_uuid}%} is between 80 and 90:
+							absoluteDamage(victim, 5)
+						if bar progress of {-Fireball::Bar::%{_uuid}%} is between 90 and 100:
+							absoluteDamage(victim, 5.5)
+						add victim to {_dontdmgagain::*}
+						wait 2 seconds
+						remove victim from {_dontdmgagain::*}
+						remove {-Fireball} from {_dontdmgagain::*}
+				
+
+
+function absoluteDamage(p: entity, a: number):
+	damage {_p} by 0.001
+	if {_p}'s health < {_num}:
+		if any:
+			{_p}'s held item is a totem of undying
+			{_p}'s offhand item is a totem of undying
+		then:
+			damage {_p} by 999
+		else:
+			set {_p}'s health to {_p}'s health - {_a}
+			add {_p} to {_dontdmgagain::*}
+	else:
+		set {_p}'s health to {_p}'s health - {_a}
+
+
+on projectile hit:
+	if event-projectile is a large fireball:
+		if {-MeteorShowerCaster} is set:
+			create a safe explosion of force 1.85 at event-projectile
+
+on death:
+	if attacker is not set:
+		if {-Fireball} is set:
+			if {-Fireball} is not invisible:
+				set death message to "%victim% ate a fireball from %{-Fireball}%"
+			else:
+				set death message to "%victim% ate a fireball from &k???"
+
+function cosyHeal(num: number):
+	loop all players:
+		set {_cn} to 1
+		if {-CampfireTimer%{_cn}%::%loop-player's uuid%} is alive:
+			if canUsePower("CampfireActive::%uuid of loop-player%") is true:
+				if canUsePower("CampfireActive1::%uuid of loop-player%") is true:
+					if canUsePower("CampfireActive2::%uuid of loop-player%") is true:
+						set {_message} to getCampfireCooldown("CampfireActive3::%uuid of loop-player%")
+					else:
+						set {_message} to getCampfireCooldown("CampfireActive2::%uuid of loop-player%")
+				else:
+					set {_message} to getCampfireCooldown("CampfireActive1::%uuid of loop-player%")
+			else:
+				set {_message} to getCampfireCooldown("CampfireActive::%uuid of loop-player%")
+			if {_message} is not "&aReady!":
+				set {-CampfireTimer%{_cn}%::%loop-player's uuid%}'s display name to "&a%{_message}%"
+			else:
+				kill {-CampfireTimer%{_cn}%::%loop-player's uuid%}
+			loop all players within radius {_num} of {-CampfireTimer%{_cn}%::%loop-player's uuid%}:
+				if loop-value-2 is loop-value-1:
+					if loop-value-2 is alive:
+						draw 5 of dust using dustOption(rgb(254, 129, 32), 1) at location 1 block above loop-value-2 with offset vector(0.3, 0.4, 0.3) with extra 0 with force
+						make 5 of happy_villager at location 1 block above loop-value-2 with offset vector(0.3, 0.4, 0.3) with extra 0 with force
+						heal loop-value-2 by 2 hearts
+						if loop-value-2's food level < 10:
+							set loop-value-2's food level to loop-value-2's food level + 4
+				else:
+					if IsTrusted(loop-value-1, loop-value-2) is true:
+						if loop-value-2 is alive:
+							draw 5 of dust using dustOption(rgb(254, 129, 32), 1) at location 1 block above loop-value-2 with offset vector(0.3, 0.4, 0.3) with extra 0 with force
+							make 5 of happy_villager at location 1 block above loop-value-2 with offset vector(0.3, 0.4, 0.3) with extra 0 with force
+							heal loop-value-2 by 2 hearts
+							if loop-value-2's food level < 10:
+
+
+on break:
+	if block is a soul campfire:
+		set {_loc} to location of event-block
+		loop all entities in radius 1.5 around {_loc}:
+			if loop-entity is an armor stand:
+				set {_en} to loop-entity
+				loop all players:
+					set {_uuid} to loop-player's uuid
+					set {_num} to 1
+					
+					loop 4 times:
+						if {_en} is {-CampfireTimer%{_num}%::%{_uuid}%}:
+							kill {-CampfireTimer%{_num}%::%{_uuid}%}
+						else:
+							add 1 to {_num}
+
+right click:
+	if isDisabled(player) is not true:
+		if getGem(player's held item) is "fire":
+			if getTier(player's held item) is 2:
+				if getEnergy(player's held item) is not 0:
+					if canUsePower("Campfire::%uuid of player%") is true:
+						if block above target block of player is air:
+							if target block of player is not air:
+								set block above target block of player to a soul campfire
+								set {_gem} to player's held item
+								send "<##FE8120>🔮 <##B8FFFB>You have used &f🥾&eCozy Campfire <##B8FFFB>skill!" to player
+								if getEnergy(player's held item) is 1:
+									blissSetcooldown("Campfire::%uuid of player%", toMilliseconds(1, 20), player)
+									set {_num} to 2
+								if getEnergy(player's held item) is 2:
+									blissSetcooldown("Campfire::%uuid of player%", toMilliseconds(1, 15), player)
+									set {_num} to 3
+								if getEnergy(player's held item) is 3:
+									blissSetcooldown("Campfire::%uuid of player%", toMilliseconds(1, 10), player)
+									set {_num} to 4
+								if getEnergy(player's held item) is 4:
+									blissSetcooldown("Campfire::%uuid of player%", toMilliseconds(1, 5), player)
+									set {_num} to 5
+								if getEnergy(player's held item) > 4:
+									blissSetcooldown("Campfire::%uuid of player%", toMilliseconds(1, 0), player)
+									set {_num} to 5.5
+								if canUsePower("CampfireActive::%uuid of player%") is true:
+									setDCooldown("CampfireActive::%uuid of player%", toMilliseconds(10, 0))
+									set {_m} to "CampfireActive::%uuid of player%"	
+									set {_cn} to 1
+								else if canUsePower("CampfireActive1::%uuid of player%") is true:
+									setDCooldown("CampfireActive1::%uuid of player%", toMilliseconds(10, 0))
+									set {_m} to "CampfireActive1::%uuid of player%"	
+									set {_cn} to 2
+								else if canUsePower("CampfireActive2::%uuid of player%") is true:
+									setDCooldown("CampfireActive2::%uuid of player%", toMilliseconds(10, 0))
+									set {_m} to "CampfireActive2::%uuid of player%"	
+									set {_cn} to 3
+								else if canUsePower("CampfireActive3::%uuid of player%") is true:
+									setDCooldown("CampfireActive3::%uuid of player%", toMilliseconds(10, 0))	
+									set {_m} to "CampfireActive3::%uuid of player%"	
+									set {_cn} to 4
+								set {_message} to getCampfireCooldown({_m})
+								spawn armor stand 1.5 blocks below target block of player
+								set {-CampfireTimer%{_cn}%::%player's uuid%} to last spawned armor stand
+								set {-CampfireTimer%{_cn}%::%player's uuid%}'s display name to "&a%{_message}%"
+								set gravity of {-CampfireTimer%{_cn}%::%player's uuid%} to off
+								set visibility of {-CampfireTimer%{_cn}%::%player's uuid%} to false
+								make {-CampfireTimer::%player's uuid%} invulnerable
+							
+
+								set {_pl} to location of target block of player		
+								loop 1800 times:
+									if {-CampfireTimer%{_cn}%::%player's uuid%} is alive:
+										dustparticlering2({_pl}, 254, 129, 32, 0.4, {_num})
+										cosyHeal({_num})
+										wait 0.25 seconds
+									else:
+										stop
+
+
+
+on damage:
+	if isDisabled(attacker) is not true:
+		if {-ChargingFireball::%attacker's uuid%} is not true:
+			if getGem(attacker's held item) is "fire":
+				if getTier(attacker's held item) is 2:
+					if getEnergy(attacker's held item) is not 0:
+						if IsTrusted(attacker, victim) is not true:
+							if canUsePower("Fireball::%uuid of attacker%") is true:
+								if attacker is not invisible:
+									send "<##FE8120>🔮 %attacker% <##B8FFFB>is raining a <##FE8120>Meteor Shower <##B8FFFB>on you!" to victim
+								else:
+									send "<##FE8120>🔮 &k???%attacker% <##B8FFFB>is raining a <##FE8120>Meteor Shower <##B8FFFB>on you!" to victim
+
+								if victim is not invisible:
+									send "<##FE8120>🔮 <##B8FFFB>You have summoned a <##FE8120>Meteor Shower <##B8FFFB>on %victim.getName()%!" to attacker
+								else:
+									send "<##FE8120>🔮 <##B8FFFB>You have summoned a <##FE8120>Meteor Shower <##B8FFFB>on &k???<##B8FFFB>!" to attacker
+										
+								set {-MeteorShower::%victim's uuid%} to true
+								set {-MeteorShowerCaster} to attacker
+								if getEnergy(attacker's held item) > 0:
+									blissSetcooldown("Fireball::%uuid of attacker%", toMilliseconds(5, 30), attacker)
+								if getEnergy(attacker's held item) > 2:
+									blissSetcooldown("Fireball::%uuid of attacker%", toMilliseconds(4, 25), attacker)
+								if getEnergy(attacker's held item) > 5:
+									blissSetcooldown("Fireball::%uuid of attacker%", toMilliseconds(3, 45), attacker)
+								if getEnergy(attacker's held item) > 7:
+									blissSetcooldown("Fireball::%uuid of attacker%", toMilliseconds(2, 30), attacker)
+								if getEnergy(attacker's held item) > 9:
+									blissSetcooldown("Fireball::%uuid of attacker%", toMilliseconds(1, 45), attacker)
+								loop 60 times:
+									if victim is alive:
+										set {_rand1} to a random number between 0 and 2
+										set {_rand2} to a random number between 0 and 2
+										set {_rand3} to a random number between 0 and 2
+										set {_rand4} to a random number between 0 and 2
+											
+										set {MeteorShowerVictimLoc::%victim's uuid%} to location 10 blocks above and {_rand1} left and {_rand2} right and {_rand3} infront and {_rand4} behind victim
+										set {_world} to world of {MeteorShowerVictimLoc::%victim's uuid%}
+										set {_vector} to new Vector(0, -1, 0)
+									
+										set {_fireball} to {_world}.spawn({MeteorShowerVictimLoc::%victim's uuid%}, Fireball.class)
+										{_fireball}.setIsIncendiary(false)
+										{_fireball}.setDirection({_vector})
+										{_fireball}.setVelocity({_vector})
+										wait 0.5 seconds
+									else:
+										stop
+										
+								delete {MeteorShowerVictimLoc::%victim's uuid%}
+								delete {-MeteorShower::%victim's uuid%}
+								delete {-MeteorShowerCaster}
+
+							else:
+								set {_message} to getActionBarCooldown("Fireball::%uuid of attacker%")
+								send "<##FE8120>🔮 <##FF686F>Your &f🧨<##FE8120>Meteor Shower &cis on cooldown for &e%{_message}%" to attacker
+
+on block break:
+	loop all players:
+		if event-block is within 13 blocks around {-MeteorShowerVictimLoc::%player's uuid%}:
+			cancel event
+
+on ignite:
+	loop all players:
+		if event-block is within 13 blocks around {-SpeedStormLoc::%player's uuid%}:
+			cancel event
+
+on death:
+	delete {-MeteorShowerCaster}
+	set {-MeteorShower::%victim's uuid%} to false
+
+		
+function CrispCircle(s: number, p: location):
+	set {_pl} to location of {_p}
+
+	loop all players:
+		if {particlelvl::%loop-player's uuid%} is "default":
+			
+			set {_spacing} to 0.5
+			set {_circumference} to 2 * pi * {_s} 
+			set {_numParticles} to floor({_circumference} / {_spacing}) 
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(254, 129, 32), 1) at {_pl} ~ {_v} for loop-player
+				draw 1 of flame at {_pl} ~ {_v} with extra 0 with force for loop-player
+
+		else if {particlelvl::%loop-player's uuid%} is "less":
+
+			set {_spacing} to 1
+			set {_circumference} to 2 * pi * {_s}
+			set {_numParticles} to floor({_circumference} / {_spacing})
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				draw 1 of flame at {_pl} ~ {_v} with extra 0 with force for loop-player
+
+		else if {particlelvl::%loop-player's uuid%} is "none":
+
+			set {_spacing} to 1.5
+			set {_circumference} to 2 * pi * {_s}
+			set {_numParticles} to floor({_circumference} / {_spacing})
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				draw 1 of flame at {_pl} ~ {_v} with extra 0 with force for loop-player
+		
+function VortexCircle(s: number, p: location):
+	set {_pl} to location of {_p}
+
+	loop all players:
+		if {particlelvl::%loop-player's uuid%} is "default":
+			
+			set {_spacing} to 0.5
+			set {_circumference} to 2 * pi * {_s} 
+			set {_numParticles} to floor({_circumference} / {_spacing}) 
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(254, 4, 180), 1) at {_pl} ~ {_v} for loop-player
+				draw 1 of happy_villager at {_pl} ~ {_v} with extra 0 with force for loop-player
+
+		else if {particlelvl::%loop-player's uuid%} is "less":
+
+			set {_spacing} to 0.6
+			set {_circumference} to 2 * pi * {_s}
+			set {_numParticles} to floor({_circumference} / {_spacing})
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(254, 4, 180), 1) at {_pl} ~ {_v} for loop-player
+
+		else if {particlelvl::%loop-player's uuid%} is "none":
+
+			set {_spacing} to 0.7
+			set {_circumference} to 2 * pi * {_s}
+			set {_numParticles} to floor({_circumference} / {_spacing})
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(254, 4, 180), 1) at {_pl} ~ {_v} for loop-player
+
+on break:
+	if {Prog1} is true:
+		if event-block is not cobweb:
+			if {-unbreakable::%event-block%} is true:
+				if {-crispActive} is true:
+					cancel event
+				else:
+					set {-unbreakable::%event-block%} to false
+	
+			if {-unbreakable2::%event-block%} is true:
+				if {-lifeActive} is true:
+					cancel event
+				else:
+					set {-unbreakable2::%event-block%} to false
+			
+			if {-unbreakable3::%event-block%} is true:
+				if {-lifeActive} is true:
+					cancel event
+				else:
+					set {-unbreakable3::%event-block%} to false
+
+
+on rightclick:
+	if isDisabled(player) is not true:
+		if getGem(player's offhand item) is "fire":
+			if canUsePower("Crisp::%uuid of player%") is true:
+				if getEnergy(player's offhand item) is not 0:
+					if player's held item is a sword or air or an axe:
+						if difference between {-FireDBC::%player%} and now is less than 0.2 seconds:
+							setDCooldown("Crisp::%uuid of player%", toMilliseconds(0, 45))
+							set {-Crisper} to player
+							send "<##FE8120>🔮<##FF686F> You used &f🥾<##FE8120>Crisp Ability" to player
+							set {_loc} to location of player
+							set {_radius} to 5
+							set {_blocks::*} to air
+							set {_blocks2::*} to air
+							set {_blocks3::*} to air
+							set {-crispActive} to true
+
+							loop blocks in radius {_radius} around {_loc}:
+								set {-unbreakable::%loop-block%} to true
+								if loop-block is short grass:
+									set {_originalType4} to loop-block's type
+									set {_blockLoc4} to loop-block's location
+									add {_blockLoc4} to {_blocks4::*}
+									set {_blocks4::%{_blockLoc4}%} to {_originalType4}
+									set loop-block to crimson root or warped root
+
+								if loop-block is tall grass:
+									set {_originalType5} to loop-block's type
+									set {_blockLoc5} to loop-block's location
+									add {_blockLoc5} to {_blocks5::*}
+									set {_blocks5::%{_blockLoc5}%} to {_originalType5}
+									set loop-block to twisting vine or weeping vine
+
+								if loop-block is oak leaves or spruce leaves or birch leaves or acacia leaves or cherry leaves or mangrove leaves or jungle leaves or dark oak leaves:
+									set {_originalType3} to loop-block's type
+									set {_blockLoc3} to loop-block's location
+									add {_blockLoc3} to {_blocks3::*}
+									set {_blocks3::%{_blockLoc3}%} to {_originalType3}
+									set loop-block to nether wart block or warped wart block
+						
+								if loop-block is grass block or stone or dirt or sand or sandstone or gravel:
+									set {_originalType} to loop-block's type
+									set {_blockLoc} to loop-block's location
+									add {_blockLoc} to {_blocks::*}
+									set {_blocks::%{_blockLoc}%} to {_originalType}
+									set loop-block to netherrack or magma or basalt
+							
+								if loop-block is oak log or spruce log or acacia log or dark oak log or cherry log or birch log or jungle log or mangrove log:
+									set {_originalType2} to loop-block's type
+									set {_blockLoc2} to loop-block's location
+									add {_blockLoc2} to {_blocks2::*}
+									set {_blocks2::%{_blockLoc2}%} to {_originalType2}
+									set loop-block to crimson stem or warped stem
+
+				
+							set {_loc2} to location 0.2 blocks above {_loc}
+							loop 90 times:
+								CrispCircle(5,{_loc2})
+								loop all entities within 5 blocks of {_loc}:
+									if loop-entity is not item:
+										if IsTrusted(player, loop-entity) is not true:
+											if player is not loop-entity:
+												set {-Crisped::%loop-entity's uuid%} to true
+												if loop-entity is not player:
+													if loop-entity is not an armor stand:
+														damage loop-entity by 1.5 hearts
+								loop all blocks in radius 5 around {_loc}:
+									if loop-block is water or stationary water:
+										set loop-block to air
+								wait 4 tick
+						
+							loop all entities:
+								delete {-Crisped::%loop-entity's uuid%}
+							loop {_blocks::*}:
+								set {_blockLoc} to loop-value
+								set {_originalType} to {_blocks::%{_blockLoc}%}
+								if {_originalType} is not air:
+									set {-unbreakable::%block%} to false
+									set block at {_blockLoc} to {_originalType}
+							
+							loop {_blocks2::*}:
+								set {_blockLoc2} to loop-value
+								set {_originalType2} to {_blocks2::%{_blockLoc2}%}
+								if {_originalType2} is not air:
+									set {-unbreakable::%block%} to false
+									set block at {_blockLoc2} to {_originalType2}
+							
+							loop {_blocks3::*}:
+								set {_blockLoc3} to loop-value
+								set {_originalType3} to {_blocks3::%{_blockLoc3}%}
+								if {_originalType3} is not air:
+									set {-unbreakable::%block%} to false
+									set block at {_blockLoc3} to {_originalType3}
+							loop {_blocks4::*}:
+								set {_blockLoc4} to loop-value
+								set {_originalType4} to {_blocks4::%{_blockLoc4}%}
+								if {_originalType4} is not air:
+									set {-unbreakable::%block%} to false
+									set block at {_blockLoc4} to {_originalType4}
+
+							loop {_blocks5::*}:
+								set {_blockLoc5} to loop-value
+								set {_originalType5} to {_blocks5::%{_blockLoc5}%}
+								if {_originalType5} is not air:
+									set {-unbreakable::%block%} to false
+									set block at {_blockLoc5} to {_originalType5}
+								
+							loop blocks in radius {_radius} around {_loc}:
+								set {-unbreakable::%loop-block%} to false
+
+							delete {-Crisper}
+							set {-crispActive} to false
+							blissSetcooldown("Crisp::%uuid of player%", toMilliseconds(0, 30), player)
+						else:
+							set {-FireDBC::%player%} to now	
+			else:
+				set {_message} to getCooldownSeconds("Crisp::%uuid of player%")
+				send "<##FE8120>🔮 &f🥾<##FF686F>Crisp is on cooldown for %{_message}%" to player
+
+
+
+every 15 seconds:
+	loop all players:
+		if isDisabled(loop-player) is not true:
+			if getGem(loop-player's held item) is "fire":
+				if getEnergy(loop-player's held item) > 4:
+					loop 128 times:
+						if loop-player has raw iron:
+							remove 1 raw iron from loop-player
+							give loop-player 1 iron ingot
+						if loop-player has raw gold:
+							remove 1 raw gold from loop-player
+							give loop-player 1 gold ingot
+						if loop-player has mutton:
+							remove 1 mutton from loop-player
+							give loop-player 1 cooked mutton
+						if loop-player has beef:
+							remove 1 beef from loop-player
+							give loop-player 1 cooked beef
+						if loop-player has pork:
+							remove 1 pork from loop-player
+							give loop-player 1 cooked pork
+						if loop-player has raw copper:
+							remove 1 raw copper from loop-player
+							give loop-player 1 copper ingot
+						if loop-player has sand:
+							remove 1 sand from loop-player
+							give loop-player 1 glass
+						if loop-player has ancient debris:
+							remove 1 ancient debris from loop-player
+							give loop-player 1 netherite scrap
+
+			else if getGem(loop-player's offhand item) is "fire":
+				if getEnergy(loop-player's offhand item) > 4:
+					loop 128 times:
+						if loop-player has raw iron:
+							remove 1 raw iron from loop-player
+							give loop-player 1 iron ingot
+						if loop-player has raw gold:
+							remove 1 raw gold from loop-player
+							give loop-player 1 gold ingot
+						if loop-player has mutton:
+							remove 1 mutton from loop-player
+							give loop-player 1 cooked mutton
+						if loop-player has beef:
+							remove 1 beef from loop-player
+							give loop-player 1 cooked beef
+						if loop-player has pork:
+							remove 1 pork from loop-player
+							give loop-player 1 cooked pork
+						if loop-player has raw copper:
+							remove 1 raw copper from loop-player
+							give loop-player 1 copper ingot
+						if loop-player has sand:
+							remove 1 sand from loop-player
+							give loop-player 1 glass
+						if loop-player has ancient debris:
+							remove 1 ancient debris from loop-player
+							give loop-player 1 netherite scrap

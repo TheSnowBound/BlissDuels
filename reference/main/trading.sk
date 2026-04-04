@@ -1,0 +1,400 @@
+on left click:
+	if all:
+		lore of player's held item contains "&7ʟᴇғᴛ ᴄʟɪᴄᴋ ғᴏʀ ᴜʟᴛɪᴍᴀᴛᴇ ᴛʀᴀᴅɪɴɢ ᴍᴇɴᴜ"
+		{-trading::%player's uuid%} is not set
+	then:
+		loop all items in player's inventory:
+			if getTier(loop-item) is 2:
+				set {_tier} to true
+				set {-atenergy::%uuid of player%} to getEnergy(loop-item)
+				set {-trading::%player's uuid%} to true
+		if {_tier} is true:
+			set {gemnames::%player's uuid%::*} to "strength", "fire", "speed", "wealth", "flux", "astra", "puff", "life"
+			set {_traderGui} to a new chest inventory with 3 rows with name "&b ᴜʟᴛɪᴍᴀᴛᴇ ᴛʀᴀᴅɪɴɢ ᴍᴇɴᴜ"
+			open {_traderGui} to player
+			set {-trading::%player's uuid%} to true
+			set {_slot} to 0
+			loop all items in player's inventory:
+				if getGem(loop-item) is "astra":
+					remove "astra" from {gemnames::%player's uuid%::*}
+					loop 27 times:
+						set slot {_slot} of player's current inventory to gray stained glass pane named " "
+						add 1 to {_slot}
+					set slot 9 of player's current inventory to {-tradegui::life2::14}
+					set slot 10 of player's current inventory to {-tradegui::strength2::14}
+					set slot 11 of player's current inventory to {-tradegui::fire2::14}
+					set slot 12 of player's current inventory to {-tradegui::speed2::14}
+					set slot 13 of player's current inventory to {-energyitem::broken}
+					set slot 14 of player's current inventory to {-tradegui::wealth2::14}
+					set slot 15 of player's current inventory to {-tradegui::flux2::14}
+					set slot 16 of player's current inventory to {-tradegui::astra2::02}
+					set slot 17 of player's current inventory to {-tradegui::puff2::14}
+
+				if getGem(loop-item) is "puff":
+					remove "puff" from {gemnames::%player's uuid%::*}
+					loop 27 times:
+						set slot {_slot} of player's current inventory to gray stained glass pane named " "
+						add 1 to {_slot}
+					set slot 9 of player's current inventory to {-tradegui::life2::14}
+					set slot 10 of player's current inventory to {-tradegui::strength2::14}
+					set slot 11 of player's current inventory to {-tradegui::fire2::14}
+					set slot 12 of player's current inventory to {-tradegui::speed2::14}
+					set slot 13 of player's current inventory to {-energyitem::broken}
+					set slot 14 of player's current inventory to {-tradegui::wealth2::14}
+					set slot 15 of player's current inventory to {-tradegui::flux2::14}
+					set slot 16 of player's current inventory to {-tradegui::astra2::14}
+					set slot 17 of player's current inventory to {-tradegui::puff2::02}
+
+				#Coded by HyperDondon
+				if getGem(loop-item) is "speed":
+					remove "speed" from {gemnames::%player's uuid%::*}
+					loop 27 times:
+						set slot {_slot} of player's current inventory to gray stained glass pane named " "
+						add 1 to {_slot}
+					set slot 9 of player's current inventory to {-tradegui::life2::14}
+					set slot 10 of player's current inventory to {-tradegui::strength2::14}
+					set slot 11 of player's current inventory to {-tradegui::fire2::14}
+					set slot 12 of player's current inventory to {-tradegui::speed2::02}
+					set slot 13 of player's current inventory to {-energyitem::broken}
+					set slot 14 of player's current inventory to {-tradegui::wealth2::14}
+					set slot 15 of player's current inventory to {-tradegui::flux2::14}
+					set slot 16 of player's current inventory to {-tradegui::astra2::14}
+					set slot 17 of player's current inventory to {-tradegui::puff2::14}
+
+				if getGem(loop-item) is "flux":
+					remove "flux" from {gemnames::%player's uuid%::*}
+					loop 27 times:
+						set slot {_slot} of player's current inventory to gray stained glass pane named " "
+						add 1 to {_slot}
+					set slot 9 of player's current inventory to {-tradegui::life2::14}
+					set slot 10 of player's current inventory to {-tradegui::strength2::14}
+					set slot 11 of player's current inventory to {-tradegui::fire2::14}
+					set slot 12 of player's current inventory to {-tradegui::speed2::14}
+					set slot 13 of player's current inventory to {-energyitem::broken}
+					set slot 14 of player's current inventory to {-tradegui::wealth2::14}
+					set slot 15 of player's current inventory to {-tradegui::flux2::02}
+					set slot 16 of player's current inventory to {-tradegui::astra2::14}
+					set slot 17 of player's current inventory to {-tradegui::puff2::14}
+
+				if getGem(loop-item) is "fire":
+					remove "fire" from {gemnames::%player's uuid%::*}
+					loop 27 times:
+						set slot {_slot} of player's current inventory to gray stained glass pane named " "
+						add 1 to {_slot}
+					set slot 9 of player's current inventory to {-tradegui::life2::14}
+					set slot 10 of player's current inventory to {-tradegui::strength2::14}
+					set slot 11 of player's current inventory to {-tradegui::fire2::02}
+					set slot 12 of player's current inventory to {-tradegui::speed2::14}
+					set slot 13 of player's current inventory to {-energyitem::broken}
+					set slot 14 of player's current inventory to {-tradegui::wealth2::14}
+					set slot 15 of player's current inventory to {-tradegui::flux2::14}
+					set slot 16 of player's current inventory to {-tradegui::astra2::14}
+					set slot 17 of player's current inventory to {-tradegui::puff2::14}
+
+				if getGem(loop-item) is "life":
+					remove "life" from {gemnames::%player's uuid%::*}
+					loop 27 times:
+						set slot {_slot} of player's current inventory to gray stained glass pane named " "
+						add 1 to {_slot}
+					set slot 9 of player's current inventory to {-tradegui::life2::02}
+					set slot 10 of player's current inventory to {-tradegui::strength2::14}
+					set slot 11 of player's current inventory to {-tradegui::fire2::14}
+					set slot 12 of player's current inventory to {-tradegui::speed2::14}
+					set slot 13 of player's current inventory to {-energyitem::broken}
+					set slot 14 of player's current inventory to {-tradegui::wealth2::14}
+					set slot 15 of player's current inventory to {-tradegui::flux2::14}
+					set slot 16 of player's current inventory to {-tradegui::astra2::14}
+					set slot 17 of player's current inventory to {-tradegui::puff2::14}
+
+				if getGem(loop-item) is "strength":
+					remove "strength" from {gemnames::%player's uuid%::*}
+					loop 27 times:
+						set slot {_slot} of player's current inventory to gray stained glass pane named " "
+						add 1 to {_slot}
+					set slot 9 of player's current inventory to {-tradegui::life2::14}
+					set slot 10 of player's current inventory to {-tradegui::strength2::02}
+					set slot 11 of player's current inventory to {-tradegui::fire2::14}
+					set slot 12 of player's current inventory to {-tradegui::speed2::14}
+					set slot 13 of player's current inventory to {-energyitem::broken}
+					set slot 14 of player's current inventory to {-tradegui::wealth2::14}
+					set slot 15 of player's current inventory to {-tradegui::flux2::14}
+					set slot 16 of player's current inventory to {-tradegui::astra2::14}
+					set slot 17 of player's current inventory to {-tradegui::puff2::14}
+
+				if getGem(loop-item) is "wealth":
+					remove "wealth" from {gemnames::%player's uuid%::*}
+					loop 27 times:
+						set slot {_slot} of player's current inventory to gray stained glass pane named " "
+						add 1 to {_slot}
+					set slot 9 of player's current inventory to {-tradegui::life2::14}
+					set slot 10 of player's current inventory to {-tradegui::strength2::14}
+					set slot 11 of player's current inventory to {-tradegui::fire2::14}
+					set slot 12 of player's current inventory to {-tradegui::speed2::14}
+					set slot 13 of player's current inventory to {-energyitem::broken}
+					set slot 14 of player's current inventory to {-tradegui::wealth2::02}
+					set slot 15 of player's current inventory to {-tradegui::flux2::14}
+					set slot 16 of player's current inventory to {-tradegui::astra2::14}
+					set slot 17 of player's current inventory to {-tradegui::puff2::14}
+
+#Set a list of gemnames as strings and remove names from list as clicked
+#done by hyperdondonreal on discord
+function TradeGUIChance(p: player):
+	set {_numgemleft} to size of {gemnames::%{_p}'s uuid%::*}
+	set {-numgemchance::%{_p}'s uuid%} to floor(100 / {_numgemleft})
+
+on inventory close:
+	if all:
+		{-trading::%player's uuid%} is true
+		name of event-inventory contains "&b ᴜʟᴛɪᴍᴀᴛᴇ ᴛʀᴀᴅɪɴɢ ᴍᴇɴᴜ"
+	then:
+		set {gemnames::%player's uuid%::*} to "strength", "fire", "speed", "wealth", "flux", "astra", "puff", "life"
+		set {-energyrequired::%player's uuid%} to 0
+		set {-trading::%player's uuid%} to true
+		delete {-atenergy::%uuid of player%}
+		delete {-trading::%player's uuid%}
+
+
+on inventory click:
+	if all:
+		event-item is a prismarine shard
+		name of event-inventory contains "&b ᴜʟᴛɪᴍᴀᴛᴇ ᴛʀᴀᴅɪɴɢ ᴍᴇɴᴜ"
+	then:
+		if {-trading::%player's uuid%} is true:
+			cancel event
+			add 1 to {-energyrequired::%player's uuid%}
+			remove 1 from {-atenergy::%uuid of player%}
+			if {-atenergy::%uuid of player%} < 0:
+				set {-atenergy::%uuid of player%} to 0
+			set slot 13 of player's current inventory to {-energyrequired::%player's uuid%} of {-energyitem::trade::%{-atenergy::%uuid of player%}%}
+			if index of event-slot is 9:
+				set slot 9 of player's current inventory to {-tradegui::life2::0}
+				add 1 to {-energyrequired::%player's uuid%}
+				set {-removegem::%player's uuid%} to "life"
+				remove {-removegem::%player's uuid%} from {gemnames::%player's uuid%::*}
+				TradeGUIChance(player)
+				loop {gemnames::%player's uuid%::*}:
+					set {_gemname} to loop-value
+					if {_gemname} is "life":
+						set slot 9 of player's current inventory to {-tradegui::life2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "strength":
+						set slot 10 of player's current inventory to {-tradegui::strength2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "fire":
+						set slot 11 of player's current inventory to {-tradegui::fire2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "speed":
+						set slot 12 of player's current inventory to {-tradegui::speed2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "wealth":
+						set slot 14 of player's current inventory to {-tradegui::wealth2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "flux":
+						set slot 15 of player's current inventory to {-tradegui::flux2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "astra":
+						set slot 16 of player's current inventory to {-tradegui::astra2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "puff":
+						set slot 17 of player's current inventory to {-tradegui::puff2::%{-numgemchance::%player's uuid%}%}
+			if index of event-slot is 10:
+				set slot 10 of player's current inventory to {-tradegui::strength2::0}
+				add 1 to {-energyrequired::%player's uuid%}
+				set {-removegem::%player's uuid%} to "strength"
+				remove {-removegem::%player's uuid%} from {gemnames::%player's uuid%::*}
+				TradeGUIChance(player)
+				loop {gemnames::%player's uuid%::*}:
+					set {_gemname} to loop-value
+					if {_gemname} is "life":
+						set slot 9 of player's current inventory to {-tradegui::life2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "strength":
+						set slot 10 of player's current inventory to {-tradegui::strength2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "fire":
+						set slot 11 of player's current inventory to {-tradegui::fire2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "speed":
+						set slot 12 of player's current inventory to {-tradegui::speed2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "wealth":
+						set slot 14 of player's current inventory to {-tradegui::wealth2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "flux":
+						set slot 15 of player's current inventory to {-tradegui::flux2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "astra":
+						set slot 16 of player's current inventory to {-tradegui::astra2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "puff":
+						set slot 17 of player's current inventory to {-tradegui::puff2::%{-numgemchance::%player's uuid%}%}
+
+			if index of event-slot is 11:
+				set slot 11 of player's current inventory to {-tradegui::fire2::0}
+				add 1 to {-energyrequired::%player's uuid%}
+				set {-removegem::%player's uuid%} to "fire"
+				remove {-removegem::%player's uuid%} from {gemnames::%player's uuid%::*}
+				TradeGUIChance(player)
+				loop {gemnames::%player's uuid%::*}:
+					set {_gemname} to loop-value
+					if {_gemname} is "life":
+						set slot 9 of player's current inventory to {-tradegui::life2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "strength":
+						set slot 10 of player's current inventory to {-tradegui::strength2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "fire":
+						set slot 11 of player's current inventory to {-tradegui::fire2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "speed":
+						set slot 12 of player's current inventory to {-tradegui::speed2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "wealth":
+						set slot 14 of player's current inventory to {-tradegui::wealth2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "flux":
+						set slot 15 of player's current inventory to {-tradegui::flux2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "astra":
+						set slot 16 of player's current inventory to {-tradegui::astra2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "puff":
+						set slot 17 of player's current inventory to {-tradegui::puff2::%{-numgemchance::%player's uuid%}%}
+			if index of event-slot is 12:
+				set slot 12 of player's current inventory to {-tradegui::speed2::0}
+				add 1 to {-energyrequired::%player's uuid%}
+				set {-removegem::%player's uuid%} to "speed"
+				remove {-removegem::%player's uuid%} from {gemnames::%player's uuid%::*}
+				TradeGUIChance(player)
+				loop {gemnames::%player's uuid%::*}:
+					set {_gemname} to loop-value
+					if {_gemname} is "life":
+						set slot 9 of player's current inventory to {-tradegui::life2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "strength":
+						set slot 10 of player's current inventory to {-tradegui::strength2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "fire":
+						set slot 11 of player's current inventory to {-tradegui::fire2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "speed":
+						set slot 12 of player's current inventory to {-tradegui::speed2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "wealth":
+						set slot 14 of player's current inventory to {-tradegui::wealth2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "flux":
+						set slot 15 of player's current inventory to {-tradegui::flux2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "astra":
+						set slot 16 of player's current inventory to {-tradegui::astra2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "puff":
+						set slot 17 of player's current inventory to {-tradegui::puff2::%{-numgemchance::%player's uuid%}%}
+			if index of event-slot is 14:
+				set slot 14 of player's current inventory to {-tradegui::wealth2::0}
+				add 1 to {-energyrequired::%player's uuid%}
+				set {-removegem::%player's uuid%} to "wealth"
+				remove {-removegem::%player's uuid%} from {gemnames::%player's uuid%::*}
+				TradeGUIChance(player)
+				loop {gemnames::%player's uuid%::*}:
+					set {_gemname} to loop-value
+					if {_gemname} is "life":
+						set slot 9 of player's current inventory to {-tradegui::life2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "strength":
+						set slot 10 of player's current inventory to {-tradegui::strength2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "fire":
+						set slot 11 of player's current inventory to {-tradegui::fire2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "speed":
+						set slot 12 of player's current inventory to {-tradegui::speed2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "wealth":
+						set slot 14 of player's current inventory to {-tradegui::wealth2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "flux":
+						set slot 15 of player's current inventory to {-tradegui::flux2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "astra":
+						set slot 16 of player's current inventory to {-tradegui::astra2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "puff":
+						set slot 17 of player's current inventory to {-tradegui::puff2::%{-numgemchance::%player's uuid%}%}
+			if index of event-slot is 15:
+				set slot 15 of player's current inventory to {-tradegui::flux2::0}
+				add 1 to {-energyrequired::%player's uuid%}
+				set {-removegem::%player's uuid%} to "flux"
+				remove {-removegem::%player's uuid%} from {gemnames::%player's uuid%::*}
+				TradeGUIChance(player)
+				loop {gemnames::%player's uuid%::*}:
+					set {_gemname} to loop-value
+					if {_gemname} is "life":
+						set slot 9 of player's current inventory to {-tradegui::life2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "strength":
+						set slot 10 of player's current inventory to {-tradegui::strength2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "fire":
+						set slot 11 of player's current inventory to {-tradegui::fire2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "speed":
+						set slot 12 of player's current inventory to {-tradegui::speed2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "wealth":
+						set slot 14 of player's current inventory to {-tradegui::wealth2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "flux":
+						set slot 15 of player's current inventory to {-tradegui::flux2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "astra":
+						set slot 16 of player's current inventory to {-tradegui::astra2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "puff":
+						set slot 17 of player's current inventory to {-tradegui::puff2::%{-numgemchance::%player's uuid%}%}
+			if index of event-slot is 16:
+				set slot 16 of player's current inventory to {-tradegui::astra2::0}
+				add 1 to {-energyrequired::%player's uuid%}
+				set {-removegem::%player's uuid%} to "astra"
+				remove {-removegem::%player's uuid%} from {gemnames::%player's uuid%::*}
+				TradeGUIChance(player)
+				loop {gemnames::%player's uuid%::*}:
+					set {_gemname} to loop-value
+					if {_gemname} is "life":
+						set slot 9 of player's current inventory to {-tradegui::life2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "strength":
+						set slot 10 of player's current inventory to {-tradegui::strength2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "fire":
+						set slot 11 of player's current inventory to {-tradegui::fire2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "speed":
+						set slot 12 of player's current inventory to {-tradegui::speed2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "wealth":
+						set slot 14 of player's current inventory to {-tradegui::wealth2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "flux":
+						set slot 15 of player's current inventory to {-tradegui::flux2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "astra":
+						set slot 16 of player's current inventory to {-tradegui::astra2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "puff":
+						set slot 17 of player's current inventory to {-tradegui::puff2::%{-numgemchance::%player's uuid%}%}
+			if index of event-slot is 17:
+				set slot 17 of player's current inventory to {-tradegui::puff2::0}
+				add 1 to {-energyrequired::%player's uuid%}
+				set {-removegem::%player's uuid%} to "puff"
+				remove {-removegem::%player's uuid%} from {gemnames::%player's uuid%::*}
+				TradeGUIChance(player)
+				loop {gemnames::%player's uuid%::*}:
+					set {_gemname} to loop-value
+					if {_gemname} is "life":
+						set slot 9 of player's current inventory to {-tradegui::life2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "strength":
+						set slot 10 of player's current inventory to {-tradegui::strength2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "fire":
+						set slot 11 of player's current inventory to {-tradegui::fire2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "speed":
+						set slot 12 of player's current inventory to {-tradegui::speed2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "wealth":
+						set slot 14 of player's current inventory to {-tradegui::wealth2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "flux":
+						set slot 15 of player's current inventory to {-tradegui::flux2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "astra":
+						set slot 16 of player's current inventory to {-tradegui::astra2::%{-numgemchance::%player's uuid%}%}
+					if {_gemname} is "puff":
+						set slot 17 of player's current inventory to {-tradegui::puff2::%{-numgemchance::%player's uuid%}%}
+
+on inventory click:
+	if all:
+		{-trading::%player's uuid%} is true
+		name of player's current inventory is "&b ᴜʟᴛɪᴍᴀᴛᴇ ᴛʀᴀᴅɪɴɢ ᴍᴇɴᴜ"
+	then:
+		cancel event
+
+on inventory click:
+	if player is sneaking:
+		if all:
+			{-trading::%player's uuid%} is true
+			name of player's current inventory is "&b ᴜʟᴛɪᴍᴀᴛᴇ ᴛʀᴀᴅɪɴɢ ᴍᴇɴᴜ"
+		then:
+			if any:
+				click action is lmb
+				click action is rmb
+			then:
+				cancel event
+	else:
+		if all:
+			{-trading::%player's uuid%} is true
+			name of player's current inventory is "&b ᴜʟᴛɪᴍᴀᴛᴇ ᴛʀᴀᴅɪɴɢ ᴍᴇɴᴜ"
+		then:
+			if any:
+				click action is lmb
+				click action is rmb
+			then:
+				cancel event
+
+on join:
+	{-trading::%player's uuid%} is set
+	delete {-trading::%player's uuid%}
+
+on right click:
+	lore of player's held item contains "&7ʟᴇғᴛ ᴄʟɪᴄᴋ ғᴏʀ ᴜʟᴛɪᴍᴀᴛᴇ ᴛʀᴀᴅɪɴɢ ᴍᴇɴᴜ"
+	cancel event
+
+	

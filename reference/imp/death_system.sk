@@ -1,0 +1,180 @@
+on death of player:
+	if attacker is a player:
+		loop all items in attacker's inventory:
+			if getGem(loop-value) is "astra":
+				set {_gem} to "<##A01FFF>&lᴀsᴛʀᴀ"
+			else if getGem(loop-value) is "wealth":
+				set {_gem} to "<##0EC912>&lᴡᴇᴀʟᴛʜ"
+			else if getGem(loop-value) is "puff":
+				set {_gem} to "<##EFEFEF>&lᴘᴜғғ"
+			else if getGem(loop-value) is "speed":
+				set {_gem} to "<##FEFD17>&lsᴘᴇᴇᴅ"
+			else if getGem(loop-value) is "life":
+				set {_gem} to "<##FE04B4>&lʟɪғᴇ"
+			else if getGem(loop-value) is "strength":
+				set {_gem} to "<##F10103>&lsᴛʀᴇɴɢᴛʜ"
+			else if getGem(loop-value) is "flux":
+				set {_gem} to "<##5ED7FF>&lғʟᴜx"
+			else if getGem(loop-value) is "fire":
+				set {_gem} to "<##FE8120>&lғɪʀᴇ"
+
+			if getEnergy(loop-value) is less than or equal to 10:
+				set {_energy} to getEnergy(loop-value)
+				loop all items in victim's inventory:
+					if IsGem(loop-value-2) is true:
+						set {_ve} to getEnergy(loop-value-2)
+						if {_energy} is not 0 or 10:
+							if {_ve} is not 0:
+								add 1 to {_energy}
+
+				if {_energy} is 10:
+					set {_energymsg} to "<##57FFC7>Pristine &f+ <##96FFD9>5"
+				else if {_energy} is 9:
+					set {_energymsg} to "<##57FFC7>Pristine &f+ <##96FFD9>4"
+				else if {_energy} is 8:
+					set {_energymsg} to "<##57FFC7>Pristine &f+ <##96FFD9>3"
+				else if {_energy} is 7:
+					set {_energymsg} to "<##57FFC7>Pristine &f+ <##96FFD9>2"
+				else if {_energy} is 6:
+					set {_energymsg} to "<##57FFC7>Pristine &f+ <##96FFD9>1"
+				else if {_energy} is 5:
+					set {_energymsg} to "<##57FFC7>Pristine"
+				else if {_energy} is 4:
+					set {_energymsg} to "<##57FF8F>Scratched"
+				else if {_energy} is 3:
+					set {_energymsg} to "<##7958DB>Cracked"
+				else if {_energy} is 2:
+					set {_energymsg} to "<##FFC929>Damaged"
+				else if {_energy} is 1:
+					set {_energymsg} to "<##FF1111>Ruined"
+				else if {_energy} is 0:
+					set {_energymsg} to "&7Broken"
+				else:
+					set {_energymsg} to "N/A"
+
+				if {_energy} is not 0 or 10:
+					if {_ve} is not 0:
+						send "<##B8FFFB>You &agained <##B8FFFB>energy, your %{_gem}% <##B8FFFB>gem is now at %{_energymsg}%" to attacker
+						SetEnergy(attacker, {_energy})
+				else if {_energy} is 10 or 0:
+					if {_ve} is not 0:
+						drop {-energyitem::%victim's uuid%::60} at victim
+
+			else:
+				add 0 to {_energy}
+	else:
+		loop the drops:
+			if IsGem(loop-value) is true:
+				if getEnergy(loop-value) is not 0:
+					drop {-energyitem::%victim's uuid%::60} at victim
+
+	loop all items in victim's inventory:
+		if IsGem(loop-item) is true:
+			add loop-item to {_gems::*}
+			
+	loop the drops:
+		if IsGem(loop-value) is true:
+			remove loop-value from the drops
+			if getTier(loop-value) is 2:
+				drop {-upgrader} at victim
+			
+	loop {_gems::*}: 
+		if getGem(loop-value) is "astra":
+			set {_gem} to "<##A01FFF>&lᴀsᴛʀᴀ"
+		else if getGem(loop-value) is "wealth":
+			set {_gem} to "<##0EC912>&lᴡᴇᴀʟᴛʜ"
+		else if getGem(loop-value) is "puff":
+			set {_gem} to "<##EFEFEF>&lᴘᴜғғ"
+		else if getGem(loop-value) is "speed":
+			set {_gem} to "<##FEFD17>&lsᴘᴇᴇᴅ"
+		else if getGem(loop-value) is "life":
+			set {_gem} to "<##FE04B4>&lʟɪғᴇ"
+		else if getGem(loop-value) is "strength":
+			set {_gem} to "<##F10103>&lsᴛʀᴇɴɢᴛʜ"
+		else if getGem(loop-value) is "flux":
+			set {_gem} to "<##5ED7FF>&lғʟᴜx"
+		else if getGem(loop-value) is "fire":
+			set {_gem} to "<##FE8120>&lғɪʀᴇ"
+
+
+		if getEnergy(loop-value) is not 0:
+			set {_energy} to getEnergy(loop-value)
+			remove 1 from {_energy}
+
+			if {_energy} is 10:
+				set {_energymsg} to "<##57FFC7>Pristine &f+ <##96FFD9>5"
+			else if {_energy} is 9:
+				set {_energymsg} to "<##57FFC7>Pristine &f+ <##96FFD9>4"
+			else if {_energy} is 8:
+				set {_energymsg} to "<##57FFC7>Pristine &f+ <##96FFD9>3"
+			else if {_energy} is 7:
+				set {_energymsg} to "<##57FFC7>Pristine &f+ <##96FFD9>2"
+			else if {_energy} is 6:
+				set {_energymsg} to "<##57FFC7>Pristine &f+ <##96FFD9>1"
+			else if {_energy} is 5:
+				set {_energymsg} to "<##57FFC7>Pristine"
+			else if {_energy} is 4:
+				set {_energymsg} to "<##57FF8F>Scratched"
+			else if {_energy} is 3:
+				set {_energymsg} to "<##7958DB>Cracked"
+			else if {_energy} is 2:
+				set {_energymsg} to "<##FFC929>Damaged"
+			else if {_energy} is 1:
+				set {_energymsg} to "<##FF1111>Ruined"
+			else if {_energy} is 0:
+				set {_energymsg} to "&7Broken"
+			else:
+				set {_energymsg} to "N/A"
+
+
+
+			if {_energy} is more than or equal to 0:
+				send "<##B8FFFB>You lost &cenergy<##B8FFFB>, your %{_gem}% <##B8FFFB>gem is now at %{_energymsg}%" to victim
+				set {Energy::%victim's uuid%} to {_energy}
+
+		else:
+			set {_energy} to 0
+
+	
+
+	if {_gems::*} is not set:
+		remove 1 from {Energy::%victim's uuid%}
+		set {_energy} to {Energy::%victim's uuid%}
+		if {_energy} is 10:
+			set {_energymsg} to "<##57FFC7>Pristine &f+ <##96FFD9>5"
+		else if {_energy} is 9:
+			set {_energymsg} to "<##57FFC7>Pristine &f+ <##96FFD9>4"
+		else if {_energy} is 8:
+			set {_energymsg} to "<##57FFC7>Pristine &f+ <##96FFD9>3"
+		else if {_energy} is 7:
+			set {_energymsg} to "<##57FFC7>Pristine &f+ <##96FFD9>2"
+		else if {_energy} is 6:
+			set {_energymsg} to "<##57FFC7>Pristine &f+ <##96FFD9>1"
+		else if {_energy} is 5:
+			set {_energymsg} to "<##57FFC7>Pristine"
+		else if {_energy} is 4:
+			set {_energymsg} to "<##57FF8F>Scratched"
+		else if {_energy} is 3:
+			set {_energymsg} to "<##7958DB>Cracked"
+		else if {_energy} is 2:
+			set {_energymsg} to "<##FFC929>Damaged"
+		else if {_energy} is 1:
+			set {_energymsg} to "<##FF1111>Ruined"
+		else if {_energy} is 0:
+			set {_energymsg} to "&7Broken"
+		else:
+			set {_energymsg} to "N/A"
+
+
+		send "<##B8FFFB>You lost &cenergy<##B8FFFB>, your N/A <##B8FFFB>gem is now at %{_energymsg}%" to victim
+
+	loop {_gems::*}:
+		wait 1 tick
+		give {-gem::%getGem(loop-value)%::1::%{_energy}%} to victim
+
+on death of player:
+	wait 2 seconds
+	loop all items in victim's inventory:
+		if IsGem(loop-item) is true:
+			if getEnergy(loop-item) is 0:
+				add 1 to progress of the custom advancement "bliss/shattered" for victim

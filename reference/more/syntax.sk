@@ -1,0 +1,28 @@
+condition %itemstack% is [a] [bliss] gem:
+    check:
+        IsGem(expr-1) is true
+        continue
+
+#String
+effect give [the] %players% [a] %string% [bliss] gem [[(of|with)] tier %integer%]:
+    trigger:
+        set {_players::*} to expr-1
+        loop {_players::*}:
+            execute console command "bliss gem %loop-value's name% %expr-2% %expr-3 ? 1%"
+
+#!We sadly cannot make our own types/aliases in Skript. We have to resort to this method sadly.
+#!The tier can be not set, for example you didn't specify the tier the code above will check if the tier is set or not.
+
+effect give [the] %players% [a] (:(strength|speed|wealth|astra|flux|fire:life:puff:random)) [bliss] gem [[(of|with)] tier %integer%]:
+    trigger:
+        give expr-1 1st element of parser tags gem tier expr-2
+
+effect:
+    patterns:
+        remove [the] %players%('s | ' | 's) gem
+        remove [the] gem of %players%
+    trigger:
+        set {_players::*} to expr-1
+        loop {_players::*}:
+            loop all items in loop-value's inventory where [IsGem(input) is true]:
+                set loop-item to air

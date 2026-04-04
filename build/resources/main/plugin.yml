@@ -1,0 +1,62 @@
+name: BlissDuels
+version: '1.0'
+main: me.thesnowbound.blissDuels.BlissDuels
+api-version: '1.21.11'
+
+commands:
+  getgem:
+    description: Gives a gem, trader, or upgrader item
+    usage: /getgem <gem|random|trader|upgrader|selector|selector1|selector2> [tier] [player]
+    permission: blissgem.admin
+  gem:
+    description: Gives you a gem if you do not already have one
+    usage: /gem [reload]
+    permission: blissgem.admin
+  dbg:
+    description: Gives a debug ability kit for one power or all powers
+    usage: /dbg <power> <player>
+    permission: blissgem.admin
+  trust:
+    description: Manage trusted players
+    usage: /trust <list|add|remove> [player]
+    aliases: [blissgems:trust]
+    permission: blissgem.trust
+  watts:
+    description: Shows your current Flux watt storage and charge percentage
+    usage: /watts
+  hiddenwatts:
+    description: Shows your hidden Flux watt storage values
+    usage: /hiddenwatts
+  startcharging:
+    description: Start converting stored watts into Flux kinetic charge
+    usage: /startcharging
+  stopcharging:
+    description: Stop converting stored watts into Flux kinetic charge
+    usage: /stopcharging
+  chargemenu:
+    description: Open the Flux watt deposit menu
+    usage: /chargemenu
+    aliases: [fluxcharge]
+  maxwatts:
+    description: Set your Flux watt storage to maximum
+    usage: /maxwatts
+    permission: blissgem.admin
+  resetwatts:
+    description: Reset your Flux watt storage to zero
+    usage: /resetwatts
+    permission: blissgem.admin
+  reset-charge:
+    description: Reset current online Flux kinetic and watt charge values
+    usage: /reset-charge
+    permission: blissgem.admin
+  giveobsidian:
+    description: Give enchanted obsidian
+    usage: /giveobsidian
+    aliases: [blissgems:giveobsidian]
+    permission: blissgem.admin
+
+permissions:
+  blissgem.admin:
+    default: op
+  blissgem.trust:
+    default: true

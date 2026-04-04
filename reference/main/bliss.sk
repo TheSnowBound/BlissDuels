@@ -1,0 +1,2683 @@
+#Made by HyperDondon, his team, and contributors
+#https://discord.gg/Z4EQbkBD
+# discord.gg/evokercord
+import:
+	java.time.Duration
+	java.lang.System
+	org.bukkit.Particle
+	java.lang.String
+	org.bukkit.event.inventory.InventoryClickEvent
+	org.bukkit.inventory.PlayerInventory
+	org.bukkit.entity.Fireball
+	org.bukkit.util.Vector
+	org.bukkit.Location
+	org.bukkit.potion.PotionEffect
+	org.bukkit.potion.PotionEffectType
+	org.bukkit.Material
+	org.bukkit.block.data.BlockData
+	org.bukkit.block.Block
+	org.bukkit.block.data.Waterlogged
+	org.bukkit.event.world.GenericGameEvent
+	org.bukkit.Bukkit
+	com.hyperdondon.glowingEntitiesLib.GlowingEntitiesLib
+	org.bukkit.ChatColor
+
+
+function Format(num: number) :: string:
+	if mod({_num}, 1) = 0:
+		return "%{_num}%.0"
+	else:
+		return "%{_num}%"
+
+on inventory click:
+	if event-item is a prismarine shard:
+		if {-trading::%player's uuid%} is true:	
+			cancel event
+
+on drop:
+	if IsGem(event-item) is true:
+		cancel event
+
+on inventory click:
+	if IsGem(event-item) is true:
+		if {-trading::%player's uuid%} is true:
+			cancel event
+
+
+#https://hypercoding.vip
+on right click:
+	if target entity of player is not set:
+		if all:
+			{-trading::%player's uuid%} is not set
+			name of player's held item contains "<##E9C2FF>&lᴛʀᴀᴅᴇʀ"
+		then: 
+			set {_h} to player's held item
+			cancel event
+			if {-trading::%player's uuid%} is not true:
+				set {-trading::%player's uuid%} to true
+				remove 1 of {_h} from player's inventory
+				set {-gemnames::%player's uuid%::*} to "strength", "fire", "speed", "wealth", "flux", "astra", "puff", "life"
+				loop all items in player's inventory:
+					if IsGem(loop-value) is true:
+						if getTier(loop-value) is 2:
+							set {_newGem} to loop-value
+							if IsGem(player's offhand item) is not true:
+								loop 6 times:
+									remove {_newGem} from player's inventory
+									set {_newGem}'s custom model data to 2 or 4 or 6 or 8 or 10 or 12 or 14 or 16
+									give player {_newGem}
+									play sound "block.amethyst_block.break" with volume 20 and pitch 2 for player
+									wait 0.5 seconds
+							else:
+								loop 6 times:
+									remove {_newGem} from player's inventory
+									set {_newGem}'s custom model data to 2 or 4 or 6 or 8 or 10 or 12 or 14 or 16
+									set player's offhand item to {_newGem}
+									play sound "block.amethyst_block.break" with volume 20 and pitch 2 for player
+									wait 0.5 seconds
+
+						if getTier(loop-value) is 1:	
+							set {_newGem} to loop-value
+							if IsGem(player's offhand item) is not true:
+								loop 6 times:
+									remove {_newGem} from player's inventory
+									set {_newGem}'s custom model data to 1 or 3 or 5 or 7 or 9 or 11 or 13 or 15
+									give player {_newGem}
+									play sound "block.amethyst_block.break" with volume 20 and pitch 2 for player
+									wait 0.5 seconds
+							else:
+								loop 6 times:
+									remove {_newGem} from player's inventory
+									set {_newGem}'s custom model data to 1 or 3 or 5 or 7 or 9 or 11 or 13 or 15
+									set player's offhand item to {_newGem}
+									play sound "block.amethyst_block.break" with volume 20 and pitch 2 for player
+									wait 0.5 seconds
+
+
+				RandomGem(player)
+				play sound "entity.player.levelup" to player
+				set {-trading::%player's uuid%} to false
+				resetcooldown(player)
+				add 1 to progress of the custom advancement "bliss/trader" for player
+
+
+
+on right click:
+	if all:
+		{-trading::%player's uuid%} is not set
+		lore of player's held item contains "&7ʀɪɢʜᴛ-ᴄʟɪᴄᴋ ᴛᴏ ᴜᴘɢʀᴀᴅᴇ ʏᴏᴜʀ ɢᴇᴍ"
+	then:
+		cancel event
+		set {_h} to player's held item
+		loop all items in player's inventory:
+			if IsGem(loop-item) is true:
+				if getTier(loop-value) is 1:
+					remove 1 of {_h} from player's inventory
+					set {_energy} to getEnergy(loop-value)
+					set {_gem} to getGem(loop-value)
+					play sound "entity.player.levelup" for player
+					set {_newGem} to {-gem::%{_gem}%::2::%{_energy}%}
+					if {-Options::UpdateGemNameOnUpgrade} is true:
+						set name of {_newGem} to name of loop-item
+					set loop-item to {_newGem}
+					add 1 to progress of the custom advancement "bliss/next_level" for player
+					upgradeEmbed(player)
+					send "<##FFD773>🔮 <##B8FFFB>You have upgraded your gem to tier 2" to player
+
+				else:
+					send "<##FFD773>🔮 <##FF686F>Your gem is already upgraded" to player
+
+
+on inventory click:
+	if lore of event-item contains "&fLeft Click to trade!":
+		cancel event
+		set {-trading::%player's uuid%} to true
+		wait 1 tick
+		close the player's inventory
+		loop all items in player's inventory:
+			if loop-item's name contains "<##E9C2FF>&lᴛʀᴀᴅᴇʀ":
+				set {_h} to loop-item
+		remove 1 of {_h} from player's inventory
+		if IsGem(player's offhand item) is true:
+			set {_offhand} to true
+		loop all items in player's inventory:
+			if IsGem(loop-value) is true:
+				if getTier(loop-value) is 2:
+					set {_newGem} to loop-value
+					remove {_newGem} from player's inventory
+					set custom model data of {_newGem} to {_cmd}
+					if {_offhand} is true:
+						set player's offhand item to {_newGem}
+					else:
+						give player {_newGem}
+					play sound "block.amethyst_block.break" with volume 20 and pitch 2 for player
+					wait 0.5 seconds
+					loop {gemnames::%player's uuid%::*}:
+						remove {_newGem} from player's inventory
+						set {_gemname} to loop-value-2
+						if {_gemname} is "life":
+							set {_newGem}'s custom model data to 4
+						if {_gemname} is "fire":
+							set {_newGem}'s custom model data to 2
+						if {_gemname} is "puff":
+							set {_newGem}'s custom model data to 6
+						if {_gemname} is "speed":
+							set {_newGem}'s custom model data to 8
+						if {_gemname} is "strength":
+							set {_newGem}'s custom model data to 10
+						if {_gemname} is "wealth":
+							set {_newGem}'s custom model data to 12
+						if {_gemname} is "astra":
+							set {_newGem}'s custom model data to 14
+						if {_gemname} is "flux":
+							set {_newGem}'s custom model data to 16
+
+						if {_offhand} is true:
+							set player's offhand item to {_newGem}
+						else:
+							give player {_newGem}					
+						play sound "block.amethyst_block.break" with volume 20 and pitch 2 for player
+						wait 0.5 seconds
+
+		RandomGem(player)
+		play sound "entity.player.levelup" to player
+		delete {-trading::%player's uuid%}
+		resetcooldown(player)
+
+
+on right click:
+	if all:
+		{-trading::%player's uuid%} is not set
+		name of player's held item is "<##96FFD9>&lᴇɴᴇʀɢʏ <##FFE4AB>ɪɴ ᴀ ʙᴏᴛᴛʟᴇ"
+	then:
+		cancel event
+		loop all items in player's inventory:
+			if IsGem(loop-value) is true:
+				if getEnergy(loop-value) is less than or equal to 10:
+					set {_energy} to getEnergy(loop-value)
+					add 1 to {_energy}
+
+					if {_energy} is 10:
+						set {_energymsg} to "<##57FFC7>Pristine &f+ <##96FFD9>5"
+					else if {_energy} is 9:
+						set {_energymsg} to "<##57FFC7>Pristine &f+ <##96FFD9>4"
+					else if {_energy} is 8:
+						set {_energymsg} to "<##57FFC7>Pristine &f+ <##96FFD9>3"
+					else if {_energy} is 7:
+						set {_energymsg} to "<##57FFC7>Pristine &f+ <##96FFD9>2"
+					else if {_energy} is 6:
+						set {_energymsg} to "<##57FFC7>Pristine &f+ <##96FFD9>1"
+					else if {_energy} is 5:
+						set {_energymsg} to "<##57FFC7>Pristine"
+					else if {_energy} is 4:
+						set {_energymsg} to "<##57FF8F>Scratched"
+					else if {_energy} is 3:
+						set {_energymsg} to "<##7958DB>Cracked"
+					else if {_energy} is 2:
+						set {_energymsg} to "<##FFC929>Damaged"
+					else if {_energy} is 1:
+						set {_energymsg} to "<##FF1111>Ruined"
+					else if {_energy} is 0:
+						set {_energymsg} to "&7Broken"
+				else:
+					set {_energymsg} to "N/A"
+
+				
+				if getEnergy(loop-value) < 10:
+					if getEnergy(loop-value) is not 0:
+						set {_energy} to getEnergy(loop-value)
+						add 1 to {_energy}
+						remove 1 of player's held item from player's inventory
+						SetEnergy(player, {_energy})
+						send "<##FFD773>🔮 <##96FFD9>&lᴇɴᴇʀɢʏ &fabsorbed, your gem is now at %{_energymsg}%" to player
+					if getEnergy(loop-value) is 0: 
+						send "<##B8FFFB>An energy bottle in your inventory has expired!" to player
+						remove 1 of player's held item from player's inventory
+						play sound "entity.allay.death" for player
+						play sound "entity.allay.ambient_without_item" for player
+
+
+on right click:
+	if all:
+		{-trading::%player's uuid%} is not set
+		name of player's held item is "<##96FFD9>&lᴇɴᴇʀɢʏ <##FFE4AB>ɪɴ ᴀ ʙᴏᴛᴛʟᴇ"
+	then:
+		wait 1 second
+		loop all items in player's inventory:
+			if IsGem(loop-value) is true:
+				if getEnergy(loop-value) is 10:
+					add 1 to progress of the custom advancement "bliss/overflowing" for player
+
+
+
+every 60 seconds:
+	loop all players:
+		loop all items in loop-player's inventory:
+			if name of loop-item contains "<##96FFD9>&lᴇɴᴇʀɢʏ <##FFE4AB>ɪɴ ᴀ ʙᴏᴛᴛʟᴇ":
+				loop all players:
+					set {_lmaonum} to 0
+					loop 61 times:
+						if lore of loop-item contains "<##96FFD9>&lFrom: <##FFE4AB>%loop-player-2%" and "&7Expires in: &f&l%{_lmaonum}% <##FFE4AB> minutes":
+							if {_lmaonum} is 0:
+								remove loop-item from loop-player-1's inventory
+								send "<##B8FFFB>An energy bottle in your inventory has expired!" to loop-player-1
+							else:
+								set {_lmaonum2} to {_lmaonum}
+								remove 1 from {_lmaonum2}
+								remove loop-item from loop-player-1's inventory
+								give loop-player-1 {-energyitem::%loop-player-2's uuid%::%{_lmaonum2}%}
+						else:
+							add 1 to {_lmaonum}
+					delete {_lmaonum}
+					delete {_lmaonum2}
+
+
+every 60 seconds:
+	loop all players:
+		loop all items in loop-player's inventory:
+			if name of loop-item contains "<##96FFD9>&lᴇɴᴇʀɢʏ <##FFE4AB>ɪɴ ᴀ ʙᴏᴛᴛʟᴇ":
+				set {_lmaonumlol} to 0
+				loop 61 times:
+					if lore of loop-item contains "<##96FFD9>&lFrom: <##FFE4AB>None" and "&7Expires in: &f&l%{_lmaonum}% <##FFE4AB> minutes":
+						if {_lmaonumlol} is 0:
+							remove loop-item from loop-player's inventory
+							send "<##B8FFFB>An energy bottle in your inventory has expired!" to loop-player
+						else:
+							set {_lmaonumlol2} to {_lmaonumlol}
+							remove 1 from {_lmaonumlol2}
+							remove loop-item from loop-player's inventory
+							give loop-player-1 {-energyitem::none::%{_lmaonumlol2}%}
+					else:
+						add 1 to {_lmaonumlol}
+				delete {_lmaonumlol}
+				delete {_lmaonumlol2}
+
+on join:
+	if {particlelvl::%player's uuid%} is not set:
+		set {particlelvl::%player's uuid%} to "default"
+	set {_lmaonum} to 0
+	loop 61 times:
+		set {-energyitem::%player's uuid%::%{_lmaonum}%} to a nautilus shell with custom model data 300 named "<##96FFD9>&lᴇɴᴇʀɢʏ <##FFE4AB>ɪɴ ᴀ ʙᴏᴛᴛʟᴇ" named "<##96FFD9>&lᴇɴᴇʀɢʏ <##FFE4AB>ɪɴ ᴀ ʙᴏᴛᴛʟᴇ" with lore "<##96FFD9>&lFrom: <##FFE4AB>%player%" and "&7Expires in: &f&l%{_lmaonum}% <##FFE4AB>minutes"
+		add 1 to {_lmaonum}
+	delete {_lmaonum}
+
+# Energy system
+
+on join:
+	delete {-atenergy::%player's uuid%}
+
+function RandomGem(p: player) :: int:
+	loop all items in {_p}'s inventory:
+		if IsGem(loop-item) is true:
+			set {_ggg} to getGem(loop-item)
+			set {_t} to getTier(loop-item)
+			set {_energy} to getEnergy(loop-item)
+			set {gemnames::%{_p}'s uuid%::*} to "strength", "fire", "speed", "wealth", "flux", "astra", "puff", "life"
+			remove {_ggg} from {gemnames::%{_p}'s uuid%::*}
+			set {_getGem} to random element out of {gemnames::%{_p}'s uuid%::*}
+			set loop-value to {-gem::%{_getGem}%::%{_t}%::%{_energy}%}
+	play sound "entity.player.levelup" to {_p}
+	loop all items in {_p}'s inventory:
+		if getGem(loop-value) is "astra":
+			set {_gem} to "<##A01FFF>&lᴀsᴛʀᴀ"
+		else if getGem(loop-value) is "wealth":
+			set {_gem} to "<##0EC912>&lᴡᴇᴀʟᴛʜ"
+		else if getGem(loop-value) is "puff":
+			set {_gem} to "<##EFEFEF>&lᴘᴜғғ"
+		else if getGem(loop-value) is "speed":
+			set {_gem} to "<##FEFD17>&lsᴘᴇᴇᴅ"
+		else if getGem(loop-value) is "life":
+			set {_gem} to "<##FE04B4>&lʟɪғᴇ"
+		else if getGem(loop-value) is "strength":
+			set {_gem} to "<##F10103>&lsᴛʀᴇɴɢᴛʜ"
+		else if getGem(loop-value) is "flux":
+			set {_gem} to "<##5ED7FF>&lғʟᴜx"
+		else if getGem(loop-value) is "fire":
+			set {_gem} to "<##FE8120>&lғɪʀᴇ"
+	send "<##FFD773>🔮 <##A4FEF1>You have traded your current gem to %{_gem}%" to {_p}
+	set {-energyrequired::%{_p}'s uuid%} to 0
+
+
+
+
+
+command /withdraw-upgrader:
+	trigger:
+		loop all items in player's inventory:
+			if IsGem(loop-item) is true:
+				if getTier(loop-item) is 2:
+					setTier(player, 1)
+					give 1 of {-upgrader} to player
+				else if getTier(loop-item) is 1:
+					send "&c Your Gem Is on tier 1" to player
+					stop
+
+command /setTier <text> <text>:
+	permission: op
+	trigger:
+		if arg-1 is set:
+			set {_i} to arg-1 parsed as integer
+			if arg-2 is set:
+				set {_p} to arg-2 parsed as player
+				setTier({_p}, {_i})
+
+on tab complete for "/setTier":
+	set tab completions for position 1 to 1 and 2
+	set tab completions for position 2 to all players
+
+
+function getCampfireCooldown(cooldown: text) :: text:
+	if canUsePower({_cooldown}) is true:
+		set {_c} to "&aReady!"
+	else:
+		set {_cs} to getCooldownSeconds({_cooldown})
+
+		set {_cm} to getCooldownMinutes({_cooldown})
+
+		
+		if {_cm} > 0:
+			if {_cs} < 1:
+				set {_c} to "&a%{_cm}%m"
+			else:
+				set {_c} to "&a%{_cm}%m %{_cs}%s"
+		if {_cm} < 1:
+			if {_cs} > 0:
+				set {_c} to "&a%{_cs}%s"
+
+		if {_c} is not set:
+			set {_c} to "&aReady!"
+				
+	return {_c}
+
+
+function canUsePower(cooldown: text) :: boolean:
+	if getCooldown({_cooldown}) - System.currentTimeMillis() <= 0:
+		return true
+	else if getCooldown({_cooldown}) - System.currentTimeMillis() = 0:
+		return true
+	else:
+		return false
+
+
+function IsGem(i: item) :: boolean:
+	if lore of {_i} contains "&f&lUnknown" or "&f&lrequired" or "&7- &f&lUnknown":
+		return true
+	else if lore of {_i} contains "&f&lᴇᴠᴇʀʏᴛʜɪɴɢ ɪs ᴀ ғʟᴜᴄᴛᴜᴀᴛɪᴏɴ":
+		return true
+	else if lore of {_i} contains "&f&lʜᴀᴠᴇ ᴛʜᴇ sᴛʀᴇɴɢᴛʜ ᴏғ ᴀ ᴀʀᴍʏ":
+		return true
+	else if lore of {_i} contains "&f&lᴄᴏɴᴛʀᴏʟ ᴛʜᴇ ʙᴀʟᴀɴᴄᴇ ᴏғ ʟɪғᴇ":
+		return true
+	else if lore of {_i} contains "&f&lʙᴇᴄᴏᴍᴇ ᴀ ʙʟᴜʀ ":
+		return true
+	else if lore of {_i} contains "&f&lʙᴇ ᴛʜᴇ ʙɪɢɢᴇsᴛ ʙɪʀᴅ":
+		return true
+	else if lore of {_i} contains "&f&lғᴜᴇʟ ᴀ ᴇᴍᴘɪʀᴇ":
+		return true
+	else if lore of {_i} contains "&f&lᴍᴀɴᴀɢᴇ ᴛʜᴇ ᴛɪᴅᴇs ᴏғ ᴛʜᴇ ᴄᴏsᴍᴏs ":
+		return true
+	else if lore of {_i} contains "&f&lᴍᴀɴɪᴘᴜʟᴀᴛᴇ ғɪʀᴇ":
+		return true
+	else if lore of {_i} contains "&f&lᴜsᴇʟᴇss":
+		return true
+	else:
+		return false
+
+function getGem(i: item) :: string:
+	if name of {_i} contains "<##FE8120>&lғɪʀᴇ":
+		return "fire"
+	else if name of {_i} contains "<##5ED7FF>&lғʟᴜx":
+		return "flux"
+	else if name of {_i} contains "<##F10103>&lsᴛʀᴇɴɢᴛʜ":
+		return "strength"
+	else if name of {_i} contains "<##FE04B4>&lʟɪғᴇ":
+		return "life"
+	else if name of {_i} contains "<##FEFD17>&lsᴘᴇᴇᴅ":
+		return "speed"
+	else if name of {_i} contains "<##EFEFEF>&lᴘᴜғғ":
+		return "puff"
+	else if name of {_i} contains "<##0EC912>&lᴡᴇᴀʟᴛʜ":
+		return "wealth"
+	else if name of {_i} contains "<##A01FFF>&lᴀsᴛʀᴀ":
+		return "astra"
+
+function getTier(i: item) :: int:
+	if {_i} is an amethyst shard:
+		return 1
+	else:
+		return 2
+
+function getEnergy(i: item) :: int:
+	if lore of {_i} contains "&f(<##57FFC7>Pristine&f + <##96FFD9>5&f)" or "&f(<##57FFC7>Pristine&f + <##96FFD9>5&7) " or "&f(<##57FFC7>Pristine&f + <##96FFD9>5&7)" or "&f(<##57FFC7>Pristine&f + <##96FFD9>5)":
+		return 10
+	else if lore of {_i} contains "&f(<##57FFC7>Pristine&f + <##96FFD9>4&f)" or "&f(<##57FFC7>Pristine&f + <##96FFD9>4&7) " or "&f(<##57FFC7>Pristine&f + <##96FFD9>4&7)" or "&f(<##57FFC7>Pristine&f + <##96FFD9>4)":
+		return 9
+	else if lore of {_i} contains "&f(<##57FFC7>Pristine&f + <##96FFD9>3&f)" or "&f(<##57FFC7>Pristine&f + <##96FFD9>3&7) " or "&f(<##57FFC7>Pristine&f + <##96FFD9>3&7)" or "&f(<##57FFC7>Pristine&f + <##96FFD9>3)":
+		return 8
+	else if lore of {_i} contains "&f(<##57FFC7>Pristine&f + <##96FFD9>2&f)" or "&f(<##57FFC7>Pristine&f + <##96FFD9>2&7) " or "&f(<##57FFC7>Pristine&f + <##96FFD9>2&7)" or "&f(<##57FFC7>Pristine&f + <##96FFD9>2)":
+		return 7
+	else if lore of {_i} contains "&f(<##57FFC7>Pristine&f + <##96FFD9>1&f)" or "&f(<##57FFC7>Pristine&f + <##96FFD9>1&7) " or "&f(<##57FFC7>Pristine&f + <##96FFD9>1&7)" or "&f(<##57FFC7>Pristine&f + <##96FFD9>1)":
+		return 6
+	else if lore of {_i} contains "&f(<##57FFC7>Pristine&f)" or "&f(<##57FFC7>Pristine&7) " or "&f(<##57FFC7>Pristine&7)":
+		return 5
+	else if lore of {_i} contains "&f(<##57FF8F>Scratched&f)" or "&f(<##57FF8F>Scratched&7) " or "&f(<##57FF8F>Scratched&7)":
+		return 4
+	else if lore of {_i} contains "&f(<##7958DB>Cracked&f)" or "&f(<##7958DB>Cracked&7) " or "&f(<##7958DB>Cracked&7)":
+		return 3
+	else if lore of {_i} contains "&f(<##FFC929>Damaged&f)" or "&f(<##FFC929>Damaged&7) " or "&f(<##FFC929>Damaged&7)":
+		return 2
+	else if lore of {_i} contains "&f(<##FF1111>Ruined&f)" or "&f(<##FF1111>Ruined&7) " or "&f(""<##FF1111>Ruined&f"")" or "&f(<##FF1111>Ruined&f) " or "&f(<##FF1111>Ruined&7)":
+		return 1
+	else if lore of {_i} contains "&f&lᴜsᴇʟᴇss":
+		return 0
+
+function actualGem(i: item) :: boolean:
+	if lore of {_i} contains "&f(<##57FFC7>Pristine&f + <##96FFD9>5&f)" or "&f(<##57FFC7>Pristine&f + <##96FFD9>5&7) " or "&f(<##57FFC7>Pristine&f + <##96FFD9>5&7)" or "&f(<##57FFC7>Pristine&f + <##96FFD9>5)":
+		return true
+	else if lore of {_i} contains "&f(<##57FFC7>Pristine&f + <##96FFD9>4&f)" or "&f(<##57FFC7>Pristine&f + <##96FFD9>4&7) " or "&f(<##57FFC7>Pristine&f + <##96FFD9>4&7)" or "&f(<##57FFC7>Pristine&f + <##96FFD9>4)":
+		return true
+	else if lore of {_i} contains "&f(<##57FFC7>Pristine&f + <##96FFD9>3&f)" or "&f(<##57FFC7>Pristine&f + <##96FFD9>3&7) " or "&f(<##57FFC7>Pristine&f + <##96FFD9>3&7)" or "&f(<##57FFC7>Pristine&f + <##96FFD9>3)":
+		return true
+	else if lore of {_i} contains "&f(<##57FFC7>Pristine&f + <##96FFD9>2&f)" or "&f(<##57FFC7>Pristine&f + <##96FFD9>2&7) " or "&f(<##57FFC7>Pristine&f + <##96FFD9>2&7)" or "&f(<##57FFC7>Pristine&f + <##96FFD9>2)":
+		return true
+	else if lore of {_i} contains "&f(<##57FFC7>Pristine&f + <##96FFD9>1&f)" or "&f(<##57FFC7>Pristine&f + <##96FFD9>1&7) " or "&f(<##57FFC7>Pristine&f + <##96FFD9>1&7)" or "&f(<##57FFC7>Pristine&f + <##96FFD9>1)":
+		return true
+	else if lore of {_i} contains "&f(<##57FFC7>Pristine&f)" or "&f(<##57FFC7>Pristine&7) " or "&f(<##57FFC7>Pristine&7)":
+		return true
+	else if lore of {_i} contains "&f(<##57FF8F>Scratched&f)" or "&f(<##57FF8F>Scratched&7) " or "&f(<##57FF8F>Scratched&7)":
+		return true
+	else if lore of {_i} contains "&f(<##7958DB>Cracked&f)" or "&f(<##7958DB>Cracked&7) " or "&f(<##7958DB>Cracked&7)":
+		return true
+	else if lore of {_i} contains "&f(<##FFC929>Damaged&f)" or "&f(<##FFC929>Damaged&7) " or "&f(<##FFC929>Damaged&7)":
+		return true
+	else if lore of {_i} contains "&f(<##FF1111>Ruined&f)" or "&f(<##FF1111>Ruined&7) " or "&f(""<##FF1111>Ruined&f"")" or "&f(<##FF1111>Ruined&f) " or "&f(<##FF1111>Ruined&7)":
+		return true
+	else if lore of {_i} contains "&f&lᴜsᴇʟᴇss":
+		return true
+	else:
+		return false
+
+
+function SetEnergy(p: player, n: number):
+	set {Energy::%{_p}'s uuid%} to {_n}
+	loop all items in {_p}'s inventory:
+		if IsGem(loop-item) is true:
+			set {_gem} to getGem(loop-item)
+			set loop-item to {-gem::%{_gem}%::%getTier(loop-item)%::%{_n}%}
+
+
+function setTier(p: player, n: number):
+	loop all items in {_p}'s inventory:
+		if IsGem(loop-item) is true:
+			set {_e} to getEnergy(loop-item)
+			set {_gem} to getGem(loop-item)
+			set loop-item to {-gem::%{_gem}%::%{_n}%::%{_e}%}
+
+	
+on tab complete for "/trust":
+	set tab completions for position 1 to "add" and "remove" and "list"
+	set tab completions for position 2 to all players
+
+on inventory click:
+	if name of event-inventory is "<##FFE4AB>ᴛʀᴜsᴛᴇᴅ ᴘʟᴀʏᴇʀs":
+		cancel event
+		if event-item is a player head:
+			set {_T} to "%event-item's name%"
+			replace all "<##B8FFFB>" with "" in {_T}
+			set {_Tplayer} to "%{_T}%" parsed as offline player
+
+			set {_uuid} to uuid of player
+			send "<##FFD773>🔮 &cUntrusted <##B8FFFB>%{_T}%" to player
+			remove {_Tplayer}'s uuid from {-Trusted::%uuid of player%::*}
+			remove event-item from player's current inventory
+
+
+# Bliss Ka Plugin
+
+on join:
+	if {Trusted::%uuid of player%::*} is set:
+		set {-Trusted::%uuid of player%::*} to {Trusted::%uuid of player%::*}
+
+
+#on join:
+#	if {SmpStarted} is true:
+#		loop all items in player's inventory:
+#			if IsGem(loop-item) is false:
+#				set {_e} to {Energy::%{_p}'s uuid%}
+#				tradeGem(player, {_e} , 1)
+
+
+on disconnect:
+	if {-Trusted::%uuid of player%::*} is set:
+		set {Trusted::%uuid of player%::*} to {-Trusted::%uuid of player%::*}
+
+on skript stop:
+	loop all players:
+		if {-Trusted::%uuid of loop-player%::*} is set:
+			set {Trusted::%uuid of loop-player%::*} to {-Trusted::%uuid of loop-player%::*}
+
+# /Bliss command
+
+command /bliss [<text>] [<text>] [<text>] [<text>]:
+	aliases: /blissgems, /blissgems:bliss, /blissgems:blissgems
+	trigger:
+		if arg-1 is "particles":
+			if arg-2 is not set:
+				send "<##FFE188>🔮&cUsage: /bliss particles (level)" to player
+			else if arg-2 is "default":
+				set {particlelvl::%player's uuid%} to "default"
+				send "<##FFE188>🔮 &aParticle Level changed to &eDEFAULT" to player
+			else if arg-2 is "less":
+				set {particlelvl::%player's uuid%} to "less"
+				send "<##FFE188>🔮 &aParticle Level changed to &eLESS" to player
+			else if arg-2 is "none":
+				set {particlelvl::%player's uuid%} to "none"
+				send "<##FFE188>🔮 &aParticle Level changed to &eNONE" to player
+			else:
+				send "<##FFE188>🔮&cUsage: /bliss particles (level)" to player
+
+		if arg-1 is "performance":
+			if arg-2 is not set:
+				send "<##FFE188>🔮&cUsage: /bliss particles (level)" to player
+			else if arg-2 is "default":
+				set {particlelvl::%player's uuid%} to "default"
+				send "<##FFE188>🔮 &aParticle Level changed to &eDEFAULT" to player
+			else if arg-2 is "less":
+				set {particlelvl::%player's uuid%} to "less"
+				send "<##FFE188>🔮 &aParticle Level changed to &eLESS" to player
+			else if arg-2 is "none":
+				set {particlelvl::%player's uuid%} to "none"
+				send "<##FFE188>🔮 &aParticle Level changed to &eNONE" to player
+			else:
+				send "<##FFE188>🔮&cUsage: /bliss particles (level)" to player
+
+
+		if arg-1 is "gem":
+			if any: 
+				player has permission "op"
+				sender is console
+			then:
+				if arg-3 is not set:
+					send "&cUsage: /bliss gem (player) (type) (tier)" to player
+					stop
+
+				if arg-3 is not "astra" or "fire" or "life" or "puff" or "random" or "speed" or "strength" or "flux" or "wealth":
+					send "&cUsage: /bliss gem (player) (type) (tier)" to player
+					stop
+
+				if arg-4 is not set:
+					send "&cUsage: /bliss gem (player) (type) (tier)" to player
+					stop
+
+				set {_tier} to arg-4 parsed as integer
+				if {_tier} is not set:
+					send "<##FFD773>🔮 <##FC8888>Argument must be an integer/number" to player
+					stop
+
+				
+				set {_pl} to arg-2 parsed as player
+				if {_pl} is not set:
+					send "<##FFD773>🔮 <##FC8888>Cannot find that player!" to player
+					stop
+				
+				if arg-3 is not set:
+					send "&cUsage: /bliss gem (player) (type) (tier)" to player
+					stop
+
+				if arg-3 is not "astra" or "fire" or "life" or "puff" or "random" or "speed" or "strength" or "flux" or "wealth":
+					send "&cUsage: /bliss gem (player) (type) (tier)" to player
+					stop
+
+				if arg-4 is not set:
+					send "&cUsage: /bliss gem (player) (type) (tier)" to player
+					stop
+
+				set {_tier} to arg-4 parsed as integer
+				if {_tier} is not set:
+					send "<##FFD773>🔮 <##FC8888>Argument must be an integer/number" to player
+					stop
+
+				
+				set {_pl} to arg-2 parsed as player
+				if {_pl} is not set:
+					send "<##FFD773>🔮 <##FC8888>Cannot find that player!" to player
+					stop
+
+				if {_tier} is not 1 or 2:
+					set {_tier} to 1
+
+				set {_loop} to false
+				loop all items in {_pl}'s inventory:
+					if {_loop} is false:
+						if IsGem(loop-item) is true:
+							set {_loop} to true
+							set {_energy} to getEnergy(loop-item)
+							
+				if {_energy} is not set:
+					set {_energy} to 5
+				#to allow players to have multiple gems, go to imp/nodupe.sk and change the multiplegems option on the top.
+				if {-Options::MultipleGems} is false:
+					remove {_pl}'s gem
+				if arg-3 is not "random":
+					give {-gem::%arg-3%::%{_tier}%::%{_energy}%} to {_pl}
+				else:
+					set {_getGem} to "fire" or "puff" or "flux" or "strength" or "speed" or "wealth" or "life" or "astra"
+					give {_pl} {-gem::%{_getGem}%::%{_tier}%::5}
+				#broadcast "%arg-3% %arg-4% %{_energy}%"
+
+
+		if arg-1 is "item":
+			if player has permission "op":
+				if arg-2 is not set:
+					send "&cUsage: /bliss item (!type) (player) (quantity)" to player
+					stop
+
+				if arg-2 is not "energy" or "repairkit" or "trader" or "upgrader" or "RestoraionTomb0" or "RestoraionTomb1" or "RestoraionTomb2" or "RestoraionTomb3" or "remote":
+					send "&cUsage: /bliss item (type!) (player) (quantity)" to player
+					stop
+
+				if arg-4 is not set:
+					send "&cUsage: /bliss item (type) (player) (!quantity)" to player
+					stop
+
+				set {_quant} to arg-4 parsed as integer
+				if {_quant} is not set:
+					send "<##FFD773>🔮 <##FC8888>Argument must be an integer/number" to player
+					stop
+
+				
+				set {_pl} to arg-3 parsed as player
+				if {_pl} is not set:
+					send "<##FFD773>🔮 <##FC8888>Cannot find that player!" to player
+					stop
+
+				loop {_quant} times:
+					if arg-2 is "trader":
+						give {-trader} to {_pl}
+					if arg-2 is "upgrader":
+						give {-upgrader} to {_pl}
+					if arg-2 is "energy":
+						give {-energyitem::%player%::60} to {_pl}
+					if arg-2 is "repairkit":
+						give 1 of {-Bliss.Repair.4} to {_pl}
+					if arg-2 is "RestoraionTomb0":
+						give 1 of {-Bliss.Revive.0} to {_pl}
+					if arg-2 is "RestoraionTomb1":
+						give 1 of {-Bliss.Revive.1} to {_pl}
+					if arg-2 is "RestoraionTomb2":
+						give 1 of {-Bliss.Revive.2} to {_pl}
+					if arg-2 is "RestoraionTomb3":
+						give 1 of {-Bliss.Revive.3} to {_pl}
+					if arg-2 is "remote":
+						give 1 of {-menu} to {_pl}
+					if arg-2 is "gemfragment":
+						give 1 of {-Bliss.Fragment} to {_pl}
+
+
+
+		if arg-1 is "set-energy":
+			if player has permission "op":
+				if arg-2 is set:
+					set {_p} to arg-2 parsed as player
+					if arg-3 is set:
+						set {_in} to arg-3 parsed as integer
+						SetEnergy({_p}, {_in})
+				else:
+					send "&cUsage: /bliss set-energy (player) [amount]" to executor
+
+		if arg-1 is "set-charge":
+			if player has permission "op":
+				if arg-2 is set:
+					set {_p} to arg-2 parsed as player
+					set {_uuid} to {_p}'s uuid
+					if arg-3 is set:
+						set {_charge} to arg-3 parsed as integer
+						set {fluxKinetic::%{_uuid}%} to {_charge}
+					if arg-3 is not set:
+						send "&fCorrect Usage /bliss set-charge [player] [charge]" to executor
+				if arg-2 is not set:
+					send "&fCorrect Usage /bliss set-charge [player] [charge]" to executor
+
+
+		if arg-1 is "withdraw":
+ 
+			if arg-2 is not set:
+				send "&cYou must specify a Number" to executor
+
+			if arg-2 is set:
+				set {_int} to arg-2 parsed as number
+				if {_int} > 0:
+					loop all items in player's inventory:
+						if IsGem(loop-item) is true:
+							set {_num} to getEnergy(loop-item) - {_int}
+							if {_num} < 1:
+								send "&c You Are Not &b&lOverflowing" to player	
+							else:
+								set {_ii} to arg-2 parsed as number
+								set {_num} to getEnergy(loop-item) - {_ii}
+								set {_p} to player
+								set {_uuid} to {_p}'s uuid
+								set {_arg2} to {_ii}
+								SetEnergy(player, {_num})
+								give {_ii} of {-energyitem::%player's uuid%::60} to player
+								send "<##FFD773>🔮 Bottled &f&l%arg-2% <##96FFD9>ᴇɴᴇʀɢʏ" to player
+
+		if arg-1 is "progression":
+			if player has permission "op":
+
+				if arg-2 is not set:
+					send "&cYou must specify a Number" to executor
+			
+				if arg-2 is set:
+					if arg-2 is "reset":
+						set {Prog1} to false
+						set {Prog2} to false
+						set {Prog3} to false
+						set {Prog4} to false
+						set {Prog5} to false
+						set {SmpStarted} to false
+				
+					if arg-2 is "1":
+						loop all players:
+							ClearGems(loop-player)
+							tradeGem(loop-player, 1, 5)
+							set {joined::%loop-player's uuid%} to true
+							set {grace::%loop-player's uuid%} to 300
+							set {Prog1} to true
+							set {Prog2} to false
+							set {Prog3} to false
+							set {Prog4} to false
+							set {Prog5} to false
+							set {SmpStarted} to true
+							play sound "minecraft:ui.toast.challenge_complete" at volume 1 at pitch 1 to all players
+							send title "<##cafca4>&lPhase 1" with subtitle "<##f9f4d3>The Creation of Everything" to all players
+							execute console command "worldborder set 2000 200"
+				
+					if arg-2 is "2":
+						set {Prog1} to false
+						set {Prog2} to true
+						set {Prog3} to false
+						set {Prog4} to false
+						set {Prog5} to false
+						set {SmpStarted} to true
+						play sound "minecraft:ui.toast.challenge_complete" at volume 1 at pitch 1 to all players
+						send title "&c&lPhase 2" with subtitle "<##FC8888>Into the Fire" to all players
+						execute console command "worldborder set 4000 500"
+				
+					if arg-2 is "3":
+						set {Prog1} to false
+						set {Prog2} to false
+						set {Prog3} to true
+						set {Prog4} to false
+						set {Prog5} to false
+						set {SmpStarted} to true
+						execute console command "recipe upgrader ON"
+						execute console command "recipe trader ON"
+						play sound "minecraft:ui.toast.challenge_complete" at volume 1 at pitch 1 to all players
+						send title "&5&lPhase 3" with subtitle "<##EB2ED8>The Next Level" to all players
+						execute console command "worldborder set 6000 500"
+		
+		if arg-1 is "pedestal":
+			if player has permission "op":
+
+				if arg-2 is not set:
+					send "&cUse activate/deactivate/set" to executor
+			
+				if arg-2 is "set":
+					set {PedestalLoc} to location 1 block below player
+					wait 10 ticks
+					set {ParticleLoc} to location 1 block above {PedestalLoc}
+					# Ancient Debris
+					set {DebrisLoc} to location 2 blocks below player
+					set {PedestalLoc1} to location 1 block above {PedestalLoc}
+					set {PedestalGilded1} to location 1 block north of {PedestalLoc}
+					set {PedestalGilded2} to location 1 block south of {PedestalLoc}
+					set {PedestalGilded3} to location 1 block east of {PedestalLoc}
+					set {PedestalGilded4} to location 1 block west of {PedestalLoc}
+					set {PedestalGold1} to location 1 block north and 1 block east of {PedestalLoc}
+					set {PedestalGold2} to location 1 block south and 1 block east of {PedestalLoc}
+					set {PedestalGold3} to location 1 block north and 1 block west of {PedestalLoc}
+					set {PedestalGold4} to location 1 block south and 1 block west of {PedestalLoc}
+					# RAW GOLD
+					set {PedestalRawGold1} to location 2 block north and 1 block west of {PedestalLoc}
+					set {PedestalRawGold2} to location 2 block north and 1 block east of {PedestalLoc}
+					set {PedestalRawGold3} to location 2 block west and 1 block south of {PedestalLoc}
+					set {PedestalRawGold4} to location 2 block west and 1 block north of {PedestalLoc}
+					set {PedestalRawGold5} to location 2 block south and 1 block east of {PedestalLoc}
+					set {PedestalRawGold6} to location 2 block south and 1 block west of {PedestalLoc}
+					set {PedestalRawGold7} to location 2 block east and 1 block north of {PedestalLoc}
+					set {PedestalRawGold8} to location 2 block east and 1 block south of {PedestalLoc}
+					# CHERRY LOGS
+					set {Cherry1} to location 2 blocks east of {PedestalLoc}
+					set {Cherry2} to location 2 blocks west of {PedestalLoc}
+					set {Cherry3} to location 2 blocks north of {PedestalLoc}
+					set {Cherry4} to location 2 blocks south of {PedestalLoc}
+					# CHERRY PLANKS
+					set {Plank1} to location 3 block east of {PedestalLoc}
+					set {Plank2} to location 3 block west of {PedestalLoc}
+					set {Plank3} to location 3 block north of {PedestalLoc}
+					set {Plank4} to location 3 block south of {PedestalLoc}
+					# Cherry Planks East
+					set {Plank5} to location 3 block east and 2 block north of {PedestalLoc}
+					set {Plank6} to location 3 block east and 2 block south of {PedestalLoc}
+					# Cheryy Planks West
+					set {Plank7} to location 3 block west and 2 block north of {PedestalLoc}
+					set {Plank8} to location 3 block west and 2 block south of {PedestalLoc}
+					# Cherry Plank North
+					set {Plank9} to location 3 block north and 2 block east of {PedestalLoc}
+					set {Plank10} to location 3 block north and 2 block west of {PedestalLoc}
+					# Cherry Plank South
+					set {Plank11} to location 3 block south and 2 block east of {PedestalLoc}
+					set {Plank12} to location 3 block south and 2 block west of {PedestalLoc}
+					# Stripped Chery Log east
+					set {stripped1} to location 3 block east and 1 block north of {PedestalLoc}
+					set {stripped2} to location 3 block east and 1 block south of {PedestalLoc}
+					# Stripped Cherry log west
+					set {stripped3} to location 3 block west and 1 block north of {PedestalLoc}
+					set {stripped4} to location 3 block west and 1 block south of {PedestalLoc}
+					# stripped cherry logs north
+					set {stripped5} to location 3 blocks north and 1 block east of {PedestalLoc}
+					set {stripped6} to location 3 blocks north and 1 block west of {PedestalLoc}
+					# stripped cherry logs south
+					set {stripped7} to location 3 blocks south and 1 block east of {PedestalLoc}
+					set {stripped8} to location 3 blocks south and 1 block west of {PedestalLoc}
+					# Stripped cherry Logs More :sob: east
+					set {stripped9} to location 2 blocks east and 2 blocks north of {PedestalLoc}
+					set {stripped10} to location 2 blocks east and 2 blocks south of {PedestalLoc}
+					# stripped log more west
+					set {stripped11} to location 2 blocks west and 2 blocks north of {PedestalLoc}
+					set {stripped12} to location 2 blocks west and 2 blocks south of {PedestalLoc}
+					# Quartz Bricks east west north south
+					set {brick1} to location 4 blocks east of {PedestalLoc}
+					set {brick2} to location 4 blocks west of {PedestalLoc}
+					set {brick3} to location 4 blocks north of {PedestalLoc}
+					set {brick4} to location 4 blocks south of {PedestalLoc}
+					# more quartz east
+					set {brick5} to location 4 blocks east and 1 block north of {PedestalLoc}
+					set {brick6} to location 4 blocks east and 2 block north of {PedestalLoc}
+					set {brick7} to location 4 blocks east and 1 block south of {PedestalLoc}
+					set {brick8} to location 4 blocks east and 2 block south of {PedestalLoc}
+					# more quartz west
+					set {brick9} to location 4 blocks west and 1 block north of {PedestalLoc}
+					set {brick10} to location 4 blocks west and 2 block north of {PedestalLoc}
+					set {brick11} to location 4 blocks west and 1 block south of {PedestalLoc}
+					set {brick12} to location 4 blocks west and 2 block south of {PedestalLoc}
+					# more quartz north 
+					set {brick13} to location 4 blocks north and 1 block east of {PedestalLoc}
+					set {brick14} to location 4 blocks north and 2 block east of {PedestalLoc}
+					set {brick15} to location 4 blocks north and 1 block west of {PedestalLoc}
+					set {brick16} to location 4 blocks north and 2 block west of {PedestalLoc}
+					# more quartz south
+					set {brick17} to location 4 blocks south and 1 block east of {PedestalLoc}
+					set {brick18} to location 4 blocks south and 2 block east of {PedestalLoc}
+					set {brick19} to location 4 blocks south and 1 block west of {PedestalLoc}
+					set {brick20} to location 4 blocks south and 2 block west of {PedestalLoc}
+					# last part east
+					set {brick21} to location 3 blocks east and 3 blocks north of {PedestalLoc}
+					set {brick22} to location 3 blocks east and 3 blocks south of {PedestalLoc}
+					set {brick23} to location 3 blocks west and 3 blocks north of {PedestalLoc}
+					set {brick24} to location 3 blocks west and 3 blocks south of {PedestalLoc}
+					# Quartz stairs east
+					set {stairs.east1} to location 5 blocks east of {PedestalLoc}
+					set {stairs.east2} to location 5 blocks east and 1 block north of {PedestalLoc}
+					set {stairs.east3} to location 5 blocks east and 1 block south of {PedestalLoc}
+					# Quartz stairs west
+					set {stairs.west1} to location 5 blocks west of {PedestalLoc}
+					set {stairs.west2} to location 5 blocks west and 1 block north of {PedestalLoc}
+					set {stairs.west3} to location 5 blocks west and 1 block south of {PedestalLoc}
+					# quartz stairs north
+					set {stairs.north1} to location 5 blocks north of {PedestalLoc}
+					set {stairs.north2} to location 5 blocks north and 1 block east of {PedestalLoc}
+					set {stairs.north3} to location 5 blocks north and 1 block west of {PedestalLoc}
+					# Quartz stairs south
+					set {stairs.south1} to location 5 blocks south of {PedestalLoc}
+					set {stairs.south2} to location 5 blocks south and 1 block east of {PedestalLoc}
+					set {stairs.south3} to location 5 blocks south and 1 block west of {PedestalLoc}
+					set {Beacon} to false
+					set {Debris} to false
+					set {PedestalRepair} to false
+					set {PedestalCount} to 0
+					set {PedestalTimer} to 0
+					set {PedestalRevive} to false
+					set {RevivalProgress} to false
+					set {-Reviving} to false
+			
+				if arg-2 is "activate":
+					pedestalactiveEmbed()
+					set {PedestalBreakTimer} to 0
+					set {PedestalDura} to 0
+					set {PedestalActive} to true
+					play sound "block.beacon.ambient" with volume 40 and pitch 1.6 at {PedestalLoc}
+					set block at location at {PedestalLoc} to air
+					# debrie
+					set block at location at {DebrisLoc} to air
+					set block at location 1 block below {DebrisLoc} to bedrock
+					# The Rest yk
+					set block at location at {PedestalGilded1} to gilded blackstone
+					set block at location at {PedestalGilded2} to gilded blackstone
+					set block at location at {PedestalGilded3} to gilded blackstone
+					set block at location at {PedestalGilded4} to gilded blackstone
+					set block at location at {PedestalGold1} to gold block
+					set block at location at {PedestalGold2} to gold block
+					set block at location at {PedestalGold3} to gold block
+					set block at location at {PedestalGold4} to gold block
+					# RAW GOLD
+					set block at location at {PedestalRawGold1} to block of raw gold
+					set block at location at {PedestalRawGold2} to block of raw gold
+					set block at location at {PedestalRawGold3} to block of raw gold
+					set block at location at {PedestalRawGold4} to block of raw gold
+					set block at location at {PedestalRawGold5} to block of raw gold
+					set block at location at {PedestalRawGold6} to block of raw gold
+					set block at location at {PedestalRawGold7} to block of raw gold
+					set block at location at {PedestalRawGold8} to block of raw gold
+					# CHERRY LOG
+					set block at location at {Cherry1} to cherry log[axis=x]
+					set block at location at {Cherry2} to cherry log[axis=x]
+					set block at location at {Cherry3} to cherry log[axis=z]
+					set block at location at {Cherry4} to cherry log[axis=z]
+					# CHERRY PLANK
+					set block at location at {Plank1} to cherry plank
+					set block at location at {Plank2} to cherry plank
+					set block at location at {Plank3} to cherry plank
+					set block at location at {Plank4} to cherry plank
+					set block at location at {Plank5} to cherry plank
+					set block at location at {Plank6} to cherry plank
+					set block at location at {Plank7} to cherry plank
+					set block at location at {Plank8} to cherry plank
+					set block at location at {Plank9} to cherry plank
+					set block at location at {Plank10} to cherry plank
+					set block at location at {Plank11} to cherry plank
+					set block at location at {Plank12} to cherry plank
+					# Stripped Cherry log
+					set block at location at {stripped1} to stripped cherry log[axis=x]
+					set block at location at {stripped2} to stripped cherry log[axis=x]
+					set block at location at {stripped3} to stripped cherry log[axis=x]
+					set block at location at {stripped4} to stripped cherry log[axis=x]
+					set block at location at {stripped5} to stripped cherry log[axis=z]
+					set block at location at {stripped6} to stripped cherry log[axis=z]
+					set block at location at {stripped7} to stripped cherry log[axis=z]
+					set block at location at {stripped8} to stripped cherry log[axis=z]
+					set block at location at {stripped9} to stripped cherry log[axis=x]
+					set block at location at {stripped10} to stripped cherry log[axis=x]
+					set block at location at {stripped11} to stripped cherry log[axis=x]
+					set block at location at {stripped12} to stripped cherry log[axis=x]
+					# Quartz bricks
+					set block at location at {brick1} to quartz bricks
+					set block at location at {brick2} to quartz bricks
+					set block at location at {brick3} to quartz bricks
+					set block at location at {brick4} to quartz bricks
+					set block at location at {brick5} to quartz bricks
+					set block at location at {brick6} to quartz bricks
+					set block at location at {brick7} to quartz bricks
+					set block at location at {brick8} to quartz bricks
+					set block at location at {brick9} to quartz bricks
+					set block at location at {brick10} to quartz bricks
+					set block at location at {brick11} to quartz bricks
+					set block at location at {brick12} to quartz bricks
+					set block at location at {brick13} to quartz bricks
+					set block at location at {brick14} to quartz bricks
+					set block at location at {brick15} to quartz bricks
+					set block at location at {brick16} to quartz bricks
+					set block at location at {brick17} to quartz bricks
+					set block at location at {brick18} to quartz bricks
+					set block at location at {brick19} to quartz bricks
+					set block at location at {brick20} to quartz bricks
+					set block at location at {brick21} to quartz bricks
+					set block at location at {brick22} to quartz bricks
+					set block at location at {brick23} to quartz bricks
+					set block at location at {brick24} to quartz bricks
+					# East
+					set block at location at {stairs.east1} to smooth quartz stairs[facing=west]
+					set block at location at {stairs.east2} to smooth quartz stairs[facing=west]
+					set block at location at {stairs.east3} to smooth quartz stairs[facing=west]
+					# west
+					set block at location at {stairs.west1} to smooth quartz stairs[facing=east]
+					set block at location at {stairs.west2} to smooth quartz stairs[facing=east]
+					set block at location at {stairs.west3} to smooth quartz stairs[facing=east]
+					# north
+					set block at location at {stairs.north1} to smooth quartz stairs[facing=south]
+					set block at location at {stairs.north2} to smooth quartz stairs[facing=south]
+					set block at location at {stairs.north3} to smooth quartz stairs[facing=south]
+					# south
+					set block at location at {stairs.south1} to smooth quartz stairs[facing=north]
+					set block at location at {stairs.south2} to smooth quartz stairs[facing=north]
+					set block at location at {stairs.south3} to smooth quartz stairs[facing=north]
+					set {PedestalRepair} to false
+					set {PedestalCount} to 0
+					set {PedestalTimer} to 0
+					set {PedestalRevive} to false
+					set {RevivalProgress} to false
+					set {-Reviving} to false
+					set {Beacon} to false
+					set {Debris} to false
+					loop all players:
+						set {RevivalLocked.%loop-player%} to false
+						set {-attempts.%loop-player's uuid%} to 0
+					broadcast "<##FE8120>Pedestal has &2 Opened"
+			
+				if arg-2 is "deactivate":
+					pedestaldeactiveEmbed()
+					set {PedestalActive} to false
+					set block at location at {PedestalLoc} to bedrock
+					# Debris
+					set block at location at {DebrisLoc} to air
+					set block at location at {PedestalGilded1} to blackstone
+					set block at location at {PedestalGilded2} to blackstone
+					set block at location at {PedestalGilded3} to blackstone
+					set block at location at {PedestalGilded4} to blackstone
+					set block at location at {PedestalGold1} to netherite block
+					set block at location at {PedestalGold2} to netherite block
+					set block at location at {PedestalGold3} to netherite block
+					set block at location at {PedestalGold4} to netherite block
+					# BASALT
+					set block at location at {PedestalRawGold1} to basalt[axis=x]
+					set block at location at {PedestalRawGold2} to basalt[axis=x]
+					set block at location at {PedestalRawGold3} to basalt[axis=x]
+					set block at location at {PedestalRawGold4} to basalt[axis=x]
+					set block at location at {PedestalRawGold5} to basalt[axis=z]
+					set block at location at {PedestalRawGold6} to basalt[axis=z]
+					set block at location at {PedestalRawGold7} to basalt[axis=x]
+					set block at location at {PedestalRawGold8} to basalt[axis=x]
+					# POLISHED BASALT
+					set block at location at {Cherry1} to polished basalt[axis=x]
+					set block at location at {Cherry2} to polished basalt[axis=x]
+					set block at location at {Cherry3} to polished basalt[axis=z]
+					set block at location at {Cherry4} to polished basalt[axis=z]
+					# Polished deepslate
+					set block at location at {Plank1} to polished deepslate
+					set block at location at {Plank2} to polished deepslate
+					set block at location at {Plank3} to polished deepslate
+					set block at location at {Plank4} to polished deepslate
+					set block at location at {Plank5} to polished deepslate
+					set block at location at {Plank6} to polished deepslate
+					set block at location at {Plank7} to polished deepslate
+					set block at location at {Plank8} to polished deepslate
+					set block at location at {Plank9} to polished deepslate
+					set block at location at {Plank10} to polished deepslate
+					set block at location at {Plank11} to polished deepslate
+					set block at location at {Plank12} to polished deepslate
+					# Deepslate Tiles
+					set block at location at {stripped1} to deepslate tiles
+					set block at location at {stripped2} to deepslate tiles
+					set block at location at {stripped3} to deepslate tiles
+					set block at location at {stripped4} to deepslate tiles
+					set block at location at {stripped5} to deepslate tiles
+					set block at location at {stripped6} to deepslate tiles
+					set block at location at {stripped7} to deepslate tiles
+					set block at location at {stripped8} to deepslate tiles
+					set block at location at {stripped9} to deepslate tiles
+					set block at location at {stripped10} to deepslate tiles
+					set block at location at {stripped11} to deepslate tiles
+					set block at location at {stripped12} to deepslate tiles
+					# Polished black stone bricks
+					set block at location at {brick1} to polished blackstone bricks
+					set block at location at {brick2} to polished blackstone bricks
+					set block at location at {brick3} to polished blackstone bricks
+					set block at location at {brick4} to polished blackstone bricks
+					set block at location at {brick5} to polished blackstone bricks
+					set block at location at {brick6} to polished blackstone bricks
+					set block at location at {brick7} to polished blackstone bricks
+					set block at location at {brick8} to polished blackstone bricks
+					set block at location at {brick9} to polished blackstone bricks
+					set block at location at {brick10} to polished blackstone bricks
+					set block at location at {brick11} to polished blackstone bricks
+					set block at location at {brick12} to polished blackstone bricks
+					set block at location at {brick13} to polished blackstone bricks
+					set block at location at {brick14} to polished blackstone bricks
+					set block at location at {brick15} to polished blackstone bricks
+					set block at location at {brick16} to polished blackstone bricks
+					set block at location at {brick17} to polished blackstone bricks
+					set block at location at {brick18} to polished blackstone bricks
+					set block at location at {brick19} to polished blackstone bricks
+					set block at location at {brick20} to polished blackstone bricks
+					set block at location at {brick21} to polished blackstone bricks
+					set block at location at {brick22} to polished blackstone bricks
+					set block at location at {brick23} to polished blackstone bricks
+					set block at location at {brick24} to polished blackstone bricks
+					# East
+					set block at location at {stairs.east1} to blackstone stairs[facing=west]
+					set block at location at {stairs.east2} to blackstone stairs[facing=west]
+					set block at location at {stairs.east3} to blackstone stairs[facing=west]
+					# west
+					set block at location at {stairs.west1} to blackstone stairs[facing=east]
+					set block at location at {stairs.west2} to blackstone stairs[facing=east]
+					set block at location at {stairs.west3} to blackstone stairs[facing=east]
+					# north
+					set block at location at {stairs.north1} to blackstone stairs[facing=south]
+					set block at location at {stairs.north2} to blackstone stairs[facing=south]
+					set block at location at {stairs.north3} to blackstone stairs[facing=south]
+					# south
+					set block at location at {stairs.south1} to blackstone stairs[facing=north]
+					set block at location at {stairs.south2} to blackstone stairs[facing=north]
+					set block at location at {stairs.south3} to blackstone stairs[facing=north]
+					set {PedestalRepair} to false
+					set {PedestalCount} to 0
+					set {PedestalTimer} to 0
+					set {PedestalRevive} to false
+					set {-Reviving} to false
+					broadcast "<##FE8120>Pedestal has &cClosed"
+					execute console command "weather clear"
+					set {Beacon} to false
+					set {Debris} to false
+					loop all players:
+						set {-attempts.%loop-player's uuid%} to 0
+
+
+command /withdraw <number>:
+	aliases: /blissgems:withdraw
+	trigger:
+		loop all items in player's inventory:
+			if IsGem(loop-item) is true:
+				if arg-1 > 0:
+					set {_num} to getEnergy(loop-item) - arg-1
+					if {_num} < 1:
+						send "&c You Are Not &b&lOverflowing" to player												
+					else:
+						set {_ii} to arg-1
+						set {_num} to getEnergy(loop-item) - arg-1
+						set {_uuid} to player's uuid
+						remove arg-1 from {Energy::%{_uuid}%}
+						SetEnergy(player, {_num})
+						give {_ii} of {-energyitem::%player's uuid%::60} to player
+						send "<##FFD773>🔮 Bottled &f&l%arg-2% <##96FFD9>ᴇɴᴇʀɢʏ" to player
+
+command /set-energy <text> <text>:
+	aliases: /blissgems:set-energy
+	permission: op
+	trigger:
+		if arg-1 is set:
+			set {_p} to arg-1 parsed as player
+			if arg-2 is set:
+				set {_in} to arg-2 parsed as integer
+				SetEnergy({_p}, {_in})
+
+
+function givegem(p: player):
+	set {_uuid} to {_p}'s uuid
+	set {_hasgem} to false
+	loop all items in {_p}'s inventory:
+		if {_hasgem} is false:
+			if IsGem(loop-item) is true:
+				set {_hasgem} to true
+
+	if {_hasgem} is false:
+		set {_Gemrandom} to a random integer between 1 and 8
+
+		if {_Gemrandom} is 1:
+			set {_gem} to "strength"
+		else if {_Gemrandom} is 2:
+			set {_gem} to "speed"
+		else if {_Gemrandom} is 3:
+			set {_gem} to "fire"
+		else if {_Gemrandom} is 4:
+			set {_gem} to "life"
+		else if {_Gemrandom} is 5:
+			set {_gem} to "puff"
+		else if {_Gemrandom} is 6:
+			set {_gem} to "wealth"
+		else if {_Gemrandom} is 7:
+			set {_gem} to "astra"
+		else if {_Gemrandom} is 8:
+			set {_gem} to "flux"
+
+		give {-gem::%{_gem}%::1::5} to {_p}
+
+
+function tradeGem(p: player, t: number, en: integer):
+	set {_uuid} to {_p}'s uuid
+	set {_hasgem} to false
+	loop all items in {_p}'s inventory:
+		if {_hasgem} is false:
+			if IsGem(loop-item) is true:
+				set {_hasgem} to true
+
+	if {_hasgem} is false:
+		set {_Gemrandom} to a random integer between 1 and 8
+
+		if {_Gemrandom} is 1:
+			set {_gem} to "strength"
+		else if {_Gemrandom} is 2:
+			set {_gem} to "speed"
+		else if {_Gemrandom} is 3:
+			set {_gem} to "fire"
+		else if {_Gemrandom} is 4:
+			set {_gem} to "life"
+		else if {_Gemrandom} is 5:
+			set {_gem} to "puff"
+		else if {_Gemrandom} is 6:
+			set {_gem} to "wealth"
+		else if {_Gemrandom} is 7:
+			set {_gem} to "astra"
+		else if {_Gemrandom} is 8:
+			set {_gem} to "flux"
+
+		give {-gem::%{_gem}%::%{_t}%::%{_en}%} to {_p}
+
+
+function ClearGems(p: player):
+	loop all items in {_p}'s inventory:
+		if IsGem(loop-item) is true:
+			remove 1 of loop-item from {_p}'s inventory
+
+
+
+on tab complete for "/set-energy" and "/blissgems:set-energy":
+	set tab completions for position 1 to all players
+	set tab completions for position 2 to 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+
+
+on tab complete of "/bliss" or "/blissgems" or "/blissgems:bliss" or "/blissgems:blissgems":
+	if event-player has permission "op":
+		set tab completions for position 1 to "gem", "item", "particles", "revive", "set-energy", "set-charge" and "withdraw" and "progression" and "pedestal"
+	else:
+		set tab completions for position 1 to "particles" and "withdraw"
+	if tab arg-1 = tab arg-1:
+		set tab completion for position 3 to all players
+
+	if tab arg-1 = "set-energy":
+		set tab completions for position 2 to all players
+		set tab completions for position 3 to 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+	
+	if tab arg-1 = "set-charge":
+		set tab completions for position 2 to all players
+		set tab completions for position 3 to "<number>"
+		
+	if tab arg-1 = "withdraw":
+		set tab completions for position 2 to 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+
+	if tab arg-1 = "gem":
+		set tab completions for position 2 to all players
+		set tab completions for position 3 to "astra", "fire", "life", "puff", "random", "speed", "strength", "flux" and "wealth"
+		set tab completions for position 4 to "1" and "2"
+
+	if tab arg-1 = "item":
+		set tab completions for position 2 to "energy" and "repairkit" and "RestoraionTomb0" and "trader" and "upgrader" and "RestoraionTomb1" and "RestoraionTomb2" and "RestoraionTomb3" and "remote" and "gemfragment"
+
+	if tab arg-1 = "particles":
+		set tab completions for position 2 to "default", "less" and "none"
+
+	if tab arg-1 = "performance":
+		set tab completions for position 2 to "default", "less" and "none"
+	if tab arg-1 = "progression":
+		set tab completions for position 2 to "reset" and "1" and "2" and "3"
+	if tab arg-1 = "pedestal":
+		set tab completions for position 2 to "set" and "activate" and "deactivate"
+
+on tab complete for "/withdraw":
+	set tab completions for position 1 to 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+
+	
+#Action bar stuff
+
+command /cooldown [<player>]:
+	aliases: /blissgems:cooldown
+	permission: op
+	trigger:
+		if arg-1 is set:
+			set {_1} to arg-1
+			resetcooldown({_1})
+			delete {-trading::%{_1}'s uuid%}
+		else:
+			set {_1} to player
+			resetcooldown({_1})
+			delete {-trading::%player's uuid%}
+
+
+
+on tab complete for "/cooldown" and "/blissgems:cooldown":
+	set tab completions for position 1 to all players
+
+
+
+function FireAction(itext: text, p: player):
+	if {_itext} is "held":
+		set {_i} to {_p}'s held item
+		
+	if {_itext} is "offhand":
+		set {_i} to {_p}'s offhand item
+
+
+	if canUsePower("Crisp::%uuid of {_p}%") is true:
+		set {_c} to "&aReady!"
+	else:
+		set {_cs} to getCooldownSeconds("Crisp::%uuid of {_p}%")
+
+		set {_cm} to getCooldownMinutes("Crisp::%uuid of {_p}%")
+		
+		if {_cm} > 0:
+			if {_cs} < 1:
+				set {_c} to "&b%{_cm}%m"
+			else:
+				set {_c} to "&b%{_cm}%m %{_cs}%s"
+		if {_cm} < 1:
+			if {_cs} > 0:
+				if {_cs} > 30:
+					set {_c} to "&cActive..."
+				if {_cs} < 31:
+					set {_c} to "&b%{_cs}%s"
+
+		if {_c} is not set:
+			set {_c} to "&aReady!"
+
+	if getTier({_i}) is 2:
+		set {_fb} to getActionBarCooldown("Fireball::%uuid of {_p}%")
+
+		set {_cf} to getActionBarCooldown("Campfire::%uuid of {_p}%")
+
+		send action bar "&f🧨 %{_fb}%  <##FE8120>🔮 %{_c}%  &f🥾 %{_cf}%" to {_p}
+
+	else:
+		send action bar "<##FE8120>🔺 %{_c}%" to {_p}
+
+# Life Gem
+
+function LifeAction(itext: text, p: player):
+	if {_itext} is "held":
+		set {_i} to {_p}'s held item
+		
+	if {_itext} is "offhand":
+		set {_i} to {_p}'s offhand item
+	
+	if canUsePower("Vitality::%uuid of {_p}%") is true:
+		set {_v} to "&aReady!"
+	else:
+		set {_vs} to getCooldownSeconds("Vitality::%uuid of {_p}%")
+
+		set {_vm} to getCooldownMinutes("Vitality::%uuid of {_p}%")
+
+		if {_vm} < 1:
+			if {_vs} > 0:
+				if {_vs} > 30:
+					set {_v} to "&cActive..."
+				if {_vs} < 31:
+					set {_v} to "&b%{_vs}%s"
+
+		if {_v} is not set:
+			set {_v} to "&aReady!"
+
+	if getTier({_i}) is 2:
+
+		set {_lc} to getActionBarCooldown("LifeCircle::%uuid of {_p}%")
+
+		set {_hl} to getActionBarCooldown("HeartLock::%uuid of {_p}%")
+			
+		send action bar "&f💘 %{_hl}%  <##FE04B4>🔮 %{_v}%  &f💖 %{_lc}%" to {_p}
+
+	else:
+		send action bar "<##FE04B4>🔺 %{_v}%" to {_p}
+
+
+
+function StrengthAction(itext: text, p: player):
+	if {_itext} is "held":
+		set {_i} to {_p}'s held item
+		
+	if {_itext} is "offhand":
+		set {_i} to {_p}'s offhand item
+
+
+	set {_b} to getActionBarCooldown("Bounty::%uuid of {_p}%")
+
+	if getTier({_i}) is 2:
+		set {_fr} to getActionBarCooldown("Frailer::%uuid of {_p}%")
+
+
+		set {_cs} to getActionBarCooldown("ChadStrength::%uuid of {_p}%")
+
+		send action bar "&f🤺 %{_fr}%  <##F10303>🔮 %{_b}%  &f⚔ %{_cs}%" to {_p}
+
+	else:
+		send action bar "<##F10303>🔺 %{_b}%" to {_p}
+
+
+function AstraAction(itext: text, p: player):
+	if {_itext} is "held":
+		set {_i} to {_p}'s held item
+		
+	if {_itext} is "offhand":
+		set {_i} to {_p}'s offhand item
+
+
+	if canUsePower("Drift::%uuid of {_p}%") is true:
+		set {_c} to "&aReady!"
+	else:
+		set {_cs} to getCooldownSeconds("Drift::%uuid of {_p}%")
+
+		set {_cm} to getCooldownMinutes("Drift::%uuid of {_p}%")
+		
+		if {_cm} > 0:
+			if {_cs} < 1:
+				set {_c} to "&b%{_cm}%m"
+			else:
+				set {_c} to "&b%{_cm}%m %{_cs}%s"
+		if {_cm} < 1:
+			if {_cs} > 0:
+				if {_cs} > 34:
+					set {_c} to "&cActive..."
+				if {_cs} < 35:
+					set {_c} to "<##A01FFF>%{_cs}%s"
+
+		if {_c} is not set:
+			set {_c} to "&aReady!"
+
+	if getTier({_i}) is 2:
+		set {_fb} to getActionBarCooldown("Daggers::%uuid of {_p}%")
+
+		set {_cf} to getActionBarCooldown("Astral::%uuid of {_p}%")
+
+		send action bar "&f🔪 %{_fb}%  <##A01FFF>🔮 %{_c}%  &f👻 %{_cf}%" to {_p}
+
+	else:
+		send action bar "<##A01FFF>🔺 %{_c}%" to {_p}
+
+			
+function PuffAction(itext: text, p: player):
+	if {_itext} is "held":
+		set {_i} to {_p}'s held item
+		
+	if {_itext} is "offhand":
+		set {_i} to {_p}'s offhand item
+
+	if canUsePower("DoubleJump::%uuid of {_p}%") is true:
+		set {_d} to "&aReady!"
+	else:
+		set {_ds} to getCooldownSeconds("DoubleJump::%uuid of {_p}%")
+
+		set {_dm} to getCooldownMinutes("DoubleJump::%uuid of {_p}%")
+		
+		if {_dm} > 0:
+			if {_ds} < 1:
+				set {_d} to "&b%{_dm}%m"
+			else:
+				set {_d} to "&b%{_dm}%m %{_ds}%s"
+
+		if {_dm} < 1:
+			if {_ds} > 0:
+				if {_ds} > 5:
+					set {_d} to "&cActive..."
+				if {_ds} < 6:
+					set {_d} to "&b%{_ds}%s"
+
+		if {_d} is not set:
+			set {_d} to "&aReady!"
+
+
+	if getTier({_i}) is 2:
+
+		set {_bb} to getActionBarCooldown("BreezyBash::%uuid of {_p}%")
+
+		set {_dash} to getActionBarCooldown("Dash::%uuid of {_p}%")
+
+		send action bar "&f☁ %{_bb}%  &f🔮 %{_d}%  &f⏫ %{_dash}%" to {_p}
+
+	else:
+		send action bar "&f🔺 %{_d}%" to {_p}
+
+
+function FluxAction(itext: text, p: player):
+	if {_itext} is "held":
+		set {_i} to {_p}'s held item
+		
+	if {_itext} is "offhand":
+		set {_i} to {_p}'s offhand item
+
+
+	
+
+	if canUsePower("KineticBurst::%uuid of {_p}%") is true:
+		set {_k} to "%Format({damage::%{_p}'s uuid%})%"
+	else:
+		set {_k} to getActionBarCooldown("KineticBurst::%uuid of {_p}%")
+
+	if getTier({_i}) is 2:
+		set {_eb} to getActionBarCooldown("EnergyBeam::%uuid of {_p}%")
+
+		set {_kin} to getActionBarCooldown("KineticOverdrive::%uuid of {_p}%")
+
+		send action bar "&f☄ %{_eb}% <##5ED7FF>🔮 &b%{_k}% <##5ED7FF>🔮 &b%Format({fluxKinetic::%{_p}'s uuid%})% &f🌀 %{_kin}%" to {_p}
+
+	else:
+		send action bar "<##5ED7FF>🔺 %{_k}%" to {_p}
+		
+function SpeedAction(itext: text, p: player):
+	if {_itext} is "held":
+		set {_i} to {_p}'s held item
+		
+	if {_itext} is "offhand":
+		set {_i} to {_p}'s offhand item
+
+
+	if canUsePower("Thunder::%uuid of {_p}%") is true:
+		set {_v} to "&aReady!"
+	else:
+		set {_vs} to getCooldownSeconds("Thunder::%uuid of {_p}%")
+
+		set {_vm} to getCooldownMinutes("Thunder::%uuid of {_p}%")
+		
+		if {_vm} > 0:
+			if {_vs} < 1:
+				set {_v} to "&b%{_vm}%m"
+			else:
+				set {_v} to "&b%{_vm}%m %{_vs}%s"
+
+		if {_vm} < 1:
+			if {_vs} > 0:
+				if {_vs} > 30:
+					set {_v} to "&cActive..."
+				if {_vs} < 31:
+					set {_v} to "&b%{_vs}%s"
+
+		if {_v} is not set:
+			set {_v} to "&aReady!"
+		
+
+	if getTier({_i}) is 2:
+		set {_bl} to getActionBarCooldown("Blur::%uuid of {_p}%")
+
+		set {_pt} to getActionBarCooldown("SpeedStorm::%uuid of {_p}%")
+
+		send action bar "&f🎯 %{_bl}%  <##E5EE2C>🔮 %{_v}%  &f🌩 %{_pt}%" to {_p}
+
+	else:
+		send action bar "<##E5EE2C>🔺 %{_v}%" to {_p}
+
+every 5 second:
+	loop all players:
+		if {fluxKinetic::%loop-player's uuid%} is not between 0 and 200:
+			set {fluxKinetic::%loop-player's uuid%} to 0
+
+
+every 5 ticks:
+	loop all players:
+		if IsGem(loop-player's held item) is false:
+			if IsGem(loop-player's offhand item) is false:
+				send action bar " " to loop-player
+		if getEnergy(loop-player's held item) is not 0:
+			if isDisabled(loop-player) is not true:
+				if getGem(loop-player's held item) is "astra":
+					if {-AstralProjection::%loop-player's uuid%} is not true:
+						AstraAction("held", loop-player)
+					else:
+						send action bar "&f🧊 &bSPOOK  <##A01FFF>🔮  &f🌟&bTAG" to loop-player
+				if getGem(loop-player's held item) is "fire":
+					FireAction("held", loop-player)
+				if getGem(loop-player's held item) is "speed":
+					SpeedAction("held", loop-player)
+				if getGem(loop-player's held item) is "flux":
+					FluxAction("held", loop-player)
+				if getGem(loop-player's held item) is "puff":
+					PuffAction("held", loop-player)
+				if getGem(loop-player's held item) is "strength":
+					StrengthAction("held", loop-player)
+				if getGem(loop-player's held item) is "life":
+					LifeAction("held", loop-player)
+				if getGem(loop-player's held item) is "wealth":
+					WealthAction("held", loop-player)
+			else:
+				set {_l} to loop-player
+				set {_dis} to {-Disabled::%loop-player's uuid%}
+				send action bar "&8&l🔒ᴅɪsᴀʙʟᴇᴅ: %{_dis}%" to loop-player
+
+			
+			if isDisabled(loop-player) is not true:
+				if getGem(loop-player's offhand item) is "speed":
+					if IsGem(loop-player's held item) is false:
+						if getEnergy(loop-player's offhand item) is not 0:
+							SpeedAction("offhand", loop-player)
+						else:
+							send action bar "&cBROKEN" to loop-player
+				if getGem(loop-player's offhand item) is "astra":
+					if IsGem(loop-player's held item) is false:
+						if getEnergy(loop-player's offhand item) is not 0:
+							if {-AstralProjection::%loop-player's uuid%} is not true:
+								AstraAction("offhand", loop-player)
+							else:
+								send action bar "&f🧊 &bSPOOK <##A01FFF>🔮 &f🌟&bTAG" to loop-player
+						else:
+							send action bar "&cBROKEN" to loop-player
+				if getGem(loop-player's offhand item) is "fire":
+					if IsGem(loop-player's held item) is false:
+						if getEnergy(loop-player's offhand item) is not 0:
+							FireAction("offhand", loop-player)
+						else:
+							send action bar "&cBROKEN" to loop-player
+				if getGem(loop-player's offhand item) is "flux":
+					if IsGem(loop-player's held item) is false:
+						if getEnergy(loop-player's offhand item) is not 0:
+							FluxAction("offhand", loop-player)
+						else:
+							send action bar "&cBROKEN" to loop-player
+				if getGem(loop-player's offhand item) is "puff":
+					if IsGem(loop-player's held item) is false:
+						if getEnergy(loop-player's offhand item) is not 0:
+							PuffAction("offhand", loop-player)
+						else:
+							send action bar "&cBROKEN" to loop-player
+				if getGem(loop-player's offhand item) is "strength":
+					if IsGem(loop-player's held item) is false:
+						if getEnergy(loop-player's offhand item) is not 0:
+							StrengthAction("offhand", loop-player)
+						else:
+							send action bar "&cBROKEN" to loop-player
+				if getGem(loop-player's offhand item) is "life":
+					if IsGem(loop-player's held item) is false:
+						if getEnergy(loop-player's offhand item) is not 0:
+							LifeAction("offhand", loop-player)
+						else:
+							send action bar "&cBROKEN" to loop-player
+				if getGem(loop-player's offhand item) is "wealth":
+					if IsGem(loop-player's held item) is false:
+						if getEnergy(loop-player's offhand item) is not 0:
+							WealthAction("offhand", loop-player)
+						else:
+							send action bar "&cBROKEN" to loop-player
+			else:
+				set {_l} to loop-player
+				set {_dis} to {-Disabled::%loop-player's uuid%}
+				send action bar "&8&l🔒ᴅɪsᴀʙʟᴇᴅ: %{_dis}%" to loop-player
+
+		else:
+			if IsGem(loop-player's held item) is true:
+				send action bar "&cBROKEN" to loop-player
+
+				
+
+every 2 seconds:
+	loop all players:
+		if doesCooldownExist("Unfortunate::%uuid of loop-player%") is not true:
+			setDCooldown("Unfortunate::%uuid of loop-player%", 0)
+		if doesCooldownExist("RichRush::%uuid of loop-player%") is not true:
+			setDCooldown("RichRush::%uuid of loop-player%", 0)
+		if doesCooldownExist("DoubleJump::%uuid of loop-player%") is not true:
+			setDCooldown("DoubleJump::%uuid of loop-player%", 0)
+		if doesCooldownExist("Fireball::%uuid of loop-player%") is not true:
+			setDCooldown("Fireball::%uuid of loop-player%", 0)
+		if doesCooldownExist("Crisp::%uuid of loop-player%") is not true:
+			setDCooldown("Crisp::%uuid of loop-player%", 0)
+		if doesCooldownExist("Campfire::%uuid of loop-player%") is not true:
+			setDCooldown("Campfire::%uuid of loop-player%", 0)
+		if doesCooldownExist("CampfireActive::%uuid of loop-player%") is not true:
+			setDCooldown("CampfireActive::%uuid of loop-player%", 0)
+		if doesCooldownExist("CampfireActive1::%uuid of loop-player%") is not true:
+			setDCooldown("CampfireActive1::%uuid of loop-player%", 0)
+		if doesCooldownExist("CampfireActive2::%uuid of loop-player%") is not true:
+			setDCooldown("CampfireActive2::%uuid of loop-player%", 0)
+		if doesCooldownExist("CampfireActive3::%uuid of loop-player%") is not true:
+			setDCooldown("CampfireActive3::%uuid of loop-player%", 0)
+		if doesCooldownExist("Blur::%uuid of loop-player%") is not true:
+			setDCooldown("Blur::%uuid of loop-player%", 0)
+		if doesCooldownExist("Thunder::%uuid of loop-player%") is not true:
+			setDCooldown("Thunder::%uuid of loop-player%", 0)
+		if doesCooldownExist("SpeedStorm::%uuid of loop-player%") is not true:
+			setDCooldown("SpeedStorm::%uuid of loop-player%", 0)
+		if doesCooldownExist("KineticBurst::%uuid of loop-player%") is not true:
+			setDCooldown("KineticBurst::%uuid of loop-player%", 0)
+		if doesCooldownExist("EnergyBeam::%uuid of loop-player%") is not true:
+			setDCooldown("EnergyBeam::%uuid of loop-player%", 0)
+		if doesCooldownExist("KineticOverdrive::%uuid of loop-player%") is not true:
+			setDCooldown("KineticOverdrive::%uuid of loop-player%", 0)
+		if doesCooldownExist("Dash::%uuid of loop-player%") is not true:
+			setDCooldown("Dash::%uuid of loop-player%", 0)
+		if doesCooldownExist("BreezyBash::%uuid of loop-player%") is not true:
+			setDCooldown("BreezyBash::%uuid of loop-player%", 0)
+		if doesCooldownExist("Autoenchanting::%uuid of loop-player%") is not true:
+			setDCooldown("Autoenchanting::%uuid of loop-player%", 0)
+		if doesCooldownExist("Daggers::%uuid of loop-player%") is not true:
+			setDCooldown("Daggers::%uuid of loop-player%", 0)
+		if doesCooldownExist("Drift::%uuid of loop-player%") is not true:
+			setDCooldown("Drift::%uuid of loop-player%", 0)
+		if doesCooldownExist("Astral::%uuid of loop-player%") is not true:
+			setDCooldown("Astral::%uuid of loop-player%", 0)
+		if doesCooldownExist("Disabled::%uuid of loop-player%") is not true:
+			setDCooldown("Disabled::%uuid of loop-player%", 0)
+			
+
+
+
+
+		
+
+
+
+#[ <----- Invisible Players -----> ]
+
+
+on death of player:
+	set {damage::%victim's uuid%} to 0
+	if attacker has potion invisibility:
+		set death message to "%victim% was slain by &k123"
+			
+# Plugins
+
+
+on ignition:
+	if {-BlurringIgniteFalse} is true:
+		cancel event
+
+
+		
+every 1 second:
+	loop all players:
+		if {-DaggerBarPro::%loop-player%} is not 0:
+			remove 2 from {-HeartLockPro::%loop-player%}
+			set bar progress of {-HeartLockBar::%loop-player%} to {-HeartLockPro::%loop-player%}
+		if {-HeartLockPro::%loop-player%} < 1:
+			if {-HeartLocking::%loop-player%} is not false:
+				remove loop-player from bar players of {-HeartLockBar::%loop-player%}
+				set {-HeartLocking::%loop-player%} to false
+
+function dustparticlering1(pl: location, r: number, g: number, b: number, h: number, radius: number):
+	set {_spacing} to 0.2
+	set {_pl} to location of {_p}
+	set {_circumference} to 2 * pi * {_s}
+	
+	# Calculate the number of particles based on the spacing
+	set {_numParticles} to floor({_circumference} / {_spacing})
+	
+	# Spawn the exact number of particles needed
+
+	loop {_numParticles} times:
+		set {_angle} to loop-value * 360 / {_numParticles}
+		set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+		
+		make 1 of dust using dustOption(rgb({_r}, {_g}, {_b}), 1) at {_pl} ~ {_v}
+		draw 1 of smoke at {_pl} ~ {_v} with extra 0 with force
+		
+
+
+function LifeBlocks(p: player):
+	# Define variables
+	set {_player} to {_p}
+	set {_radius} to 3
+	set {_blocks::*} to air
+	
+
+	# blocks here!
+	set {_b1} to Dead Tube Coral Block
+	set {_b2} to Dead Fire Coral Block
+	set {_b3} to Dead Bubble Coral Block
+	set {_b4} to Dead Brain Coral Block
+	set {_b5} to Tuff
+	set {_b6} to Dead Horn Coral Fan
+
+
+
+	set {_grass} to dead brain coral
+
+	# Collect blocks and turn them into redstone
+	loop blocks in radius {_radius} around {_player}:
+		if loop-block is not air:
+			wait 1 tick
+			set {_originalType} to loop-block's type
+			set {_blockLoc} to loop-block's location
+			# Store block location and its original type
+			add {_blockLoc} to {_blocks::*}
+			set {_blocks::%{_blockLoc}%} to {_originalType}
+			dustparticlering1({_loc3}, 254, 4, 180, 1.5, 3)
+			particlering({_loc3}, 2, 3, dust)
+			set loop-block to {_b1}
+			chance of 35%
+			set loop-block to {_b2}
+			chance of 35%
+			set loop-block to {_b3}
+			chance of 35%
+			set loop-block to {_b4}
+			chance of 35%
+			set loop-block to {_b5}
+			if loop-block is short grass:
+				set loop-block to {_grass}
+			else if loop-block is long grass:
+				set loop-block to {_grass}
+
+	# Wait for 5 seconds
+	wait 5 seconds
+
+	# Revert blocks back to their original state
+	loop {_blocks::*}:
+		set {_blockLoc} to loop-value
+		set {_originalType} to {_blocks::%{_blockLoc}%}
+		if {_originalType} is not air:
+			wait 1 tick
+			set block at {_blockLoc} to {_originalType}
+
+# Effects 
+
+every 0.2 second:
+	loop all players:
+		if isDisabled(loop-player) is not true:
+			if getGem(loop-player's held item) is "speed":
+				if getTier(loop-player's held item) is 2:
+					if loop-player's boots slot is air:
+						if getEnergy(loop-player's held item) > 3:
+							set {_effectType} to PotionEffectType.DOLPHINS_GRACE
+							set {_effect} to new PotionEffect({_effectType}, 40, 1, true, false, true)
+							loop-player.addPotionEffect({_effect}, true)
+					if getEnergy(loop-player's held item) > 3:
+						set {_effectType} to PotionEffectType.SPEED
+						set {_effect} to new PotionEffect({_effectType}, 40, 1, true, false, true)
+						loop-player.addPotionEffect({_effect}, true)
+					if getEnergy(loop-player's held item) > 1:
+						set {_effectType} to PotionEffectType.SPEED
+						set {_effect} to new PotionEffect({_effectType}, 40, 1, true, false, true)
+						loop-player.addPotionEffect({_effect}, true)
+						
+			if getGem(loop-player's offhand item) is "speed":
+				if getTier(loop-player's offhand item) is 2:
+					if loop-player's boots slot is air:
+						if getEnergy(loop-player's offhand item) > 3:
+							set {_effectType} to PotionEffectType.DOLPHINS_GRACE
+							set {_effect} to new PotionEffect({_effectType}, 40, 1, true, false, true)
+							loop-player.addPotionEffect({_effect}, true)
+					if getEnergy(loop-player's offhand item) > 3:
+						set {_effectType} to PotionEffectType.SPEED
+						set {_effect} to new PotionEffect({_effectType}, 40, 1, true, false, true)
+						loop-player.addPotionEffect({_effect}, true)
+					if getEnergy(loop-player's offhand item) > 1:
+						set {_effectType} to PotionEffectType.SPEED
+						set {_effect} to new PotionEffect({_effectType}, 40, 1, true, false, true)
+						loop-player.addPotionEffect({_effect}, true)
+						
+			if getGem(loop-player's held item) is "speed":
+				if getTier(loop-player's held item) is 1:
+					if loop-player's boots slot is air:
+						if getEnergy(loop-player's held item) > 3:
+							set {_effectType} to PotionEffectType.DOLPHINS_GRACE
+							set {_effect} to new PotionEffect({_effectType}, 40, 0, true, false, true)
+							loop-player.addPotionEffect({_effect}, true)
+					if getEnergy(loop-player's held item) > 1:		
+						set {_effectType} to PotionEffectType.SPEED
+						set {_effect} to new PotionEffect({_effectType}, 40, 0, true, false, true)
+						loop-player.addPotionEffect({_effect}, true)
+						
+			if getGem(loop-player's offhand item) is "speed":
+				if getTier(loop-player's offhand item) is 1:
+					if loop-player's boots slot is air:
+						if getEnergy(loop-player's offhand item) > 3:
+							set {_effectType} to PotionEffectType.DOLPHINS_GRACE
+							set {_effect} to new PotionEffect({_effectType}, 40, 0, true, false, true)
+							loop-player.addPotionEffect({_effect}, true)
+					if getEnergy(loop-player's offhand item) > 1:		
+						set {_effectType} to PotionEffectType.SPEED
+						set {_effect} to new PotionEffect({_effectType}, 40, 0, true, false, true)
+						loop-player.addPotionEffect({_effect}, true)
+
+			if getGem(loop-player's held item) is "strength":
+				if getTier(loop-player's held item) is 1:
+					if getEnergy(loop-player's held item) > 1:
+						if {Prog1} is false:
+							if server is not at bukkit api change:
+								set {_effectType} to PotionEffectType.INCREASE_DAMAGE
+							else:
+								set {_effectType} to PotionEffectType.STRENGTH
+							set {_effect} to new PotionEffect({_effectType}, 40, 0, true, false, true)
+							loop-player.addPotionEffect({_effect}, true)
+						else:
+							set loop-player's attack damage attribute to 4
+			else:
+				set loop-player's attack damage attribute to 2
+					
+			if getGem(loop-player's offhand item) is "strength":
+				if getTier(loop-player's offhand item) is 1:
+					if getEnergy(loop-player's offhand item) > 1:
+						if {Prog1} is false:
+							if server is not at bukkit api change:
+								set {_effectType} to PotionEffectType.INCREASE_DAMAGE
+							else:
+								set {_effectType} to PotionEffectType.STRENGTH
+							set {_effect} to new PotionEffect({_effectType}, 40, 0, true, false, true)
+							loop-player.addPotionEffect({_effect}, true)
+						else:
+							set loop-player's attack damage attribute to 4
+			else:
+				set loop-player's attack damage attribute to 2
+
+			if getGem(loop-player's held item) is "strength":
+				if getTier(loop-player's held item) is 2:
+					if getEnergy(loop-player's held item) > 2:
+						if server is not at bukkit api change:
+							set {_effectType} to PotionEffectType.INCREASE_DAMAGE
+						else:
+							set {_effectType} to PotionEffectType.STRENGTH
+						set {_effect} to new PotionEffect({_effectType}, 40, 0, true, false, true)
+						loop-player.addPotionEffect({_effect}, true)
+					else:
+						if getEnergy(loop-player's held item) > 1:
+							if server is not at bukkit api change:
+								set {_effectType} to PotionEffectType.INCREASE_DAMAGE
+							else:
+								set {_effectType} to PotionEffectType.STRENGTH
+							set {_effect} to new PotionEffect({_effectType}, 40, 0, true, false, true)
+							loop-player.addPotionEffect({_effect}, true)
+
+			if getGem(loop-player's offhand item) is "strength":
+				if getTier(loop-player's offhand item) is 2:
+					if getEnergy(loop-player's offhand item) > 2:
+						if server is not at bukkit api change:
+							set {_effectType} to PotionEffectType.INCREASE_DAMAGE
+						else:
+							set {_effectType} to PotionEffectType.STRENGTH
+						set {_effect} to new PotionEffect({_effectType}, 40, 0, true, false, true)
+						loop-player.addPotionEffect({_effect}, true)
+					else:
+						if getEnergy(loop-player's offhand item) > 1:
+							if server is not at bukkit api change:
+								set {_effectType} to PotionEffectType.INCREASE_DAMAGE
+							else:
+								set {_effectType} to PotionEffectType.STRENGTH
+							set {_effect} to new PotionEffect({_effectType}, 40, 0, true, false, true)
+							loop-player.addPotionEffect({_effect}, true)
+
+			if getGem(loop-player's held item) is "wealth":
+				if getTier(loop-player's held item) is 1:
+					set {_effectType} to PotionEffectType.LUCK
+					set {_effect} to new PotionEffect({_effectType}, 40, 0, true, false, true)
+					loop-player.addPotionEffect({_effect}, true)
+					
+					set {_effectType} to PotionEffectType.HERO_OF_THE_VILLAGE
+					set {_effect} to new PotionEffect({_effectType}, 40, 0, true, false, true)
+					loop-player.addPotionEffect({_effect}, true)
+					
+			if getGem(loop-player's offhand item) is "wealth":
+				if getTier(loop-player's offhand item) is 1:
+					set {_effectType} to PotionEffectType.LUCK
+					set {_effect} to new PotionEffect({_effectType}, 40, 0, true, false, true)
+					loop-player.addPotionEffect({_effect}, true)
+					
+					set {_effectType} to PotionEffectType.HERO_OF_THE_VILLAGE
+					set {_effect} to new PotionEffect({_effectType}, 40, 0, true, false, true)
+					loop-player.addPotionEffect({_effect}, true)
+
+			if getGem(loop-player's held item) is "wealth":
+				if getTier(loop-player's held item) is 2:
+					set {_effectType} to PotionEffectType.LUCK
+					set {_effect} to new PotionEffect({_effectType}, 40, 0, true, false, true)
+					loop-player.addPotionEffect({_effect}, true)
+					
+					set {_effectType} to PotionEffectType.HERO_OF_THE_VILLAGE
+					set {_effect} to new PotionEffect({_effectType}, 40, 1, true, false, true)
+					loop-player.addPotionEffect({_effect}, true)
+
+			if getGem(loop-player's offhand item) is "wealth":
+				if getTier(loop-player's offhand item) is 2:
+					set {_effectType} to PotionEffectType.LUCK
+					set {_effect} to new PotionEffect({_effectType}, 40, 0, true, false, true)
+					loop-player.addPotionEffect({_effect}, true)
+					
+					set {_effectType} to PotionEffectType.HERO_OF_THE_VILLAGE
+					set {_effect} to new PotionEffect({_effectType}, 40, 1, true, false, true)
+					loop-player.addPotionEffect({_effect}, true)
+
+			if getGem(loop-player's held item) is "fire":
+				if getEnergy(loop-player's held item) > 1:
+					set {_effectType} to PotionEffectType.FIRE_RESISTANCE
+					set {_effect} to new PotionEffect({_effectType}, 40, 0, true, false, true)
+					loop-player.addPotionEffect({_effect}, true)
+
+			if getGem(loop-player's offhand item) is "fire":
+				if getEnergy(loop-player's offhand item) > 1:
+					set {_effectType} to PotionEffectType.FIRE_RESISTANCE
+					set {_effect} to new PotionEffect({_effectType}, 40, 0, true, false, true)
+					loop-player.addPotionEffect({_effect}, true)
+# Auto Enchanting 
+every 5 second:
+	if {Prog1} is false:
+		loop all players:
+			if getGem(loop-player's held item) is "puff":
+				if getTier(loop-player's held item) is 1:
+					loop all items in loop-player's inventory:
+						if loop-item is a bow:
+							if getEnergy(loop-player's held item) > 4:
+								if loop-item is not enchanted with power 6 or power 5 or power 4:
+									enchant loop-item with power 3
+							if getEnergy(loop-player's held item) > 3:
+								if loop-item is not enchanted with power 6 or power 5 or power 4 or power 3:
+									enchant loop-item with power 2
+							if getEnergy(loop-player's held item) > 2:
+								if loop-item is not enchanted with punch 3 or punch 2:
+									enchant loop-item with punch 1
+
+			if getGem(loop-player's offhand item) is "puff":
+				if getTier(loop-player's offhand item) is 1:
+					loop all items in loop-player's inventory:
+						if loop-item is a bow:
+							if getEnergy(loop-player's offhand item) > 4:
+								if loop-item is not enchanted with power 6 or power 5 or power 4:
+									enchant loop-item with power 3
+							if getEnergy(loop-player's offhand item) > 3:
+								if loop-item is not enchanted with power 6 or power 5 or power 4 or power 3:
+									enchant loop-item with power 2
+							if getEnergy(loop-player's offhand item) > 2:
+								if loop-item is not enchanted with punch 3 or punch 2:
+									enchant loop-item with punch 1
+
+			if getGem(loop-player's held item) is "puff":
+				if getTier(loop-player's held item) is 2:
+					loop all items in loop-player's inventory:
+						if loop-item is a bow:
+							if getEnergy(loop-player's held item) > 4:
+								if loop-item is not enchanted with power 6:
+									enchant loop-item with power 5
+							if getEnergy(loop-player's held item) > 3:
+								if loop-item is not enchanted with power 6 or power 5:
+									enchant loop-item with power 4
+								enchant loop-item with punch 2
+							if getEnergy(loop-player's held item) > 2:
+								if loop-item is not enchanted with punch 3 or punch 2:
+									enchant loop-item with punch 1
+
+			if getGem(loop-player's offhand item) is "puff":
+				if getTier(loop-player's offhand item) is 2:
+					loop all items in loop-player's inventory:
+						if loop-item is a bow:
+							if getEnergy(loop-player's offhand item) > 4:
+								if loop-item is not enchanted with power 6:
+									enchant loop-item with power 5
+							if getEnergy(loop-player's offhand item) > 3:
+								if loop-item is not enchanted with power 6 or power 5:
+									enchant loop-item with power 4
+								enchant loop-item with punch 2
+							if getEnergy(loop-player's offhand item) > 2:
+								if loop-item is not enchanted with punch 3 or punch 2:
+									enchant loop-item with punch 1
+
+			if getGem(loop-player's offhand item) is "speed":
+				if getTier(loop-player's offhand item) is 1:
+					loop all items in loop-player's inventory:
+						if loop-item is a pickaxe or an axe or a shovel or a hoe:
+							if getEnergy(loop-player's offhand item) > 2:
+								if loop-item is not enchanted with efficiency 6 or efficiency 5 or efficiency 4 or efficiency 3:
+									enchant loop-item with efficiency 2
+							else if getEnergy(loop-player's offhand item) is 2:
+								if loop-item is not enchanted with efficiency 6 or efficiency 5 or efficiency 4 or efficiency 3 or efficiency 2:
+									enchant loop-item with efficiency 1
+								
+						if loop-item is a boots:
+							if getEnergy(loop-player's held item) > 2:
+								if loop-item is not enchanted with soul speed 4 or soul speed 3 or soul speed 2:
+									enchant loop-item with soul speed 1
+
+			if getGem(loop-player's held item) is "speed":
+				if getTier(loop-player's held item) is 2:
+					loop all items in loop-player's inventory:
+						if loop-item is a pickaxe or an axe or a shovel or a hoe:
+							if getEnergy(loop-player's held item) > 4:
+								if loop-item is not enchanted with efficiency 6:
+									enchant loop-item with efficiency 5
+							if getEnergy(loop-player's held item) is 4:
+								if loop-item is not enchanted with efficiency 6 or efficiency 5:
+									enchant loop-item with efficiency 4
+							if getEnergy(loop-player's held item) is 3:
+								if loop-item is not enchanted with efficiency 6 or efficiency 5 or efficiency 4:
+									enchant loop-item with efficiency 3
+							if getEnergy(loop-player's held item) is 2:
+								if loop-item is not enchanted with efficiency 6 or efficiency 5 or efficiency 4 or efficiency 3:
+									enchant loop-item with efficiency 2
+
+						if loop-item is a boots:
+							if getEnergy(loop-player's held item) > 4:
+								if loop-item is not enchanted with soul speed 4:
+									enchant loop-item with soul speed 3
+							if getEnergy(loop-player's held item) is 4:
+								if loop-item is not enchanted with soul speed 4 or soul speed 3:
+									enchant loop-item with soul speed 2
+							if getEnergy(loop-player's held item) is 3:
+								if loop-item is not enchanted with soul speed 4 or soul speed 3 or soul speed 2:
+									enchant loop-item with soul speed 1
+						
+			if getGem(loop-player's offhand item) is "speed":
+				if getTier(loop-player's offhand item) is 2:
+					loop all items in loop-player's inventory:
+						if loop-item is a pickaxe or an axe or a shovel or a hoe:
+							if getEnergy(loop-player's offhand item) > 4:
+								if loop-item is not enchanted with efficiency 6:
+									enchant loop-item with efficiency 5
+							if getEnergy(loop-player's offhand item) is 4:
+								if loop-item is not enchanted with efficiency 6 or efficiency 5:
+									enchant loop-item with efficiency 4
+							if getEnergy(loop-player's offhand item) is 3:
+								if loop-item is not enchanted with efficiency 6 or efficiency 5 or efficiency 4:
+									enchant loop-item with efficiency 3
+							if getEnergy(loop-player's offhand item) is 2:
+								if loop-item is not enchanted with efficiency 6 or efficiency 5 or efficiency 4 or efficiency 3:
+									enchant loop-item with efficiency 2
+
+						if loop-item is a boots:
+							if getEnergy(loop-player's offhand item) > 4:
+								if loop-item is not enchanted with soul speed 4:
+									enchant loop-item with soul speed 3
+							if getEnergy(loop-player's offhand item) is 4:
+								if loop-item is not enchanted with soul speed 4 or soul speed 3:
+									enchant loop-item with soul speed 2
+							if getEnergy(loop-player's offhand item) is 3:
+								if loop-item is not enchanted with soul speed 4 or soul speed 3 or soul speed 2:
+									enchant loop-item with soul speed 1
+
+			if getGem(loop-player's held item) is "wealth":
+				if getTier(loop-player's held item) is 2:
+					if getEnergy(loop-player's held item) > 2:
+						loop all items in loop-player's inventory:
+							if loop-item is a pickaxe or an axe or a shovel or a hoe or a sword or a helmet or a chestplate or a leggings or a boots:
+								if loop-item is not enchanted with mending 2:
+									enchant loop-item with mending
+							if loop-item is a sword:
+								if loop-item is not enchanted with looting 4:
+									enchant loop-item with looting 3
+							if loop-item is a pickaxe or an axe:
+								if loop-item is not enchanted with silk touch or fortune 4:
+									enchant loop-item with fortune 3
+
+			if getGem(loop-player's offhand item) is "wealth":
+				if getTier(loop-player's offhand item) is 2:
+					if getEnergy(loop-player's offhand item) > 2:
+						loop all items in loop-player's inventory:
+							if loop-item is a pickaxe or an axe or a shovel or a hoe or a sword or a helmet or a chestplate or a leggings or a boots:
+								if loop-item is not enchanted with mending 2:
+									enchant loop-item with mending
+							if loop-item is a sword:
+								if loop-item is not enchanted with looting 4:
+									enchant loop-item with looting 3
+							if loop-item is a pickaxe or an axe:
+								if loop-item is not enchanted with silk touch or fortune 4:
+									enchant loop-item with fortune 3
+
+
+
+			if getGem(loop-player's held item) is "wealth":
+				if getTier(loop-player's held item) is 1:
+					if getEnergy(loop-player's held item) > 2:
+						loop all items in loop-player's inventory:
+							if loop-item is a pickaxe or an axe or a shovel or a hoe or a sword or a helmet or a chestplate or a leggings or a boots or a shield or elytra:
+								if loop-item is not enchanted with mending 2:
+									enchant loop-item with mending
+							if loop-item is a sword:
+								if loop-item is not enchanted with looting 4:
+									enchant loop-item with looting 3
+							if loop-item is a pickaxe or an axe:
+								if loop-item is not enchanted with silk touch or fortune 4:
+									enchant loop-item with fortune 3
+
+			if getGem(loop-player's offhand item) is "wealth":
+				if getTier(loop-player's offhand item) is 1:
+					if getEnergy(loop-player's offhand item) > 2:
+						loop all items in loop-player's inventory:
+							if loop-item is a pickaxe or an axe or a shovel or a hoe or a sword or a helmet or a chestplate or a leggings or a boots:
+								if loop-item is not enchanted with mending 2:
+									enchant loop-item with mending
+							if loop-item is a sword:
+								if loop-item is not enchanted with looting 4:
+									enchant loop-item with looting 3
+							if loop-item is a pickaxe or an axe:
+								if loop-item is not enchanted with silk touch or fortune 4:
+									enchant loop-item with fortune 3
+
+
+			if getGem(loop-player's held item) is "strength":
+				if getTier(loop-player's held item) is 1:
+					loop all items in loop-player's inventory:
+						if loop-item is a sword or an axe:
+							if loop-item is not enchanted with sharpness 3 or sharpness 4 or sharpness 5 or sharpness 6:
+								if getEnergy(loop-player's held item) > 3:
+									enchant loop-item with sharpness 2
+								else:
+									enchant loop-item with sharpness 1
+
+			if getGem(loop-player's offhand item) is "strength":
+				if getTier(loop-player's offhand item) is 1:
+					loop all items in loop-player's inventory:
+						if loop-item is a sword or an axe:
+							if loop-item is not enchanted with sharpness 3 or sharpness 4 or sharpness 5 or sharpness 6:
+								if getEnergy(loop-player's offhand item) > 3:
+									enchant loop-item with sharpness 2
+								else:
+									enchant loop-item with sharpness 1
+
+			if getGem(loop-player's held item) is "strength":
+				if getTier(loop-player's held item) is 2:
+					loop all items in loop-player's inventory:
+						if loop-item is a sword or an axe:
+							if getEnergy(loop-player's held item) > 4:
+								if loop-item is not enchanted with sharpness 6:
+									enchant loop-item with sharpness 5
+							else if getEnergy(loop-player's held item) is 4:
+								if loop-item is not enchanted with sharpness 6 or sharpness 5:
+									enchant loop-item with sharpness 4
+							else if getEnergy(loop-player's held item) is 3:
+								if loop-item is not enchanted with sharpness 6 or sharpness 5 or sharpness 4:
+									enchant loop-item with sharpness 3
+
+			if getGem(loop-player's offhand item) is "strength":
+				if getTier(loop-player's offhand item) is 2:
+					loop all items in loop-player's inventory:
+						if loop-item is a sword or an axe:
+							if getEnergy(loop-player's offhand item) > 4:
+								if loop-item is not enchanted with sharpness 6:
+									enchant loop-item with sharpness 5
+							else if getEnergy(loop-player's offhand item) is 4:
+								if loop-item is not enchanted with sharpness 6 or sharpness 5:
+									enchant loop-item with sharpness 4
+							else if getEnergy(loop-player's offhand item) is 3:
+								if loop-item is not enchanted with sharpness 6 or sharpness 5 or sharpness 4:
+									enchant loop-item with sharpness 3
+
+			if getGem(loop-player's offhand item) is "strength":
+				if getTier(loop-player's offhand item) is 2:
+					loop all items in loop-player's inventory:
+						if loop-item is a sword or an axe:
+							if getEnergy(loop-player's offhand item) > 4:
+								if loop-item is not enchanted with sharpness 6:
+									enchant loop-item with sharpness 5
+							else if getEnergy(loop-player's offhand item) is 4:
+								if loop-item is not enchanted with sharpness 6 or sharpness 5:
+									enchant loop-item with sharpness 4
+							else if getEnergy(loop-player's offhand item) is 3:
+								if loop-item is not enchanted with sharpness 6 or sharpness 5 or sharpness 4:
+									enchant loop-item with sharpness 3
+
+			if getGem(loop-player's held item) is "life":
+				if getTier(loop-player's held item) is 2:
+					loop all items in loop-player's inventory:
+						if loop-item is not enchanted with unbreaking 4:
+							if loop-item is any helmet:
+								if getEnergy(loop-player's held item) > 2:
+									enchant loop-item with unbreaking 3
+							if loop-item is any chestplate:
+								if getEnergy(loop-player's held item) > 2:
+									enchant loop-item with unbreaking 3
+							if loop-item is any leggings:
+								if getEnergy(loop-player's held item) > 2:
+									enchant loop-item with unbreaking 3
+							if loop-item is any boots:
+								if getEnergy(loop-player's held item) > 2:
+									enchant loop-item with unbreaking 3
+
+			if getGem(loop-player's offhand item) is "life":
+				if getTier(loop-player's offhand item) is 2:
+					loop all items in loop-player's inventory:
+						if loop-item is not enchanted with unbreaking 4:
+							if loop-item is any helmet:
+								if getEnergy(loop-player's offhand item) > 2:
+									enchant loop-item with unbreaking 3
+							if loop-item is any chestplate:
+								if getEnergy(loop-player's offhand item) > 2:
+									enchant loop-item with unbreaking 3
+							if loop-item is any leggings:
+								if getEnergy(loop-player's offhand item) > 2:
+									enchant loop-item with unbreaking 3
+							if loop-item is any boots:
+								if getEnergy(loop-player's offhand item) > 2:
+									enchant loop-item with unbreaking 3
+			if getGem(loop-player's held item) is "life":
+				if getTier(loop-player's held item) is 2:
+					loop all items in loop-player's inventory:
+						if loop-item is not enchanted with unbreaking 4:
+							if loop-item is any helmet:
+								if getEnergy(loop-player's held item) > 2:
+									enchant loop-item with unbreaking 3
+							if loop-item is any chestplate:
+								if getEnergy(loop-player's held item) > 2:
+									enchant loop-item with unbreaking 3
+							if loop-item is any leggings:
+								if getEnergy(loop-player's held item) > 2:
+									enchant loop-item with unbreaking 3
+							if loop-item is any boots:
+								if getEnergy(loop-player's held item) > 2:
+									enchant loop-item with unbreaking 3
+
+			if getGem(loop-player's offhand item) is "life":
+				if getTier(loop-player's offhand item) is 1:
+					loop all items in loop-player's inventory:
+						if loop-item is not enchanted with unbreaking 4 or unbreaking 3 or unbreaking 2 or unbreaking 1:
+							if loop-item is any helmet:
+								if getEnergy(loop-player's offhand item) > 2:
+									enchant loop-item with unbreaking 1
+							if loop-item is any chestplate:
+								if getEnergy(loop-player's offhand item) > 2:
+									enchant loop-item with unbreaking 1
+							if loop-item is any leggings:
+								if getEnergy(loop-player's offhand item) > 2:
+									enchant loop-item with unbreaking 1
+							if loop-item is any boots:
+								if getEnergy(loop-player's offhand item) > 2:
+									enchant loop-item with unbreaking 1
+			if getGem(loop-player's held item) is "life":
+				if getTier(loop-player's held item) is 1:
+					loop all items in loop-player's inventory:
+						if loop-item is not enchanted with unbreaking 4 or unbreaking 3 or unbreaking 2 or unbreaking 1:
+							if loop-item is any helmet:
+								if getEnergy(loop-player's held item) > 2:
+									enchant loop-item with unbreaking 1
+							if loop-item is any chestplate:
+								if getEnergy(loop-player's held item) > 2:
+									enchant loop-item with unbreaking 1
+							if loop-item is any leggings:
+								if getEnergy(loop-player's held item) > 2:
+									enchant loop-item with unbreaking 1
+							if loop-item is any boots:
+								if getEnergy(loop-player's held item) > 2:
+									enchant loop-item with unbreaking 1
+
+						
+every 1 seconds:
+	loop all players:
+		if {-amp} is not set:
+			if {Prog3} or {Prog4} is true:
+				loop all items in loop-player's inventory:
+					if loop-item is enchanted with sharpness 4 or sharpness 5:
+						enchant loop-item with sharpness 3
+
+					if loop-item is enchanted with unbreaking 4:
+						enchant loop-item with unbreaking 3
+
+					if loop-item is enchanted with mending 2:
+						enchant loop-item with mending 1
+
+					if loop-item is enchanted with density 5 or density 4:
+						enchant loop-item with density 3
+					
+					if loop-item is enchanted with breach 5 or breach 4:
+						enchant loop-item with breach 3
+
+					if loop-item is enchanted with protection 5 or protection 4:
+						enchant loop-item with protection 3
+
+					if loop-item is enchanted with projectile protection 5:
+						enchant loop-item with projectile protection 4
+
+					if loop-item is enchanted with fire protection 5:
+						enchant loop-item with fire protection 4
+
+					if loop-item is enchanted with blast protection 5:
+						enchant loop-item with blast protection 4
+
+					if loop-item is enchanted with looting 4:
+						enchant loop-item with looting 3
+
+					if loop-item is enchanted with sweeping edge 4:
+						enchant loop-item with sweeping edge 3
+
+					if loop-item is enchanted with fire aspect 3:
+						enchant loop-item with fire aspect 2
+
+					if loop-item is enchanted with depth strider 4:
+						enchant loop-item with depth strider 3
+
+					if loop-item is enchanted with feather falling 5:
+						enchant loop-item with feather falling 4
+
+					if loop-item is enchanted with swift sneak 4:
+						enchant loop-item with swift sneak 3
+
+					if loop-item is enchanted with soul speed 4:
+						enchant loop-item with soul speed 3
+
+					if loop-item is enchanted with respiration 4:
+						enchant loop-item with respiration 3
+
+					if loop-item is enchanted with aqua affinity 2:
+						enchant loop-item with aqua affinity
+
+					if loop-item is enchanted with thorns 4:
+						enchant loop-item with thorns 3
+
+					if loop-item is enchanted with efficiency 6:
+						enchant loop-item with efficiency 5
+
+					if loop-item is enchanted with fortune 4:
+						enchant loop-item with fortune 3
+
+					if loop-item is enchanted with silk touch 2:
+						enchant loop-item with silk touch
+
+					if loop-item is enchanted with power 6:
+						enchant loop-item with power 5
+
+					if loop-item is enchanted with infinity 2:
+						enchant loop-item with infinity
+
+					if loop-item is enchanted with flame 2:
+						enchant loop-item with flame
+
+					if loop-item is enchanted with multishot 2:
+						enchant loop-item with multishot
+
+					if loop-item is enchanted with punch 3:
+						enchant loop-item with punch 2
+
+					if loop-item is enchanted with quick charge 4:
+						enchant loop-item with quick charge 3
+
+					if loop-item is enchanted with lure 4:
+						enchant loop-item with lure 3
+
+					if loop-item is enchanted with luck of the sea 4:
+						enchant loop-item with luck of the sea 3
+
+					if loop-item is enchanted with loyalty 4:
+						enchant loop-item with loyalty 3
+
+					if loop-item is enchanted with impaling 6:
+						enchant loop-item with impaling 5
+					
+					if loop-item is enchanted with riptide 4:
+						enchant loop-item with riptide 3
+					
+					if loop-item is enchanted with channeling 2:
+						enchant loop-item with channeling
+					
+					if loop-item is enchanted with piercing 5:
+						enchant loop-item with piercing 4
+			
+			if {Prog2} is true:
+				loop all items in loop-player's inventory:
+					if loop-item is enchanted with sharpness 5 or sharpness 4:
+						enchant loop-item with sharpness 3
+
+					if loop-item is enchanted with unbreaking 4:
+						enchant loop-item with unbreaking 3
+
+
+					if loop-item is enchanted with mending 2:
+						enchant loop-item with mending 1
+
+					if loop-item is enchanted with protection 4:
+						enchant loop-item with protection 3
+
+					if loop-item is enchanted with projectile protection 4:
+						enchant loop-item with projectile protection 3
+
+					if loop-item is enchanted with fire protection 4:
+						enchant loop-item with fire protection 3
+
+					if loop-item is enchanted with blast protection 4:
+						enchant loop-item with blast protection 3
+
+					if loop-item is enchanted with looting 4:
+						enchant loop-item with looting 3
+
+					if loop-item is enchanted with sweeping edge 4:
+						enchant loop-item with sweeping edge 3
+
+					if loop-item is enchanted with fire aspect 3:
+						enchant loop-item with fire aspect 2
+
+					if loop-item is enchanted with depth strider 4:
+						enchant loop-item with depth strider 3
+
+					if loop-item is enchanted with feather falling 5 or feather falling 4:
+						enchant loop-item with feather falling 3
+
+					if loop-item is enchanted with swift sneak 4:
+						enchant loop-item with swift sneak 3
+
+					if loop-item is enchanted with soul speed 4:
+						enchant loop-item with soul speed 3
+
+					if loop-item is enchanted with respiration 4:
+						enchant loop-item with respiration 3
+
+					if loop-item is enchanted with aqua affinity 2:
+						enchant loop-item with aqua affinity
+
+					if loop-item is enchanted with thorns:
+						enchant loop-item with thorns 0
+
+					if loop-item is enchanted with efficiency 5:
+						enchant loop-item with efficiency 4
+
+					if loop-item is enchanted with fortune 4:
+						enchant loop-item with fortune 3
+
+					if loop-item is enchanted with silk touch 2:
+						enchant loop-item with silk touch
+
+					if loop-item is enchanted with power 5 or power 4:
+						enchant loop-item with power 3
+
+					if loop-item is enchanted with infinity 2:
+						enchant loop-item with infinity
+
+					if loop-item is enchanted with flame 2:
+						enchant loop-item with flame
+
+					if loop-item is enchanted with multishot 2:
+						enchant loop-item with multishot
+
+					if loop-item is enchanted with punch 3:
+						enchant loop-item with punch 2
+
+					if loop-item is enchanted with quick charge 4 or quick charge 3:
+						enchant loop-item with quick charge 2
+
+					if loop-item is enchanted with lure 4:
+						enchant loop-item with lure 3
+
+					if loop-item is enchanted with luck of the sea 4:
+						enchant loop-item with luck of the sea 3
+
+					if loop-item is enchanted with loyalty 4:
+						enchant loop-item with loyalty 3
+
+					if loop-item is enchanted with impaling 6:
+						enchant loop-item with impaling 5
+					
+					if loop-item is enchanted with riptide 4 or riptide 3:
+						enchant loop-item with riptide 2
+					
+					if loop-item is enchanted with channeling 2:
+						enchant loop-item with channeling
+					
+					if loop-item is enchanted with piercing 5 or piercing 4:
+						enchant loop-item with piercing 3
+
+			if {Prog1} is true:
+				loop all items in loop-player's inventory:
+					if loop-item is not amethyst shard or prismarine shard:
+						if loop-item is not obsidian:
+							if loop-item is enchanted with protection 2 or protection 3 or protection 4:
+								enchant loop-item with protection 1
+							if loop-item is enchanted with sharpness 2 or sharpness 3 or sharpness 4:
+								enchant loop-item with sharpness 1
+							if loop-item is enchanted with power 2 or power 3 or power 4:
+								enchant loop-item with power 1
+							if loop-item is enchanted with fire aspect 2:
+								enchant loop-item with fire aspect 1
+					if loop-item is obsidian:
+						if loop-item is not enchanted:
+							set {_o} to loop-item
+							loop 64 times:
+								remove 1 of loop-item from loop-player's inventory
+
+on right click on villager:
+	if {Prog1} is true:
+		cancel event
+
+on craft:
+	if event-item is golden apple:
+		if {Prog1} is true:
+			cancel event
+
+on join:
+	set {damage::%player's uuid%} to 0
+
+# Disabling functions / mechanics
+
+function isDisabled(p: player) :: boolean:
+	if {-Disabled::%{_p}'s uuid%} is not 0:
+		return true
+	else:
+		return false
+
+function isDisabledTimer(p: player) :: boolean:
+	if {-disabledTimer::%{_p}'s uuid%} is not 0:
+		return true
+	else:
+		return false
+
+on tab complete for "/trust" and "/blissgems:trust":
+	set tab completions for position 1 to "add" and "remove" and "list"
+
+
+on inventory click:
+	if name of event-inventory is "<##FFE4AB>ᴛʀᴜsᴛᴇᴅ ᴘʟᴀʏᴇʀs":
+		cancel event
+		if event-item is a player head:
+			set {_T} to event-item's name
+			replace all "<##B8FFFB>" with "" in {_T}
+			set {_Tplayer} to "%{_T}%" parsed as offline player
+
+			set {_uuid} to uuid of player
+			send "<##FFD773>🔮 &cUntrusted <##B8FFFB>%{_T}%" to player
+			remove {_Tplayer}'s uuid from {-Trusted::%uuid of player%::*}
+			remove event-item from player's current inventory
+
+
+
+command /trust [<text>] [<offlineplayer>]:
+	aliases: /blissgems:trust
+	trigger:
+		set {_uuid} to uuid of player
+		set {_arguuid} to uuid of arg-2
+		if arg-1 is "list":
+			set {_s} to 0
+			set {_Bliss::Trusted::GUI} to a new chest inventory with 3 row with name "<##FFE4AB>ᴛʀᴜsᴛᴇᴅ ᴘʟᴀʏᴇʀs"
+			loop {-Trusted::%uuid of player%::*}:
+
+				set {_p} to loop-value parsed as offline player
+				set {_sk} to skull of {_p}
+				set slot {_s} of {_Bliss::Trusted::GUI} to {_sk} named "<##B8FFFB>%{_p}%" with lore "" and "&fClick to &cuntrust"
+				add 1 to {_s}
+
+			open {_Bliss::Trusted::GUI} to player
+
+		if arg-1 is "add":
+			if arg-2 is set:
+				if arg-2 is not player:
+					if {-Trusted::%uuid of player%::*} contains {_arguuid}:
+						send "<##FFD773>🔮 <##B8FFFB>%arg-2% &cis already trusted!" to player
+
+
+					else:
+						
+						set {_uuid} to uuid of player
+						add {_arguuid} to {-Trusted::%uuid of player%::*}
+
+						send "<##FFD773>🔮 &aTrusted <##B8FFFB>%arg-2%" to player
+				else:
+					send "<##FFD773>🔮 <##FC8888>You cannot trust yourself!" to player
+
+					
+		if arg-1 is "remove":
+			if arg-2 is set:
+				if arg-2 is not player:
+					if {-Trusted::%uuid of player%::*} contains {_arguuid}:
+						send "<##FFD773>🔮 &cUntrusted <##B8FFFB>%arg-2%" to player
+						remove {_arguuid} from {-Trusted::%uuid of player%::*}
+				else:
+					send "<##FFD773>🔮 <##FC8888>You cannot untrust yourself!" to player
+
+on damage:
+	if victim is player:
+		loop all items in victim's inventory:
+			if IsGem(loop-item) is true:
+				if getEnergy(loop-item) is 0:
+					add damage / 2 to damage

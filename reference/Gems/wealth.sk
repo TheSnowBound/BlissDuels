@@ -1,0 +1,607 @@
+# Wealth Gem
+on load:
+	delete {-amp}
+
+
+on experience increase:
+	if isDisabled(player) is not true:
+		if getGem(player's offhand item) is "wealth":
+			add spawned experience to spawned experience
+
+
+
+on mine of any ore:
+	if isDisabled(player) is not true:
+		if getEnergy(player's offhand item) is not 0:
+			if getGem(player's offhand item) is "wealth":
+				if event-block is not ancient debris:
+					chance of 25%:
+						drop drops of block at event-block's location
+
+
+on damage:
+	if isDisabled(attacker) is not true:
+		if getEnergy(attacker's offhand item) is not 0:
+			if getGem(attacker's offhand item) is "wealth":
+				if any:
+					hit is critical
+					attacker is sprinting
+				then:
+					set durability of victim's helmet to durability of victim's helmet - 2
+					set durability of victim's chestplate to durability of victim's chestplate - 2
+					set durability of victim's leggings to durability of victim's leggings - 2
+					set durability of victim's boots to durability of victim's boots - 2
+			
+
+
+
+function WealthAction(itext: text, p: player):
+	if {_itext} is "held":
+		set {_i} to {_p}'s held item
+		
+	if {_itext} is "offhand":
+		set {_i} to {_p}'s offhand item
+
+	
+
+	if getTier({_i}) is 2:
+		set {_un} to getActionBarCooldown("Unfortunate::%uuid of {_p}%")
+
+		set {_rr} to getActionBarCooldown("RichRush::%uuid of {_p}%")
+
+		send action bar "&f🍀 %{_un}% <##0EC912>🔮 &f💸 %{_rr}%" to {_p}
+
+	else:
+		send action bar "<##0EC912>🔺" to {_p}
+
+function WealthCircleEXP(s: number, p: location):
+	set {_pl} to location of {_p}
+
+	loop all players:
+		if {particlelvl::%loop-player's uuid%} is "default":
+			
+			set {_spacing} to 0.1
+			set {_circumference} to 2 * pi * {_s} # Calculate the number of particles based on the spacing
+			set {_numParticles} to floor({_circumference} / {_spacing}) # Spawn the exact number of particles needed
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(0, 166, 44), 1) at {_pl} ~ {_v} for loop-player
+				draw 1 of happy_villager at {_pl} ~ {_v} with extra 0 with force for loop-player
+
+		else if {particlelvl::%loop-player's uuid%} is "less":
+
+			set {_spacing} to 0.15
+			set {_circumference} to 2 * pi * {_s}
+			set {_numParticles} to floor({_circumference} / {_spacing})
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(0, 166, 44), 1) at {_pl} ~ {_v} for loop-player
+
+		else if {particlelvl::%loop-player's uuid%} is "none":
+
+			set {_spacing} to 0.5
+			set {_circumference} to 2 * pi * {_s}
+			set {_numParticles} to floor({_circumference} / {_spacing})
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(0, 166, 44), 1) at {_pl} ~ {_v} for loop-player
+		
+function WealthCircle(s: number, p: location):
+	set {_pl} to location of {_p}
+
+	loop all players:
+		if {particlelvl::%loop-player's uuid%} is "default":
+			
+			set {_spacing} to 0.1
+			set {_circumference} to 2 * pi * {_s} # Calculate the number of particles based on the spacing
+			set {_numParticles} to floor({_circumference} / {_spacing}) # Spawn the exact number of particles needed
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(0, 166, 44), 1) at {_pl} ~ {_v} for loop-player
+				draw 1 of smoke at {_pl} ~ {_v} with extra 0 with force for loop-player
+
+		else if {particlelvl::%loop-player's uuid%} is "less":
+
+			set {_spacing} to 0.15
+			set {_circumference} to 2 * pi * {_s}
+			set {_numParticles} to floor({_circumference} / {_spacing})
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(0, 166, 44), 1) at {_pl} ~ {_v} for loop-player
+
+		else if {particlelvl::%loop-player's uuid%} is "none":
+
+			set {_spacing} to 0.5
+			set {_circumference} to 2 * pi * {_s}
+			set {_numParticles} to floor({_circumference} / {_spacing})
+
+			loop {_numParticles} times:
+				set {_angle} to loop-value-2 * 360 / {_numParticles}
+				set {_v} to spherical vector with radius {_s}, yaw {_angle} and pitch 0
+				
+				make 1 of dust using dustOption(rgb(0, 166, 44), 1) at {_pl} ~ {_v} for loop-player
+ 
+function WealthCirclelastEXP(s: number, p: location):
+	set {_pl} to location of {_p}
+	loop 7 times:
+		WealthCircleEXP({_s}, {_pl})
+		wait 0.3 seconds  
+ 
+function WealthCirclelast(s: number, p: location):
+	set {_pl} to location of {_p}
+	loop 7 times:
+		WealthCircle({_s}, {_pl})
+		wait 0.3 seconds  
+
+on inventory click:
+	if event-inventory is a furnace inventory:
+		if getGem(player's offhand item) is "wealth":
+			if event-item is netherite scrap:
+				set {_amtofscrap} to item amount of event-item
+				execute console command "/give %player% netherite_scrap %{_amtofscrap}%"
+
+on right click:
+	if player is sneaking:
+		if isDisabled(player) is not true:
+			if getGem(player's offhand item) is "wealth":
+				if getEnergy(player's offhand item) is not 0:
+					if player's held item is air or an axe or a sword:
+						if {-DoubleClick::%player's uuid%} is not set:
+							set {-DoubleClick::%player's uuid%} to true
+						else:
+							delete {-DoubleClick::%player's uuid%}
+							if {wealthInv::%player's uuid%::*} is not set:
+								set {_inv} to dropper inventory named "Pockets"
+							else:
+								set {_inv} to dropper inventory named "Pockets"
+								loop {wealthInv::%player's uuid%::*}:
+									set slot (loop-index parsed as integer - 1) of {_inv} to loop-value
+							open {_inv} for player
+
+on inventory close:
+	if name of event-inventory contains "Pockets":
+		clear {wealthInv::%player's uuid%::*}
+		loop 9 times:
+			set {_item} to slot (loop-number - 1) of event-inventory
+			if {_item} is not air:
+				set {wealthInv::%player's uuid%::%loop-number%} to {_item}
+
+
+#on death of player:
+#	if {wealthInv::%victim's uuid%} is set:
+#		set {_inv} to {wealthInv::%victim's uuid%}
+#		loop 5 times:
+#			set {_num} to a random integer between 0 and 8
+#			if slot {_num} of {_inv} is not air:
+#				set {_item} to slot {_num} of {_inv}
+#				if {_item} is not air:
+#					drop {_item} at victim's location
+#					set slot {_num} of {_inv} to air
+#			else:
+#				set {_num} to a random integer between 0 and 8
+
+on left click:
+	if isDisabled(player) is not true:
+		if getGem(player's held item) is "wealth":
+			if getTier(player's held item) is 2:
+				if canUsePower("Unfortunate::%uuid of player%") is true:
+					if getEnergy(player's held item) is not 0:
+						if getEnergy(player's held item) is 1:
+							blissSetcooldown("Unfortunate::%uuid of player%", toMilliseconds(1, 30), player)
+						if getEnergy(player's held item) is 2:
+							blissSetcooldown("Unfortunate::%uuid of player%", toMilliseconds(1, 25), player)
+						if getEnergy(player's held item) is 3:
+							blissSetcooldown("Unfortunate::%uuid of player%", toMilliseconds(1, 20), player)
+						if getEnergy(player's held item) is 4:
+							blissSetcooldown("Unfortunate::%uuid of player%", toMilliseconds(1, 15), player)
+						if getEnergy(player's held item) > 4:
+							blissSetcooldown("Unfortunate::%uuid of player%", toMilliseconds(1, 10), player)
+						send "<##0EC912>🔮 <##B8FFFB>You have used &f🍀<##0EC912>Item Lock" to player
+						set {_num} to 1
+						set {_loc} to location of player
+						loop 2 times:
+							WealthCircleEXP({_num}, {_loc})
+							add 0.5 to {_num}
+							wait 1 tick
+						WealthCirclelastEXP({_num}, {_loc})
+						loop all players within 2 blocks of player's location:
+							if loop-player is not player:
+								if loop-player's held item is not a prismarine shard or an amethyst shard:
+									set item cooldown of loop-player's held item for loop-player to 30 seconds
+									if player is not invisible:
+										send "<##0EC912>🔮 <##B8FFFB>Your held item has been locked for <##0EC912>30 seconds <##B8FFFB>by <##0EC912>%player%" to loop-player
+									else:
+										send "<##0EC912>🔮 <##B8FFFB>Your held item has been locked for <##0EC912>30 seconds <##B8FFFB>by <##0EC912>&k???" to loop-player
+
+									set bar progress of {-ItemLock::Bar::%player's uuid%} to 100
+									set {-ItemLock::Bar::%player's uuid%} to boss bar with id "%player's uuid%sitemlock" with title "&fItem Lock" with color green with progress 100
+									set bar style of {-ItemLock::Bar::%player's uuid%} to solid bar
+									add loop-player to bossbar players of {-ItemLock::Bar::%player's uuid%}
+
+									loop 600 times:
+										remove 0.167 from bar progress of {-ItemLock::Bar::%player's uuid%}
+										wait 1 tick
+
+									remove loop-player from bossbar players of {-ItemLock::Bar::%player's uuid%}
+
+
+on right click:
+	if item cooldown of player's held item for player is not 0 ticks:
+		cancel event
+
+on consume:
+	if item cooldown of player's held item for player is not 0 ticks:
+		cancel event
+	if item cooldown of player's offhand item for player is not 0 ticks:
+		cancel event
+
+on left click:
+	if item cooldown of player's held item for player is not 0 ticks:
+		cancel event
+
+on block break:
+	if item cooldown of player's held item for player is not 0 ticks:
+		cancel event
+
+
+on damage:
+	if attacker is player:
+		if item cooldown of attacker's tool for attacker is not 0 ticks:
+			cancel event
+
+on damage:
+	if isDisabled(attacker) is not true:
+		if getGem(attacker's held item) is "wealth":
+			if getTier(attacker's held item) is 2:
+				if getEnergy(attacker's held item) is not 0:
+					if canUsePower("Unfortunate::%uuid of attacker%") is true:
+						if getEnergy(attacker's held item) is 1:
+							blissSetcooldown("Unfortunate::%uuid of attacker%", toMilliseconds(1, 30), attacker)
+						if getEnergy(attacker's held item) is 2:
+							blissSetcooldown("Unfortunate::%uuid of attacker%", toMilliseconds(1, 25), attacker)
+						if getEnergy(attacker's held item) is 3:
+							blissSetcooldown("Unfortunate::%uuid of attacker%", toMilliseconds(1, 20), attacker)
+						if getEnergy(attacker's held item) is 4:
+							blissSetcooldown("Unfortunate::%uuid of attacker%", toMilliseconds(1, 15), attacker)
+						if getEnergy(attacker's held item) > 4:
+							blissSetcooldown("Unfortunate::%uuid of attacker%", toMilliseconds(1, 10), attacker)
+						set {-Unfortunate::%victim's uuid%} to true
+						WealthLine(attacker,victim)
+						set {-wealthLine::%victim's uuid%} to true
+
+						if victim is invisible:
+							send "<##0EC912>🔮 <##B8FFFB>You have used &f🍀<##0EC912>Unfortunate <##B8FFFB>on &e&k???" to attacker
+						else:		
+							send "<##0EC912>🔮 <##B8FFFB>You have used &f🍀<##0EC912>Unfortunate <##B8FFFB>on &e%victim.getName()%" to attacker
+
+						if attacker is invisible:
+							send "<##0EC912>🔮 <##B8FFFB>You have been affected with &f🍀<##0EC912>Unfortunate <##B8FFFB>by &e&k???" to victim
+						else:
+							send "<##0EC912>🔮 <##B8FFFB>You have been affected with &f🍀<##0EC912>Unfortunate <##B8FFFB>by &e%attacker%" to victim
+								
+						set bar progress of {-Unfortunate::Bar::%attacker's uuid%} to 100
+						set {-Unfortunate::Bar::%attacker's uuid%} to boss bar with id "%attacker's uuid%sunforunate" with title "&fUnfortunate" with color green with progress 100
+						set bar style of {-Unfortunate::Bar::%attacker's uuid%} to solid bar
+						add victim to bossbar players of {-Unfortunate::Bar::%attacker's uuid%}
+							
+						loop 800 times:
+							remove 0.125 from bar progress of {-Unfortunate::Bar::%attacker's uuid%}
+							wait 1 tick
+							
+						remove victim from bossbar players of {-Unfortunate::Bar::%attacker's uuid%}
+						set {-Unfortunate::%victim's uuid%} to false
+
+on damage:
+	if {-Unfortunate::%attacker's uuid%} is true:
+		chance of 33%
+		cancel event
+		play sound "block.anvil.land" for attacker
+
+on right click:
+	if {-Unfortunate::%player's uuid%} is true:
+		chance of 33%
+		cancel event
+		play sound "block.anvil.land" for player
+
+on left click:
+	if {-Unfortunate::%player's uuid%} is true:
+		chance of 33%
+		cancel event
+		play sound "block.anvil.land" for player
+
+on shoot:
+	if {-Unfortunate::%shooter's uuid%} is true:
+		chance of 33%
+		cancel event
+		play sound "block.anvil.land" for shooter
+
+
+on break:
+	if isDisabled(player) is not true:
+		if event-block is ancient debris:
+			if getGem(player's offhand item) is "wealth":
+				if getTier(player's offhand item) is 2:
+					cancel event
+					set {_loc} to location of event-block
+					set block at location at {_loc} to air
+					drop 2 netherite scrap at {_loc}
+
+on mine of any ore:
+	if isDisabled(player) is not true:
+		if {-RichRush::%uuid of player%} is true:
+			if event-block is not ancient debris:
+				make 30 of dust using dustOption(rgb(14, 201, 18), 1) at event-block with offset vector(0.15, 0.15, 0.15) with extra 0 with force
+				if player's held item is enchanted with silk touch:
+					clear drops
+				else:
+					drop drops of block at event-block's location
+			
+on death:
+	if victim is not a player or a mule or a donkey or a llama or a trader llama or a fox:
+		if {-RichRush::%uuid of attacker%} is true:
+			drop the drops
+			
+on right click:
+	if isDisabled(player) is not true:
+		if target entity of player is not set:
+			if getGem(player's held item) is "wealth":
+				if getTier(player's held item) is 2:
+					if getEnergy(player's held item) is not 0:
+						if canUsePower("RichRush::%uuid of player%") is true:
+							set {-RichRush::%uuid of player%} to true
+							apply haste 2 without particles to player for 150 seconds
+							send "<##0EC912>🔮 <##B8FFFB>You have used &f💸<##0EC912>Rich Rush <##B8FFFB>for <##0EC912>5 minutes" to player
+							draw 10 of dust using dustOption(rgb(14, 201, 18), 1) at location 1 block above player with offset vector(0.3, 0.3, 0.3) with extra 0 with force
+							make 5 of happy_villager at location 1 block above player with offset vector(0.4, 0.4, 0.4) with extra 0 with force
+							if getEnergy(player's held item) is 1:
+								blissSetcooldown("RichRush::%uuid of player%", toMilliseconds(10, 40), player)
+							if getEnergy(player's held item) is 2:
+								blissSetcooldown("RichRush::%uuid of player%", toMilliseconds(10, 30), player)
+							if getEnergy(player's held item) is 3:
+								blissSetcooldown("RichRush::%uuid of player%", toMilliseconds(10, 20), player)
+							if getEnergy(player's held item) is 4:
+								blissSetcooldown("RichRush::%uuid of player%", toMilliseconds(10, 10), player)
+							if getEnergy(player's held item) > 4:
+								blissSetcooldown("RichRush::%uuid of player%", toMilliseconds(10, 0), player)
+							wait 5 minutes
+							set {-RichRush::%uuid of player%} to false
+
+
+
+on right click on entity:
+	if isDisabled(player) is not true:
+		if getGem(player's held item) is "wealth":
+			if getTier(player's held item) is 2:
+				if getEnergy(player's held item) is not 0:
+					if canUsePower("RichRush::%uuid of player%") is true:
+						send "<##0EC912>🔮 <##B8FFFB>You have used <##0EC912>Amplification <##B8FFFB>on <##0EC912>%target entity of player.getName()%" to player
+						set {_loc} to location of target entity of player
+						if getEnergy(player's held item) > 0:
+							blissSetcooldown("RichRush::%uuid of player%", toMilliseconds(3, 40), player)
+						if getEnergy(player's held item) > 2:
+							blissSetcooldown("RichRush::%uuid of player%", toMilliseconds(3, 30), player)
+						if getEnergy(player's held item) > 4:
+							blissSetcooldown("RichRush::%uuid of player%", toMilliseconds(3, 20), player)
+						if getEnergy(player's held item) > 7:
+							blissSetcooldown("RichRush::%uuid of player%", toMilliseconds(3, 10), player)
+						if getEnergy(player's held item) > 8:
+							blissSetcooldown("RichRush::%uuid of player%", toMilliseconds(3, 0), player)
+						set {_num} to 1
+						set {-amp} to true
+						add 1 to progress of the custom advancement "bliss/wealth" for player
+						loop 2 times:
+							WealthCircle({_num}, {_loc})
+							add 0.5 to {_num}
+							wait 1 tick
+						WealthCirclelast({_num}, {_loc})
+						loop all players within 2.5 blocks of {_loc}:
+							if IsTrusted(player, loop-player) is true:
+								send "<##0EC912>🔮 <##B8FFFB>You have been affected with <##0EC912>Amplification <##B8FFFB>by <##0EC912>%player%" to loop-player
+								add 1 to progress of the custom advancement "bliss/wealth" for loop-player
+								set {-amp} to true
+								loop all items in loop-player's inventory:
+									set {-amp} to true
+									if loop-item is enchanted with sharpness 5:
+										enchant loop-item with sharpness 6
+									if loop-item is enchanted with sharpness 4:
+										enchant loop-item with sharpness 5
+									if loop-item is enchanted with sharpness 3:
+										enchant loop-item with sharpness 4
+									if loop-item is enchanted with unbreaking 3:
+										enchant loop-item with unbreaking 4
+									if loop-item is enchanted with mending:
+										enchant loop-item with mending 2
+									if loop-item is enchanted with protection 4:
+										enchant loop-item with protection 5
+									if loop-item is enchanted with protection 3:
+										enchant loop-item with protection 4
+									if loop-item is enchanted with projectile protection 4:
+										enchant loop-item with projectile protection 5
+									if loop-item is enchanted with fire protection 4:
+										enchant loop-item with fire protection 5
+									if loop-item is enchanted with blast protection 4:
+										enchant loop-item with blast protection 5
+									if loop-item is enchanted with looting 3:
+										enchant loop-item with looting 4
+									if loop-item is enchanted with sweeping edge 3:
+										enchant loop-item with sweeping edge 4
+									if loop-item is enchanted with fire aspect 2:
+										enchant loop-item with fire aspect 3
+									if loop-item is enchanted with depth strider 3:
+										enchant loop-item with depth strider 4
+									if loop-item is enchanted with feather falling 4:
+										enchant loop-item with feather falling 5
+									if loop-item is enchanted with swift sneak 3:
+										enchant loop-item with swift sneak 4
+									if loop-item is enchanted with soul speed 3:
+										enchant loop-item with soul speed 4
+									if loop-item is enchanted with respiration 3:
+										enchant loop-item with respiration 4
+									if loop-item is enchanted with aqua affinity:
+										enchant loop-item with aqua affinity 2
+									if loop-item is enchanted with thorns 3:
+										enchant loop-item with thorns 4
+									if loop-item is enchanted with efficiency 5:
+										enchant loop-item with efficiency 6
+									if loop-item is enchanted with fortune 3:
+										enchant loop-item with fortune 4
+									if loop-item is enchanted with silk touch:
+										enchant loop-item with silk touch 2
+									if loop-item is enchanted with power 5:
+										enchant loop-item with power 6
+									if loop-item is enchanted with infinity:
+										enchant loop-item with infinity 2
+									if loop-item is enchanted with flame:
+										enchant loop-item with flame 2
+									if loop-item is enchanted with multishot:
+										enchant loop-item with multishot 2
+									if loop-item is enchanted with punch 2:
+										enchant loop-item with punch 3
+									if loop-item is enchanted with quick charge 3:
+										enchant loop-item with quick charge 4
+									if loop-item is enchanted with lure 3:
+										enchant loop-item with lure 4
+									if loop-item is enchanted with luck of the sea 3:
+										enchant loop-item with luck of the sea 4
+									if loop-item is enchanted with loyalty 3:
+										enchant loop-item with loyalty 4
+									if loop-item is enchanted with impaling 5:
+										enchant loop-item with impaling 6
+									if loop-item is enchanted with riptide 3:
+										enchant loop-item with riptide 4
+									if loop-item is enchanted with channeling:
+										enchant loop-item with channeling 2
+									if loop-item is enchanted with piercing 4:
+										enchant loop-item with piercing 5
+							
+						loop all items in player's inventory:
+							set {-amp} to true
+							if loop-item is enchanted with sharpness 5:
+								enchant loop-item with sharpness 6
+							if loop-item is enchanted with sharpness 4:
+								enchant loop-item with sharpness 5
+
+							if loop-item is enchanted with sharpness 3:
+								enchant loop-item with sharpness 4
+								
+							if loop-item is enchanted with unbreaking 3:
+								enchant loop-item with unbreaking 4
+								
+							if loop-item is enchanted with mending:
+								enchant loop-item with mending 2
+								
+							if loop-item is enchanted with protection 4:
+								enchant loop-item with protection 5
+								
+							if loop-item is enchanted with protection 3:
+								enchant loop-item with protection 4
+								
+							if loop-item is enchanted with projectile protection 4:
+								enchant loop-item with projectile protection 5
+								
+							if loop-item is enchanted with fire protection 4:
+								enchant loop-item with fire protection 5
+								
+							if loop-item is enchanted with blast protection 4:
+								enchant loop-item with blast protection 5
+								
+							if loop-item is enchanted with looting 3:
+								enchant loop-item with looting 4
+								
+							if loop-item is enchanted with sweeping edge 3:
+								enchant loop-item with sweeping edge 4
+								
+							if loop-item is enchanted with fire aspect 2:
+								enchant loop-item with fire aspect 3
+								
+							if loop-item is enchanted with depth strider 3:
+								enchant loop-item with depth strider 4
+								
+							if loop-item is enchanted with feather falling 4:
+								enchant loop-item with feather falling 5
+								
+							if loop-item is enchanted with swift sneak 3:
+								enchant loop-item with swift sneak 4
+								
+							if loop-item is enchanted with soul speed 3:
+								enchant loop-item with soul speed 4
+								
+							if loop-item is enchanted with respiration 3:
+								enchant loop-item with respiration 4
+								
+							if loop-item is enchanted with aqua affinity:
+								enchant loop-item with aqua affinity 2
+								
+							if loop-item is enchanted with thorns 3:
+								enchant loop-item with thorns 4
+								
+							if loop-item is enchanted with efficiency 5:
+								enchant loop-item with efficiency 6
+								
+							if loop-item is enchanted with fortune 3:
+								enchant loop-item with fortune 4
+								
+							if loop-item is enchanted with silk touch:
+								enchant loop-item with silk touch 2
+								
+							if loop-item is enchanted with power 5:
+								enchant loop-item with power 6
+								
+							if loop-item is enchanted with power 4:
+								enchant loop-item with power 5
+								
+							if loop-item is enchanted with infinity:
+								enchant loop-item with infinity 2
+								
+							if loop-item is enchanted with flame:
+								enchant loop-item with flame 2
+								
+							if loop-item is enchanted with multishot:
+								enchant loop-item with multishot 2
+								
+							if loop-item is enchanted with punch 2:
+								enchant loop-item with punch 3
+								
+							if loop-item is enchanted with quick charge 3:
+								enchant loop-item with quick charge 4
+								
+							if loop-item is enchanted with lure 3:
+								enchant loop-item with lure 4
+								
+							if loop-item is enchanted with luck of the sea 3:
+								enchant loop-item with luck of the sea 4
+								
+							if loop-item is enchanted with loyalty 3:
+								enchant loop-item with loyalty 4
+								
+							if loop-item is enchanted with impaling 5:
+								enchant loop-item with impaling 6
+								
+							if loop-item is enchanted with riptide 3:
+								enchant loop-item with riptide 4
+								
+							if loop-item is enchanted with channeling:
+								enchant loop-item with channeling 2
+								
+							if loop-item is enchanted with piercing 4:
+								enchant loop-item with piercing 5
+						wait 50 seconds
+						delete {-amp}
+
+#Made by that.bear_ on discord
+#user id: 923415754873917440
