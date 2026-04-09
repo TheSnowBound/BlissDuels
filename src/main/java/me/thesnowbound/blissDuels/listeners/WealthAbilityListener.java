@@ -69,7 +69,7 @@ public class WealthAbilityListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onExp(PlayerExpChangeEvent event) {
         Player player = event.getPlayer();
         if (!hasWealthWithEnergy(player.getInventory().getItemInOffHand(), 1)) {
@@ -80,7 +80,7 @@ public class WealthAbilityListener implements Listener {
         event.setAmount(event.getAmount() * 2);
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
         ItemStack offhand = player.getInventory().getItemInOffHand();
@@ -124,7 +124,7 @@ public class WealthAbilityListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player attacker)) {
             return;
@@ -166,7 +166,7 @@ public class WealthAbilityListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onShoot(EntityShootBowEvent event) {
         if (!(event.getEntity() instanceof Player shooter)) {
             return;
@@ -177,7 +177,7 @@ public class WealthAbilityListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onInteract(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) {
             return;
@@ -210,7 +210,7 @@ public class WealthAbilityListener implements Listener {
         tryRichRush(player);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onInteractEntity(PlayerInteractEntityEvent event) {
         Player player = event.getPlayer();
         if (!(event.getRightClicked() instanceof LivingEntity target)) {
@@ -233,7 +233,7 @@ public class WealthAbilityListener implements Listener {
         applyAmplification(player, target.getLocation());
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onDeath(EntityDeathEvent event) {
         Player killer = event.getEntity().getKiller();
         if (killer == null) {

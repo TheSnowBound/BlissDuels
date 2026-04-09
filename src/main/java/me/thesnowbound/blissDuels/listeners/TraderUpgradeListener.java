@@ -66,7 +66,7 @@ public class TraderUpgradeListener implements Listener {
         this.tradeSystem = tradeSystem;
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onInteract(PlayerInteractEvent event) {
         if (!event.getAction().isRightClick() && !event.getAction().isLeftClick()) {
             return;
@@ -104,7 +104,7 @@ public class TraderUpgradeListener implements Listener {
         openTraderMenu(player);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) {
             return;

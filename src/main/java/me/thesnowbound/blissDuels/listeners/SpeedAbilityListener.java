@@ -61,7 +61,7 @@ public class SpeedAbilityListener implements Listener {
         startSwimPassiveTick();
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onInteract(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) {
             return;
@@ -86,7 +86,7 @@ public class SpeedAbilityListener implements Listener {
         tryPrimeBlur(player);
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler( priority = EventPriority.HIGHEST)
     public void onDamage(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player attacker) || !(event.getEntity() instanceof LivingEntity victim)) {
             return;

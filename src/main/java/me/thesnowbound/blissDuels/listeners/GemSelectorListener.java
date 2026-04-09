@@ -38,7 +38,7 @@ public class GemSelectorListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onInteract(PlayerInteractEvent event) {
         if (!event.getAction().isRightClick()) {
             return;
@@ -56,7 +56,7 @@ public class GemSelectorListener implements Listener {
         openSelectorMenu(player, tier);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) {
             return;

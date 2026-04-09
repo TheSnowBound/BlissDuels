@@ -52,7 +52,7 @@ public class NoDupeListener implements Listener {
         }, 100L, 100L);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onDrop(PlayerDropItemEvent event) {
         if (!enabled) {
             return;

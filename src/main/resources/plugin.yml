@@ -1,7 +1,7 @@
 name: BlissDuels
 version: '${version}'
 main: me.thesnowbound.blissDuels.BlissDuels
-api-version: '1.21.11'
+api-version: '1.21'
 
 commands:
   getgem:

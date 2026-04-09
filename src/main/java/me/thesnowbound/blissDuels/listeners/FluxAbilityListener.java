@@ -49,7 +49,7 @@ public class FluxAbilityListener implements Listener {
         this.beamParticles = new FluxBeamParticles(plugin, this::isTrusted);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onInteract(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) {
             return;

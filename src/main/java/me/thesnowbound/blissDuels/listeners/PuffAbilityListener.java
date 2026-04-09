@@ -49,7 +49,7 @@ public class PuffAbilityListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onGameEvent(GenericGameEvent event) {
         if (event.getEvent() != GameEvent.SCULK_SENSOR_TENDRILS_CLICKING) {
             return;
@@ -64,7 +64,7 @@ public class PuffAbilityListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onInteract(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) {
             return;
@@ -93,7 +93,7 @@ public class PuffAbilityListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler( priority = EventPriority.HIGHEST)
     public void onDamage(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player attacker) || !(event.getEntity() instanceof LivingEntity victim)) {
             return;
@@ -126,7 +126,7 @@ public class PuffAbilityListener implements Listener {
         }, 19L);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player victim)) {
             return;
@@ -147,7 +147,7 @@ public class PuffAbilityListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onJump(PlayerJumpEvent event) {
         Player player = event.getPlayer();
         if (player.getGameMode().name().equals("SURVIVAL")
@@ -158,7 +158,7 @@ public class PuffAbilityListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onFlightToggle(PlayerToggleFlightEvent event) {
         Player player = event.getPlayer();
         if (!player.getGameMode().name().equals("SURVIVAL")) {

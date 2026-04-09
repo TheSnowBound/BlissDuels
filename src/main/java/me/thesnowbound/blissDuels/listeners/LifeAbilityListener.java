@@ -58,7 +58,7 @@ public class LifeAbilityListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onInteract(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) {
             return;
@@ -99,7 +99,7 @@ public class LifeAbilityListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler( priority = EventPriority.HIGHEST)
     public void onDamage(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player attacker) || !(event.getEntity() instanceof LivingEntity victim)) {
             return;
@@ -145,7 +145,7 @@ public class LifeAbilityListener implements Listener {
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> restoreHeartLock(victim), 20L * 20L);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onGenericDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player victim)) {
             return;
@@ -159,7 +159,7 @@ public class LifeAbilityListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onConsume(PlayerItemConsumeEvent event) {
         Player player = event.getPlayer();
         ItemStack consumed = event.getItem();

@@ -94,7 +94,7 @@ public class FluxParityListener implements Listener {
         startTickLoops();
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onJoin(PlayerJoinEvent event) {
         fluxAbilityListener.setKinetic(event.getPlayer(), fluxAbilityListener.getKinetic(event.getPlayer()));
         fluxChargeWatts.putIfAbsent(event.getPlayer().getUniqueId(), 0);
@@ -127,7 +127,7 @@ public class FluxParityListener implements Listener {
         staticBurstCharge.remove(uuid);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onDeath(PlayerDeathEvent event) {
         Player victim = event.getEntity();
         UUID uuid = victim.getUniqueId();
@@ -142,7 +142,7 @@ public class FluxParityListener implements Listener {
         staticBurstCharge.put(uuid, 0.0);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onShoot(EntityShootBowEvent event) {
         if (!(event.getEntity() instanceof Player shooter) || !(event.getProjectile() instanceof Arrow arrow)) {
             return;
@@ -185,7 +185,7 @@ public class FluxParityListener implements Listener {
         }.runTaskTimer(plugin, 1L, 1L);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onProjectileHit(ProjectileHitEvent event) {
         if (!(event.getEntity() instanceof Arrow arrow)) {
             return;
@@ -193,7 +193,7 @@ public class FluxParityListener implements Listener {
         fluxShotOwnerByProjectile.remove(arrow.getUniqueId());
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler( priority = EventPriority.HIGHEST)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         if (event.getDamager() instanceof Arrow arrow && event.getEntity() instanceof LivingEntity victim) {
             handleFluxArrowImpact(arrow, victim);
@@ -225,7 +225,7 @@ public class FluxParityListener implements Listener {
         tryGround(attacker, victim);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
         if (isDisabled(player)) {
@@ -242,7 +242,7 @@ public class FluxParityListener implements Listener {
         handleKineticOverdriveBreakContribution(player);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         if (isDisabled(player)) {
@@ -262,7 +262,7 @@ public class FluxParityListener implements Listener {
         resetOverflowMovement(player);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onInteract(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) {
             return;
@@ -283,7 +283,7 @@ public class FluxParityListener implements Listener {
         tryDepositDiamondBlockCharge(player);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onInteractEntity(PlayerInteractEntityEvent event) {
         Player player = event.getPlayer();
         if (!(event.getRightClicked() instanceof LivingEntity target)) {
@@ -430,7 +430,7 @@ public class FluxParityListener implements Listener {
         return true;
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onChargeMenuOpenByDropOne(InventoryClickEvent event) {
         if (event.getAction() != InventoryAction.DROP_ONE_SLOT) {
             return;
@@ -448,7 +448,7 @@ public class FluxParityListener implements Listener {
         openChargeMenu(player);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onChargeMenuClose(InventoryCloseEvent event) {
         if (!(event.getPlayer() instanceof Player player)) {
             return;
@@ -477,7 +477,7 @@ public class FluxParityListener implements Listener {
         player.sendMessage(getWattsMessage(player));
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onAnyDamage(org.bukkit.event.entity.EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player victim)) {
             return;

@@ -74,7 +74,7 @@ public class StrengthAbilityListener implements Listener {
         startChadParticlesTick();
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onInteract(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) {
             return;
@@ -103,7 +103,7 @@ public class StrengthAbilityListener implements Listener {
         tryNullify(player);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) {
             return;
@@ -141,7 +141,7 @@ public class StrengthAbilityListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onPotionConsume(PlayerItemConsumeEvent event) {
         if (!isNullified(event.getPlayer())) {
             return;
@@ -152,7 +152,7 @@ public class StrengthAbilityListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onInventoryClose(InventoryCloseEvent event) {
         if (!(event.getPlayer() instanceof Player player)) {
             return;
@@ -199,7 +199,7 @@ public class StrengthAbilityListener implements Listener {
         bountyCounter.put(hunterId, 0);
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler( priority = EventPriority.HIGHEST)
     public void onDamage(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player attacker) || !(event.getEntity() instanceof LivingEntity victim)) {
             return;

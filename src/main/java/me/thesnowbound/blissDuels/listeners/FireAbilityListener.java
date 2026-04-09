@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -17,6 +18,7 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
@@ -25,13 +27,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -54,6 +58,8 @@ public class FireAbilityListener implements Listener {
     private static final Particle.DustOptions CAMPFIRE_DUST = new Particle.DustOptions(Color.fromRGB(255, 168, 60), 1.0f);
 
     private final BlissDuels plugin;
+    private final NamespacedKey fireballChargeKey;
+    private final NamespacedKey fireballOwnerKey;
 
     private final Map<UUID, Boolean> chargingFireball = new HashMap<>();
     private final Map<UUID, Double> fireballCharge = new HashMap<>();
@@ -64,10 +70,12 @@ public class FireAbilityListener implements Listener {
 
     public FireAbilityListener(BlissDuels plugin) {
         this.plugin = plugin;
+        this.fireballChargeKey = new NamespacedKey(plugin, FIREBALL_CHARGE_META);
+        this.fireballOwnerKey = new NamespacedKey(plugin, FIREBALL_OWNER_META);
         startCampfireTick();
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onMeleeDamage(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player attacker)) {
             return;
@@ -108,7 +116,7 @@ public class FireAbilityListener implements Listener {
         startMeteorShower(attacker, victim);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onShoot(EntityShootBowEvent event) {
         if (!(event.getEntity() instanceof Player shooter)) {
             return;
@@ -125,7 +133,7 @@ public class FireAbilityListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onInteract(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) {
             return;
@@ -183,22 +191,28 @@ public class FireAbilityListener implements Listener {
         };
 
         plugin.getCooldownManager().setCooldown(player, "Campfire", cooldown);
-        campfireZones.add(new CampfireZone(player.getUniqueId(), above.getLocation().toCenterLocation(), radius, System.currentTimeMillis() + FormatUtil.toMilliseconds(10, 0)));
+
+        Location campfireLoc = above.getLocation().toCenterLocation();
+        ArmorStand timer = spawnCampfireTimer(campfireLoc, System.currentTimeMillis() + FormatUtil.toMilliseconds(10, 0));
+        campfireZones.add(new CampfireZone(player.getUniqueId(), campfireLoc, radius, System.currentTimeMillis() + FormatUtil.toMilliseconds(10, 0), timer.getUniqueId()));
 
         player.sendMessage(ColorUtil.color("<##FE8120> You used Cozy Campfire"));
         player.playSound(player.getLocation(), Sound.BLOCK_CAMPFIRE_CRACKLE, 1.0f, 1.2f);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onFireballHit(ProjectileHitEvent event) {
         if (!(event.getEntity() instanceof Fireball fireball)) {
             return;
         }
-        if (!fireball.hasMetadata(FIREBALL_CHARGE_META)) {
+
+        PersistentDataContainer data = fireball.getPersistentDataContainer();
+        Double chargeValue = data.get(fireballChargeKey, PersistentDataType.DOUBLE);
+        if (chargeValue == null) {
             return;
         }
 
-        float charge = (float) fireball.getMetadata(FIREBALL_CHARGE_META).getFirst().asDouble();
+        float charge = chargeValue.floatValue();
         float yield = mapExplosionYield(charge);
         fireball.getWorld().createExplosion(fireball.getLocation(), yield, false, true);
 
@@ -208,8 +222,10 @@ public class FireAbilityListener implements Listener {
             if (!(nearby instanceof LivingEntity living)) {
                 continue;
             }
-            if (fireball.hasMetadata(FIREBALL_OWNER_META)) {
-                UUID ownerId = UUID.fromString(fireball.getMetadata(FIREBALL_OWNER_META).getFirst().asString());
+
+            String ownerRaw = data.get(fireballOwnerKey, PersistentDataType.STRING);
+            if (ownerRaw != null) {
+                UUID ownerId = UUID.fromString(ownerRaw);
                 Player owner = Bukkit.getPlayer(ownerId);
                 if (owner != null && owner.equals(living)) {
                     continue;
@@ -227,7 +243,16 @@ public class FireAbilityListener implements Listener {
         stopFireballCharge(event.getPlayer());
 
         UUID uuid = event.getPlayer().getUniqueId();
-        campfireZones.removeIf(zone -> zone.owner().equals(uuid));
+        cleanupCampfireZones(zone -> zone.owner().equals(uuid));
+    }
+
+    @EventHandler
+    public void onCampfireBreak(BlockBreakEvent event) {
+        if (event.getBlock().getType() != Material.SOUL_CAMPFIRE) {
+            return;
+        }
+        Location broken = event.getBlock().getLocation().toCenterLocation();
+        cleanupCampfireZones(zone -> zone.location().distanceSquared(broken) <= 0.05);
     }
 
     private void handleFireballLeftClick(Player player) {
@@ -243,7 +268,7 @@ public class FireAbilityListener implements Listener {
             if (!plugin.getCooldownManager().isCooldownReady(player, "Fireball")) {
                 return;
             }
-            startFireballCharge(player, held.energy());
+            startFireballCharge(player);
             return;
         }
 
@@ -251,7 +276,7 @@ public class FireAbilityListener implements Listener {
         releaseFireball(player, held.energy());
     }
 
-    private void startFireballCharge(Player player, int energy) {
+    private void startFireballCharge(Player player) {
         UUID uuid = player.getUniqueId();
         chargingFireball.put(uuid, true);
         fireballCharge.put(uuid, 0.0);
@@ -300,8 +325,8 @@ public class FireAbilityListener implements Listener {
         projectile.setIsIncendiary(false);
         projectile.setVelocity(direction.multiply(2.2));
         projectile.setYield(0f);
-        projectile.setMetadata(FIREBALL_CHARGE_META, new FixedMetadataValue(plugin, charge));
-        projectile.setMetadata(FIREBALL_OWNER_META, new FixedMetadataValue(plugin, player.getUniqueId().toString()));
+        projectile.getPersistentDataContainer().set(fireballChargeKey, PersistentDataType.DOUBLE, charge);
+        projectile.getPersistentDataContainer().set(fireballOwnerKey, PersistentDataType.STRING, player.getUniqueId().toString());
 
         player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.0f, 1.0f);
         player.sendMessage(ColorUtil.color("<##FE8120> Fireball launched"));
@@ -375,18 +400,17 @@ public class FireAbilityListener implements Listener {
             while (iterator.hasNext()) {
                 CampfireZone zone = iterator.next();
                 Block block = zone.location().getBlock();
+                ArmorStand timer = getCampfireTimer(zone.timerId());
 
-                if (zone.expiresAt() <= now) {
-                    if (block.getType() == Material.SOUL_CAMPFIRE) {
-                        block.setType(Material.AIR);
-                    }
+                if (zone.expiresAt() <= now || block.getType() != Material.SOUL_CAMPFIRE) {
+                    removeCampfireZone(zone, true);
                     iterator.remove();
                     continue;
                 }
 
-                if (block.getType() != Material.SOUL_CAMPFIRE) {
-                    iterator.remove();
-                    continue;
+                if (timer != null) {
+                    long remaining = Math.max(0L, zone.expiresAt() - now);
+                    timer.setCustomName(ColorUtil.color("&a" + formatCampfireTimer(remaining)));
                 }
 
                 Location center = zone.location().clone().add(0.0, 0.7, 0.0);
@@ -405,13 +429,78 @@ public class FireAbilityListener implements Listener {
                         continue;
                     }
 
-                    double max = player.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH) == null
-                        ? 20.0
-                        : player.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH).getValue();
-                    player.setHealth(Math.min(max, player.getHealth() + 1.0));
+                    double max = getMaxHealth(player);
+                    // Skript parity: Cozy Campfire heals 2 hearts per pulse.
+                    player.setHealth(Math.min(max, player.getHealth() + 4.0));
+                    if (player.getFoodLevel() < 10) {
+                        player.setFoodLevel(Math.min(20, player.getFoodLevel() + 4));
+                    }
+
+                    Location healFx = player.getLocation().add(0, 1, 0);
+                    player.getWorld().spawnParticle(Particle.DUST, healFx, 5, 0.3, 0.4, 0.3, 0.0, FIRE_DUST);
+                    player.getWorld().spawnParticle(Particle.HAPPY_VILLAGER, healFx, 5, 0.3, 0.4, 0.3, 0.0);
                 }
             }
-        }, 20L, 20L);
+        }, 5L, 5L);
+    }
+
+    private void cleanupCampfireZones(java.util.function.Predicate<CampfireZone> predicate) {
+        Iterator<CampfireZone> iterator = campfireZones.iterator();
+        while (iterator.hasNext()) {
+            CampfireZone zone = iterator.next();
+            if (!predicate.test(zone)) {
+                continue;
+            }
+            removeCampfireZone(zone, false);
+            iterator.remove();
+        }
+    }
+
+    private void removeCampfireZone(CampfireZone zone, boolean destroyBlock) {
+        if (destroyBlock && zone.location().getBlock().getType() == Material.SOUL_CAMPFIRE) {
+            zone.location().getBlock().setType(Material.AIR);
+        }
+        ArmorStand timer = getCampfireTimer(zone.timerId());
+        if (timer != null) {
+            timer.remove();
+        }
+    }
+
+    private ArmorStand spawnCampfireTimer(Location campfireLoc, long expiresAt) {
+        ArmorStand stand = campfireLoc.getWorld().spawn(campfireLoc.clone().add(0.0, 0.25, 0.0), ArmorStand.class);
+        stand.setInvisible(true);
+        stand.setGravity(false);
+        stand.setMarker(true);
+        stand.setInvulnerable(true);
+        stand.setCustomNameVisible(true);
+        stand.setCustomName(ColorUtil.color("&a" + formatCampfireTimer(Math.max(0L, expiresAt - System.currentTimeMillis()))));
+        return stand;
+    }
+
+    private ArmorStand getCampfireTimer(UUID timerId) {
+        if (timerId == null) {
+            return null;
+        }
+        Entity entity = Bukkit.getEntity(timerId);
+        if (entity instanceof ArmorStand stand && stand.isValid()) {
+            return stand;
+        }
+        return null;
+    }
+
+    private String formatCampfireTimer(long remainingMillis) {
+        long totalSeconds = Math.max(0L, remainingMillis / 1000L);
+        long minutes = totalSeconds / 60L;
+        long seconds = totalSeconds % 60L;
+        if (minutes > 0L) {
+            return seconds > 0L ? minutes + "m " + seconds + "s" : minutes + "m";
+        }
+        return seconds > 0L ? seconds + "s" : "Ready!";
+    }
+
+    private double getMaxHealth(Player player) {
+        org.bukkit.attribute.AttributeInstance health = player.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH);
+        return health == null ? 20.0 : health.getValue();
     }
 
     private float mapExplosionYield(double charge) {
@@ -454,7 +543,7 @@ public class FireAbilityListener implements Listener {
         return plugin.getTrustManager().isTrusted(source, target);
     }
 
-    private record CampfireZone(UUID owner, Location location, double radius, long expiresAt) {
+    private record CampfireZone(UUID owner, Location location, double radius, long expiresAt, UUID timerId) {
     }
 
     private static final class ItemStackAccessor {
@@ -476,3 +565,4 @@ public class FireAbilityListener implements Listener {
         }
     }
 }
+

@@ -11,6 +11,7 @@ import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
@@ -44,7 +45,8 @@ import org.bukkit.event.world.GenericGameEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -72,6 +74,7 @@ public class AstraAbilityListener implements Listener {
     private static final Particle.DustOptions ASTRA_DUST = new Particle.DustOptions(Color.fromRGB(198, 154, 255), 1.0f);
 
     private final BlissDuels plugin;
+    private final NamespacedKey daggerOwnerKey;
 
     // Shared disable timer (script used {-Disabled::uuid}).
     private final Map<UUID, Integer> disabledSeconds = new HashMap<>();
@@ -113,6 +116,7 @@ public class AstraAbilityListener implements Listener {
 
     public AstraAbilityListener(BlissDuels plugin) {
         this.plugin = plugin;
+        this.daggerOwnerKey = new NamespacedKey(plugin, DAGGER_META_OWNER);
         startTickLoops();
     }
 
@@ -161,6 +165,11 @@ public class AstraAbilityListener implements Listener {
                         Location body = astralBodyLocation.get(uuid);
                         body.getWorld().spawnParticle(Particle.DUST, body.clone().add(0, 1, 0), 20, 0.4, 0.4, 0.4, 0.01, ASTRA_DUST);
                     }
+
+                    if (daggersActive.contains(uuid)) {
+                        updateDaggerVisuals(player);
+                        drainDaggers(player);
+                    }
                 }
             }
         }.runTaskTimer(plugin, 1L, 2L);
@@ -183,7 +192,7 @@ public class AstraAbilityListener implements Listener {
         }.runTaskTimer(plugin, 10L, 10L);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         disabledSeconds.putIfAbsent(player.getUniqueId(), 0);
@@ -195,7 +204,7 @@ public class AstraAbilityListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player quitter = event.getPlayer();
         UUID quitterId = quitter.getUniqueId();
@@ -224,7 +233,7 @@ public class AstraAbilityListener implements Listener {
         cleanupDrift(quitterId);
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler( priority = EventPriority.HIGHEST)
     public void onRightClickEntity(PlayerInteractAtEntityEvent event) {
         Player player = event.getPlayer();
         Entity target = event.getRightClicked();
@@ -299,7 +308,7 @@ public class AstraAbilityListener implements Listener {
         }.runTaskTimer(plugin, 0L, 40L);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onInteract(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) {
             return;
@@ -326,7 +335,7 @@ public class AstraAbilityListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
@@ -348,7 +357,7 @@ public class AstraAbilityListener implements Listener {
                 souls.addFirst(entry.getValue());
                 toRemove.add(soulLoc);
 
-                double newHealth = Math.min(player.getAttribute(Attribute.MAX_HEALTH).getValue(), player.getHealth() + 4.0);
+                double newHealth = Math.min(getMaxHealth(player), player.getHealth() + 4.0);
                 player.setHealth(newHealth);
                 player.setSaturation(Math.min(20f, player.getSaturation() + 3f));
                 break;
@@ -369,7 +378,7 @@ public class AstraAbilityListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler( priority = EventPriority.HIGHEST)
     public void onEntityDamage(EntityDamageByEntityEvent event) {
         // Unbounded activation.
         if (event.getDamager() instanceof Player attacker && event.getEntity() instanceof Player victim) {
@@ -401,16 +410,16 @@ public class AstraAbilityListener implements Listener {
 
         // Dagger projectile hit damage.
         if (event.getDamager() instanceof Snowball snowball && event.getEntity() instanceof LivingEntity victim) {
-            if (!snowball.hasMetadata(DAGGER_META_OWNER)) {
+            UUID ownerId = getDaggerOwner(snowball);
+            if (ownerId == null) {
                 return;
             }
-            UUID ownerId = UUID.fromString(snowball.getMetadata(DAGGER_META_OWNER).getFirst().asString());
             Player owner = Bukkit.getPlayer(ownerId);
             if (owner == null) {
                 return;
             }
             event.setCancelled(true);
-            applyDaggerDamage(victim, 2.5, owner);
+            applyDaggerDamage(victim, owner);
             victim.setVelocity(victim.getLocation().toVector().subtract(snowball.getLocation().toVector()).normalize().multiply(0.4));
         }
 
@@ -424,12 +433,12 @@ public class AstraAbilityListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onProjectileHit(ProjectileHitEvent event) {
         if (!(event.getEntity() instanceof Snowball snowball)) {
             return;
         }
-        if (!snowball.hasMetadata(DAGGER_META_OWNER)) {
+        if (getDaggerOwner(snowball) == null) {
             return;
         }
 
@@ -437,7 +446,7 @@ public class AstraAbilityListener implements Listener {
         snowball.remove();
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player victim)) {
             return;
@@ -452,7 +461,7 @@ public class AstraAbilityListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onDeath(EntityDeathEvent event) {
         LivingEntity victim = event.getEntity();
         Player attacker = victim.getKiller();
@@ -481,7 +490,7 @@ public class AstraAbilityListener implements Listener {
 
                     if (attacker.getLocation().distanceSquared(loc) <= 1.5) {
                         double heal = victim instanceof Player ? 8.0 : 4.0;
-                        attacker.setHealth(Math.min(attacker.getAttribute(Attribute.MAX_HEALTH).getValue(), attacker.getHealth() + heal));
+                        attacker.setHealth(Math.min(getMaxHealth(attacker), attacker.getHealth() + heal));
                         attacker.setSaturation(Math.min(20f, attacker.getSaturation() + (victim instanceof Player ? 10f : 4f)));
                         cancel();
                         soulPool.remove(loc);
@@ -503,7 +512,7 @@ public class AstraAbilityListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onVehicleExit(VehicleExitEvent event) {
         if (!(event.getExited() instanceof Player player)) {
             return;
@@ -514,22 +523,24 @@ public class AstraAbilityListener implements Listener {
 
         UUID uuid = player.getUniqueId();
         if (driftHorse.containsKey(uuid)) {
-            stopDrift(player, true);
+            stopDrift(player);
+            plugin.getCooldownManager().setCooldown(player, "Drift", FormatUtil.toMilliseconds(0, 35));
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onSneak(PlayerToggleSneakEvent event) {
         if (!event.isSneaking()) {
             return;
         }
         Player player = event.getPlayer();
         if (driftHorse.containsKey(player.getUniqueId())) {
-            stopDrift(player, true);
+            stopDrift(player);
+            plugin.getCooldownManager().setCooldown(player, "Drift", FormatUtil.toMilliseconds(0, 35));
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler()
     public void onHorseJump(GenericGameEvent event) {
         // Paper emits jump game events from vehicles; this keeps the double-jump behavior server-safe.
         if (event.getEntity() == null || !(event.getEntity() instanceof Player rider)) {
@@ -703,9 +714,9 @@ public class AstraAbilityListener implements Listener {
         }
 
         AbstractHorse horse = (AbstractHorse) player.getWorld().spawnEntity(player.getLocation(), EntityType.HORSE);
-        horse.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.243);
-        horse.getAttribute(Attribute.MAX_HEALTH).setBaseValue(53.0);
-        horse.getAttribute(Attribute.JUMP_STRENGTH).setBaseValue(1.2);
+        setAttributeIfPresent(horse, Attribute.MOVEMENT_SPEED, 0.243);
+        setAttributeIfPresent(horse, Attribute.MAX_HEALTH, 53.0);
+        setAttributeIfPresent(horse, Attribute.JUMP_STRENGTH, 1.2);
         horse.setInvulnerable(true);
         horse.setInvisible(true);
         horse.setTamed(true);
@@ -714,7 +725,7 @@ public class AstraAbilityListener implements Listener {
         driftHorse.put(uuid, horse);
     }
 
-    private void stopDrift(Player player, boolean applySneakCooldown) {
+    private void stopDrift(Player player) {
         UUID uuid = player.getUniqueId();
         driftActive.remove(uuid);
         driftJumping.remove(uuid);
@@ -724,10 +735,6 @@ public class AstraAbilityListener implements Listener {
         if (horse != null && !horse.isDead()) {
             horse.eject();
             horse.remove();
-        }
-
-        if (applySneakCooldown) {
-            plugin.getCooldownManager().setCooldown(player, "Drift", FormatUtil.toMilliseconds(0, 35));
         }
     }
 
@@ -881,7 +888,7 @@ public class AstraAbilityListener implements Listener {
         Snowball projectile = player.launchProjectile(Snowball.class);
         projectile.setVelocity(projectile.getVelocity().multiply(2.0));
         projectile.setItem(createDaggerDisplayItem());
-        projectile.setMetadata(DAGGER_META_OWNER, new FixedMetadataValue(plugin, owner.toString()));
+        projectile.getPersistentDataContainer().set(daggerOwnerKey, PersistentDataType.STRING, owner.toString());
 
         new BukkitRunnable() {
             int ticksAlive = 0;
@@ -933,19 +940,19 @@ public class AstraAbilityListener implements Listener {
         daggerVictims.remove(uuid);
     }
 
-    private void applyDaggerDamage(LivingEntity victim, double amount, Player owner) {
+    private void applyDaggerDamage(LivingEntity victim, Player owner) {
         disabledSeconds.merge(victim.getUniqueId(), 10, Integer::sum);
         daggerVictims.computeIfAbsent(owner.getUniqueId(), ignored -> new HashSet<>()).add(victim.getUniqueId());
 
         double health = victim.getHealth();
-        if (health <= amount) {
+        if (health <= 2.5) {
             if (hasTotem(victim)) {
                 victim.damage(9999.0, owner);
             } else {
                 victim.setHealth(0.0);
             }
         } else {
-            victim.setHealth(health - amount);
+            victim.setHealth(health - 2.5);
         }
         victim.setNoDamageTicks(0);
     }
@@ -1115,6 +1122,31 @@ public class AstraAbilityListener implements Listener {
             return player.isInvisible() ? "???" : player.getName();
         }
         return entity.getType().name().toLowerCase();
+    }
+
+    private UUID getDaggerOwner(Snowball snowball) {
+        PersistentDataContainer container = snowball.getPersistentDataContainer();
+        String raw = container.get(daggerOwnerKey, PersistentDataType.STRING);
+        if (raw == null) {
+            return null;
+        }
+        try {
+            return UUID.fromString(raw);
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
+    }
+
+    private double getMaxHealth(LivingEntity entity) {
+        org.bukkit.attribute.AttributeInstance maxHealth = entity.getAttribute(Attribute.MAX_HEALTH);
+        return maxHealth == null ? 20.0 : maxHealth.getValue();
+    }
+
+    private void setAttributeIfPresent(LivingEntity entity, Attribute attribute, double value) {
+        org.bukkit.attribute.AttributeInstance instance = entity.getAttribute(attribute);
+        if (instance != null) {
+            instance.setBaseValue(value);
+        }
     }
 
     private void cleanupDrift(UUID uuid) {

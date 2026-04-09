@@ -33,7 +33,8 @@ This document describes the scope of the initial `v1.0` release.
 
 ## Compatibility
 
-- API version: `1.21.11`
+- Supported Minecraft versions: `1.21` to `1.21.11`
+- API version: `1.21`
 - Java target: `21`
 - Gradle project version: `1.0`
 
@@ -42,4 +43,3 @@ This document describes the scope of the initial `v1.0` release.
 - Plugin metadata is defined in `src/main/resources/plugin.yml`.
 - Build version is defined in `build.gradle`.
 - This file is intended as a stable baseline for future version changelogs.
-
