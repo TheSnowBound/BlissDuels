@@ -29,6 +29,8 @@ public class GemItemManager {
     private final NamespacedKey specialItemKey = new NamespacedKey(BlissDuels.getInstance(), "special_item");
     private final NamespacedKey energyFromKey = new NamespacedKey(BlissDuels.getInstance(), "energy_from");
     private final NamespacedKey energyMinutesKey = new NamespacedKey(BlissDuels.getInstance(), "energy_expire_minutes");
+    private final NamespacedKey goldSelectedKey = new NamespacedKey(BlissDuels.getInstance(), "gold_selected_index");
+    private final NamespacedKey goldSelectedTierKey = new NamespacedKey(BlissDuels.getInstance(), "gold_selected_tier");
 
     private static final GemEnergy FIXED_GEM_ENERGY = GemEnergy.PRISTINE;
 
@@ -227,6 +229,101 @@ public class GemItemManager {
         }
         String type = item.getItemMeta().getPersistentDataContainer().get(specialItemKey, PersistentDataType.STRING);
         return "gem_selector_t1".equalsIgnoreCase(type) ? 1 : 2;
+    }
+
+    // --- Gold gem helpers ---
+    public ItemStack createGoldGemItem() {
+        ItemStack item = new ItemStack(Material.PRISMARINE_CRYSTALS);
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return item;
+
+        meta.setDisplayName(ColorUtil.color("<##FFD773>&lɢᴏʟᴅ &eɢᴇᴍ"));
+        meta.setLore(ColorUtil.color(Arrays.asList(
+            "&lᴡᴀᴛᴄʜ ᴛʜᴇ ʟɪɴᴇ ᴏꜰ ʀᴇᴀʟɪᴛʏ ꜰʀᴀʏ ᴀꜱ ᴇɪɢʜᴛ ꜱᴏᴜʟꜱ ʙᴇᴄᴏᴍᴇ ᴏɴᴇ",
+            "(&6Dormant&r)",
+            "",
+            "&cAbility",
+            "&k&6kasdjkeiosafjisfnjds",
+            "",
+            "&6Powers",
+            "&k&ekasdjkeiosaf",
+            "&k&ekasdjkeiosafsadasd",
+            "",
+            "&k&ekasdjkeiosaf",
+            "&k&ekasdjkeiosafsadasd"
+        )));
+        applyCustomModelData(meta, 340);
+        meta.getPersistentDataContainer().set(specialItemKey, PersistentDataType.STRING, "gold_gem");
+        // default selection: first gem, tier 2
+        meta.getPersistentDataContainer().set(goldSelectedKey, PersistentDataType.INTEGER, 0);
+        meta.getPersistentDataContainer().set(goldSelectedTierKey, PersistentDataType.INTEGER, 2);
+        item.setItemMeta(meta);
+
+        // Persist gem data for compatibility with listeners: set to first gem, tier 2
+        GemType initial = GemType.values()[0];
+        GemUtil.saveGemData(item, initial, GemTier.TIER_2, FIXED_GEM_ENERGY);
+        return item;
+    }
+
+    public boolean isGoldGem(ItemStack item) {
+        if (item == null || item.getType().isAir() || item.getItemMeta() == null) return false;
+        String type = item.getItemMeta().getPersistentDataContainer().get(specialItemKey, PersistentDataType.STRING);
+        return "gold_gem".equalsIgnoreCase(type);
+    }
+
+    public int getGoldSelectedIndex(ItemStack item) {
+        if (item == null || item.getItemMeta() == null) return 0;
+        Integer idx = item.getItemMeta().getPersistentDataContainer().get(goldSelectedKey, PersistentDataType.INTEGER);
+        return idx == null ? 0 : Math.max(0, idx);
+    }
+
+    public int getGoldSelectedTier(ItemStack item) {
+        // Gold gem is always Tier 2 by design.
+        return 2;
+    }
+
+    public ItemStack setGoldSelected(ItemStack item, int index, int tier) {
+        if (item == null || item.getItemMeta() == null) return item;
+        ItemMeta meta = item.getItemMeta();
+        int safe = Math.floorMod(index, GemType.values().length);
+        // Force Tier 2 for Gold Gem
+        int safeTier = 2;
+        GemType sel = GemType.values()[safe];
+
+        meta.getPersistentDataContainer().set(goldSelectedKey, PersistentDataType.INTEGER, safe);
+        meta.getPersistentDataContainer().set(goldSelectedTierKey, PersistentDataType.INTEGER, safeTier);
+
+        // update lore display line (last line before blank or replace existing selected)
+        java.util.List<String> lore = meta.hasLore() ? new java.util.ArrayList<>(meta.getLore()) : new java.util.ArrayList<>();
+        String selectedLine = ColorUtil.color("&eSelected: &f" + sel.getDisplayName() + " (T" + safeTier + ")");
+        // try to replace existing Selected line if present
+        boolean replaced = false;
+        for (int i = 0; i < lore.size(); i++) {
+            String plain = org.bukkit.ChatColor.stripColor(lore.get(i));
+            if (plain != null && plain.toLowerCase().startsWith("selected:")) {
+                lore.set(i, selectedLine);
+                replaced = true;
+                break;
+            }
+        }
+        if (!replaced) {
+            lore.add(0, "");
+            lore.add(0, selectedLine);
+        }
+        meta.setLore(lore);
+        item.setItemMeta(meta);
+
+        // persist gem data so other listeners treat this as the selected gem
+        GemTier gemTier = GemTier.TIER_2;
+        GemUtil.saveGemData(item, sel, gemTier, FIXED_GEM_ENERGY);
+        return item;
+    }
+
+    public ItemStack cycleGoldSelection(ItemStack item) {
+        if (!isGoldGem(item)) return item;
+        int idx = getGoldSelectedIndex(item);
+        idx = (idx + 1) % GemType.values().length;
+        return setGoldSelected(item, idx, 2);
     }
 
     private void applyCustomModelData(ItemMeta meta, int customModelData) {

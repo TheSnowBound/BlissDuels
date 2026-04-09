@@ -52,6 +52,15 @@ public class GetGemCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage("Gave trader to " + target.getName());
             return true;
         }
+        if (token.equals("gold")) {
+            if (!sender.isOp()) {
+                sender.sendMessage("Only operators can give the gold gem.");
+                return true;
+            }
+            target.getInventory().addItem(plugin.getGemItemManager().createGoldGemItem());
+            sender.sendMessage("Gave Gold Gem to " + target.getName());
+            return true;
+        }
         if (token.equals("upgrader")) {
             target.getInventory().addItem(plugin.getGemItemManager().createUpgraderItem());
             sender.sendMessage("Gave upgrader to " + target.getName());
@@ -102,6 +111,7 @@ public class GetGemCommand implements CommandExecutor, TabCompleter {
             out.add("selector");
             out.add("selector1");
             out.add("selector2");
+            out.add("gold");
             for (GemType type : GemType.values()) {
                 out.add(type.getIdentifier());
             }

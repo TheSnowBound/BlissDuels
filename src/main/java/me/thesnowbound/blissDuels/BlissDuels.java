@@ -81,6 +81,7 @@ public final class BlissDuels extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new StrengthAbilityListener(this), this);
         getServer().getPluginManager().registerEvents(new TraderUpgradeListener(this, gemSystem, tradeSystem), this);
         getServer().getPluginManager().registerEvents(new TrustGuiListener(this), this);
+        getServer().getPluginManager().registerEvents(new me.thesnowbound.blissDuels.listeners.GoldGemListener(this), this);
 
         registerCommands();
         actionBarUpdater.start();

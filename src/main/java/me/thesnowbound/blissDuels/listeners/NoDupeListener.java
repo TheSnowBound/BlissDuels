@@ -74,6 +74,13 @@ public class NoDupeListener implements Listener {
             if (!GemUtil.isGem(drop)) {
                 return false;
             }
+            // If this drop is a Gold Gem, allow it to drop (per user request)
+            boolean isGold = BlissDuels.getInstance().getGemItemManager().isGoldGem(drop);
+            if (isGold) {
+                return false; // keep gold gem in drops
+            }
+
+            // otherwise remove normal gems from drops and keep them for later
             keptGems.add(drop.clone());
             return true;
         });
@@ -94,16 +101,30 @@ public class NoDupeListener implements Listener {
     }
 
     private void removeExtraGems(Player player) {
-        boolean foundFirst = false;
+        // Allow one normal gem and one gold gem in inventory; remove any additional gems
+        boolean foundNormal = false;
+        boolean foundGold = false;
         for (int slot = 0; slot < player.getInventory().getSize(); slot++) {
             ItemStack item = player.getInventory().getItem(slot);
             if (!GemUtil.isGem(item)) {
                 continue;
             }
-            if (!foundFirst) {
-                foundFirst = true;
+            boolean isGold = BlissDuels.getInstance().getGemItemManager().isGoldGem(item);
+            if (isGold) {
+                if (!foundGold) {
+                    foundGold = true;
+                    continue;
+                }
+                // extra gold gem -> remove
+                player.getInventory().setItem(slot, null);
                 continue;
             }
+            // normal gem
+            if (!foundNormal) {
+                foundNormal = true;
+                continue;
+            }
+            // extra normal gem -> remove
             player.getInventory().setItem(slot, null);
         }
     }

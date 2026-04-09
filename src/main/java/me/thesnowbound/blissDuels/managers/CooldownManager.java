@@ -2,6 +2,9 @@ package me.thesnowbound.blissDuels.managers;
 
 import java.util.HashMap;
 import java.util.Map;
+import me.thesnowbound.blissDuels.BlissDuels;
+import me.thesnowbound.blissDuels.managers.GemItemManager; // not a real manager, but we use BlissDuels#getGemItemManager
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.entity.Player;
 
 /**
@@ -23,6 +26,27 @@ public class CooldownManager {
         double multiplier = configManager.getMultiplier(abilityName);
         long adjusted = Math.max(0L, Math.round(milliseconds * multiplier));
         cooldowns.put(key, System.currentTimeMillis() + adjusted);
+
+        // If the player is holding the "gold gem", propagate this cooldown to all abilities so switching gems doesn't bypass it.
+        try {
+            ItemStack main = player.getInventory().getItemInMainHand();
+            ItemStack off = player.getInventory().getItemInOffHand();
+            boolean holdingGold = BlissDuels.getInstance().getGemItemManager().isGoldGem(main)
+                || BlissDuels.getInstance().getGemItemManager().isGoldGem(off);
+            if (holdingGold) {
+                // apply same wall-clock expiry to all ability keys defined in config (respecting their multipliers)
+                long now = System.currentTimeMillis();
+                for (String ability : configManager.getAllAbilityKeys()) {
+                    if (ability == null || ability.equalsIgnoreCase(abilityName)) continue;
+                    double mul = configManager.getMultiplier(ability);
+                    long adj = Math.max(0L, Math.round(milliseconds * mul));
+                    String otherKey = player.getUniqueId() + ":" + ability;
+                    cooldowns.put(otherKey, now + adj);
+                }
+            }
+        } catch (Exception ignored) {
+            // defensive: do not let gold propagation break cooldown setting
+        }
     }
 
     /**
