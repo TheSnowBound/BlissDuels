@@ -2,6 +2,7 @@ package me.thesnowbound.blissDuels.listeners;
 
 import me.thesnowbound.blissDuels.BlissDuels;
 import me.thesnowbound.blissDuels.util.GemUtil;
+import me.thesnowbound.blissDuels.gem.GemTier;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Allay;
@@ -78,6 +79,11 @@ public class NoDupeListener implements Listener {
             boolean isGold = BlissDuels.getInstance().getGemItemManager().isGoldGem(drop);
             if (isGold) {
                 return false; // keep gold gem in drops
+            }
+
+            // If this drop is a Tier 2 gem, allow PlayerDeathListener to process it (so upgrader drops correctly).
+            if (GemUtil.getTier(drop) == GemTier.TIER_2) {
+                return false;
             }
 
             // otherwise remove normal gems from drops and keep them for later

@@ -615,7 +615,9 @@ public class FluxBeamParticles {
             }
 
             dontDmgAgain.add(id);
-            double damage = living.getHealth() * (kineticPercent / 100.0);
+            // Use target max health to compute percent-based damage so low-current-health targets still take proportional
+            double maxHp = living.getMaxHealth();
+            double damage = maxHp * (kineticPercent / 100.0);
             living.damage(Math.max(0.001, damage), p);
             damageArmor(living, duraPenalty);
         }

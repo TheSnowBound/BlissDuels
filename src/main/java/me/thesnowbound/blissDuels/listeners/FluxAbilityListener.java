@@ -149,10 +149,12 @@ public class FluxAbilityListener implements Listener {
     }
 
     private void tryEnergyBeamRelease(Player player) {
-        ItemStack held = player.getInventory().getItemInMainHand();
-        if (!isFluxTier2WithEnergy(held)) {
+        // Main powers require the flux gem in the main hand only.
+        ItemStack main = player.getInventory().getItemInMainHand();
+        if (!isFluxTier2WithEnergy(main)) {
             return;
         }
+
         if (!plugin.getCooldownManager().isCooldownReady(player, "EnergyBeam")) {
             return;
         }
@@ -161,18 +163,18 @@ public class FluxAbilityListener implements Listener {
         double kinetic = fluxKinetic.getOrDefault(id, 0.0);
 
         fluxKinetic.put(id, 0.0);
-        plugin.getCooldownManager().setCooldown(player, "EnergyBeam", energyBeamCooldown(player));
+        // cooldown based on the gem energy of the main hand
+        int energyLevel = Math.max(0, GemUtil.getEnergyLevel(main));
+        plugin.getCooldownManager().setCooldown(player, "EnergyBeam", energyBeamCooldownForEnergy(energyLevel));
 
-        Location pl2 = player.getEyeLocation().clone().add(player.getLocation().getDirection().normalize().multiply(1.0));
-        Location pl3 = player.getEyeLocation().clone().add(player.getLocation().getDirection().normalize().multiply(1.7));
-        Location plFar = player.getEyeLocation().clone().add(player.getLocation().getDirection().normalize().multiply(3.0));
+        // beam origin locations are computed in executeKineticRelease; no need to precompute here
         Set<UUID> dontDmgAgain = new HashSet<>();
 
         // Skript waits 1 tick before evaluating any kinetic branch.
-        Bukkit.getScheduler().runTaskLater(plugin, () -> executeKineticRelease(player, kinetic, pl2, pl3, plFar, dontDmgAgain), 1L);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> executeKineticRelease(player, kinetic, dontDmgAgain), 1L);
     }
 
-    private void executeKineticRelease(Player player, double kinetic, Location pl2, Location pl3, Location plFar, Set<UUID> dontDmgAgain) {
+    private void executeKineticRelease(Player player, double kinetic, Set<UUID> dontDmgAgain) {
         if (!player.isOnline()) {
             return;
         }
@@ -519,9 +521,9 @@ public class FluxAbilityListener implements Listener {
         });
     }
 
-    private long energyBeamCooldown(Player player) {
-        int energy = GemUtil.getEnergyLevel(player.getInventory().getItemInMainHand());
-        return switch (energy) {
+    // cooldown helper that doesn't rely on main hand item
+    private long energyBeamCooldownForEnergy(int energy) {
+        return switch (Math.max(0, energy)) {
             case 1 -> FormatUtil.toMilliseconds(0, 50);
             case 2 -> FormatUtil.toMilliseconds(0, 45);
             case 3 -> FormatUtil.toMilliseconds(0, 40);
@@ -541,15 +543,6 @@ public class FluxAbilityListener implements Listener {
         playFluxSound(player, Sound.BLOCK_BEACON_AMBIENT, 1.5f, 1.6f);
         playFluxSound(player, Sound.ENTITY_WARDEN_SONIC_BOOM, 1.1f, 1.0f);
         playFluxSound(player, Sound.ENTITY_GENERIC_EXPLODE, 1.1f, 0.75f);
-    }
-
-    private Runnable playPrimaryReleaseStackSafe(Player player) {
-        return () -> {
-            if (!player.isOnline()) {
-                return;
-            }
-            playPrimaryReleaseStack(player);
-        };
     }
 
     private void runLater(long ticks, Runnable runnable) {
@@ -578,18 +571,34 @@ public class FluxAbilityListener implements Listener {
     }
 
     private void consumeHeldFluxEnergy(Player player) {
-        ItemStack held = player.getInventory().getItemInMainHand();
-        if (!isFluxTier2WithEnergy(held)) {
+        // Consume one energy from the flux gem in either hand (prefer offhand)
+        ItemStack offhand = player.getInventory().getItemInOffHand();
+        ItemStack main = player.getInventory().getItemInMainHand();
+        ItemStack source = null;
+        boolean useOff = false;
+        if (isFluxTier2WithEnergy(offhand)) {
+            source = offhand;
+            useOff = true;
+        } else if (isFluxTier2WithEnergy(main)) {
+            source = main;
+        }
+        if (source == null) {
             return;
         }
 
-        int energy = GemUtil.getEnergyLevel(held);
+        int energy = GemUtil.getEnergyLevel(source);
         if (energy <= 0) {
             return;
         }
 
         ItemStack downgraded = plugin.getGemItemManager().getGem(GemType.FLUX, 2, Math.max(0, energy - 1));
-        if (downgraded != null) {
+        if (downgraded == null) {
+            return;
+        }
+
+        if (useOff) {
+            player.getInventory().setItemInOffHand(downgraded);
+        } else {
             player.getInventory().setItemInMainHand(downgraded);
         }
     }
@@ -609,6 +618,7 @@ public class FluxAbilityListener implements Listener {
         return plugin.getTrustManager().isTrusted(source, target);
     }
 
+    @SuppressWarnings("unused")
     private boolean isDisabled(Player player) {
         return false;
     }

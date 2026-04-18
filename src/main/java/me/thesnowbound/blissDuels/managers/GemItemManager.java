@@ -237,20 +237,10 @@ public class GemItemManager {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return item;
 
-        meta.setDisplayName(ColorUtil.color("<##FFD773>&lɢᴏʟᴅ &eɢᴇᴍ"));
+        meta.setDisplayName(ColorUtil.color("<##ffcc26>&lɢᴏʟᴅ &eɢᴇᴍ"));
         meta.setLore(ColorUtil.color(Arrays.asList(
             "&lᴡᴀᴛᴄʜ ᴛʜᴇ ʟɪɴᴇ ᴏꜰ ʀᴇᴀʟɪᴛʏ ꜰʀᴀʏ ᴀꜱ ᴇɪɢʜᴛ ꜱᴏᴜʟꜱ ʙᴇᴄᴏᴍᴇ ᴏɴᴇ",
-            "(&6Dormant&r)",
-            "",
-            "&cAbility",
-            "&k&6kasdjkeiosafjisfnjds",
-            "",
-            "&6Powers",
-            "&k&ekasdjkeiosaf",
-            "&k&ekasdjkeiosafsadasd",
-            "",
-            "&k&ekasdjkeiosaf",
-            "&k&ekasdjkeiosafsadasd"
+            "(&6Dormant&r)"
         )));
         applyCustomModelData(meta, 340);
         meta.getPersistentDataContainer().set(specialItemKey, PersistentDataType.STRING, "gold_gem");

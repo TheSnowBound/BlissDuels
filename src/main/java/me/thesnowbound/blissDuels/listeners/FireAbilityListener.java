@@ -67,6 +67,9 @@ public class FireAbilityListener implements Listener {
     private final Map<UUID, BukkitTask> fireballTasks = new HashMap<>();
 
     private final List<CampfireZone> campfireZones = new ArrayList<>();
+    private final Map<UUID, Long> lastRightClick = new HashMap<>();
+    private final Map<UUID, Boolean> crispActive = new HashMap<>();
+    private final Map<UUID, Map<Location, Material>> crispChangedBlocks = new HashMap<>();
 
     public FireAbilityListener(BlissDuels plugin) {
         this.plugin = plugin;
@@ -147,7 +150,13 @@ public class FireAbilityListener implements Listener {
             return;
         }
 
-        if (action != Action.RIGHT_CLICK_BLOCK) {
+        // Handle right-click (air or block): Crisp uses offhand fire gem on right-click (air), Campfire is block-only.
+        if (action.isRightClick() && action != Action.RIGHT_CLICK_BLOCK) {
+            // try Crisp activation from offhand
+            if (tryCrisp(event)) {
+                return;
+            }
+            // otherwise ignore other right-click air
             return;
         }
 
@@ -564,5 +573,153 @@ public class FireAbilityListener implements Listener {
             return GemUtil.getEnergyLevel(item);
         }
     }
-}
 
+    private boolean isSwordAxeOrAir(org.bukkit.inventory.ItemStack item) {
+        if (item == null || item.getType().isAir()) {
+            return true;
+        }
+        String name = item.getType().name();
+        return name.endsWith("_SWORD") || name.endsWith("_AXE");
+    }
+
+    private boolean isDisabled(Player player) {
+        return false;
+    }
+
+    private boolean tryCrisp(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        if (isDisabled(player)) return false;
+
+        org.bukkit.inventory.ItemStack off = player.getInventory().getItemInOffHand();
+        if (!isFireGem(off)) return false;
+        int energy = GemUtil.getEnergyLevel(off);
+        if (energy <= 0) return false;
+
+        org.bukkit.inventory.ItemStack held = player.getInventory().getItemInMainHand();
+        if (!isSwordAxeOrAir(held)) return false;
+
+        UUID uuid = player.getUniqueId();
+        long now = System.currentTimeMillis();
+        long last = lastRightClick.getOrDefault(uuid, 0L);
+        // update timestamp for next click
+        lastRightClick.put(uuid, now);
+
+        // require quick double-right-click within 200ms
+        if (now - last > 200L) {
+            return false;
+        }
+
+        // check cooldown
+        if (!plugin.getCooldownManager().isCooldownReady(player, "Crisp")) {
+            int secs = plugin.getCooldownManager().getRemainingSeconds(player, "Crisp");
+            player.sendMessage(ColorUtil.color("<##FE8120>🔮 &f🥾<##FF686F>Crisp is on cooldown for " + secs + "s"));
+            return true;
+        }
+
+        // small activation gate
+        plugin.getCooldownManager().setCooldown(player, "Crisp", FormatUtil.toMilliseconds(0, 45));
+        event.setCancelled(true);
+        startCrispRoutine(player, energy);
+        return true;
+    }
+
+    private void startCrispRoutine(Player player, int energy) {
+        UUID uuid = player.getUniqueId();
+        if (Boolean.TRUE.equals(crispActive.get(uuid))) return;
+        crispActive.put(uuid, true);
+
+        player.sendMessage(ColorUtil.color("<##FE8120>🔮<##FF686F> You used &f🥾<##FE8120>Crisp Ability"));
+        player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.0f, 1.0f);
+
+        // Reduced and surface-focused block changes to limit terrain churn and CPU usage.
+        int radius = 5;
+        Map<Location, Material> original = new HashMap<>();
+        Location center = player.getLocation();
+        // only modify a thin vertical band around the player
+        for (int x = -radius; x <= radius; x++) {
+            for (int y = -1; y <= 1; y++) {
+                for (int z = -radius; z <= radius; z++) {
+                    Location loc = center.clone().add(x, y, z);
+                    Block b = loc.getBlock();
+                    Material t = b.getType();
+
+                    boolean transformed = false;
+                    if (t == Material.GRASS_BLOCK || t == Material.DIRT) {
+                        original.put(b.getLocation(), t);
+                        b.setType(Material.NETHERRACK);
+                        transformed = true;
+                    } else if (t.name().endsWith("_LOG")) {
+                        original.put(b.getLocation(), t);
+                        b.setType(Material.CRIMSON_STEM);
+                        transformed = true;
+                    } else if (t.name().endsWith("_LEAVES")) {
+                        original.put(b.getLocation(), t);
+                        b.setType(Material.WARPED_WART_BLOCK);
+                        transformed = true;
+                    } else if (t == Material.TALL_GRASS || t == Material.SHORT_GRASS) {
+                        original.put(b.getLocation(), t);
+                        b.setType(Material.TWISTING_VINES);
+                        transformed = true;
+                    }
+
+                    if (transformed) {
+                        b.getWorld().spawnParticle(Particle.SMOKE, b.getLocation().add(0.5, 0.5, 0.5), 1, 0.0, 0.0, 0.0, 0.0);
+                    }
+                }
+            }
+        }
+
+        crispChangedBlocks.put(uuid, original);
+
+        // run pulses (90 pulses, every 4 ticks)
+        new BukkitRunnable() {
+            int pulses = 0;
+
+            @Override
+            public void run() {
+                if (!player.isOnline()) {
+                    restoreCrispBlocks(uuid);
+                    crispActive.remove(uuid);
+                    cancel();
+                    return;
+                }
+                if (pulses >= 90) {
+                    restoreCrispBlocks(uuid);
+                    plugin.getCooldownManager().setCooldown(player, "Crisp", FormatUtil.toMilliseconds(0, 30));
+                    crispActive.remove(uuid);
+                    cancel();
+                    return;
+                }
+
+                for (Entity ent : player.getNearbyEntities(5.0, 5.0, 5.0)) {
+                    if (!(ent instanceof LivingEntity living)) continue;
+                    if (living.equals(player)) continue;
+                    if (isTrusted(player, living)) continue;
+                    if (!(living instanceof ArmorStand)) continue;
+                    living.damage(3.0);
+                }
+
+                Location fx = player.getLocation().add(0, 1, 0);
+                player.getWorld().spawnParticle(Particle.DUST, fx, 30, 5.0, 0.5, 5.0, 0.01, FIRE_DUST);
+                pulses++;
+            }
+        }.runTaskTimer(plugin, 0L, 4L);
+    }
+
+    private void restoreCrispBlocks(UUID uuid) {
+        Map<Location, Material> original = crispChangedBlocks.remove(uuid);
+        if (original == null) return;
+        for (Map.Entry<Location, Material> e : original.entrySet()) {
+            Location loc = e.getKey();
+            try {
+                Block b = loc.getBlock();
+                Material orig = e.getValue();
+                if (orig != null && b.getType() != orig) {
+                    b.setType(orig);
+                }
+            } catch (Exception ignored) {
+                // Defensive: ignore worlds/chunk unloads or other unexpected errors.
+            }
+        }
+    }
+}

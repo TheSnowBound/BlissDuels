@@ -19,88 +19,94 @@ public class PassiveEffectSystem {
      * Apply passive effects for the gem the player is holding
      */
     public void applyPassiveEffects(Player player) {
+        // Clear previously applied passive potion effects before re-applying.
+        clearPassiveEffects(player);
+
         ItemStack mainHand = player.getInventory().getItemInMainHand();
         ItemStack offHand = player.getInventory().getItemInOffHand();
 
-        // Check main hand
+        // Collect gem info from both hands. If both hands have the same gem type, prefer the higher tier.
+        java.util.Map<GemType, GemTier> merged = new java.util.HashMap<>();
+
         if (GemUtil.isGem(mainHand)) {
-            applyGemPassives(player, GemUtil.getGem(mainHand), GemUtil.getTier(mainHand));
+            GemType type = GemUtil.getGem(mainHand);
+            GemTier tier = GemUtil.getTier(mainHand);
+            if (type != null) merged.put(type, tier);
         }
-        // Check off hand
-        else if (GemUtil.isGem(offHand)) {
-            applyGemPassives(player, GemUtil.getGem(offHand), GemUtil.getTier(offHand));
+
+        if (GemUtil.isGem(offHand)) {
+            GemType type = GemUtil.getGem(offHand);
+            GemTier tier = GemUtil.getTier(offHand);
+            if (type != null) {
+                merged.merge(type, tier, (existing, incoming) -> incoming.ordinal() > existing.ordinal() ? incoming : existing);
+            }
         }
+
+        if (merged.isEmpty()) return;
+
+        applyGemPassivesCombined(player, merged);
     }
 
     /**
-     * Apply passive effects based on gem type
+     * Clear any passive potion effects that gems apply.
      */
-    private void applyGemPassives(Player player, GemType gemType, GemTier tier) {
-        if (gemType == null) return;
+    public void clearPassiveEffects(Player player) {
+        player.removePotionEffect(PotionEffectType.FIRE_RESISTANCE);
+        player.removePotionEffect(PotionEffectType.SPEED);
+        player.removePotionEffect(PotionEffectType.STRENGTH);
+        player.removePotionEffect(PotionEffectType.REGENERATION);
+        player.removePotionEffect(PotionEffectType.LUCK);
+        player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+        // For Flux, we previously removed SLOWNESS/HUNGER/WEAKNESS; don't re-add them here.
+    }
 
-        switch (gemType) {
-            case FIRE:
-                // Fire Resistance, Saturation
-                player.addPotionEffect(
-                    new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 120, 0, false, false)
-                );
-                break;
+    /**
+     * Apply passive effects based on merged gem types from both hands.
+     * If both hands have the same gem type, the higher tier is used.
+     */
+    private void applyGemPassivesCombined(Player player, java.util.Map<GemType, GemTier> gems) {
+        // FIRE
+        if (gems.containsKey(GemType.FIRE)) {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 120, 0, false, false));
+        }
 
-            case SPEED:
-                // Speed, Dolphin's Grace
-                player.addPotionEffect(
-                    new PotionEffect(PotionEffectType.SPEED, 120, 1, false, false)
-                );
-                break;
+        // SPEED
+        if (gems.containsKey(GemType.SPEED)) {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 120, 1, false, false));
+        }
 
-            case STRENGTH:
-                int amplifier = tier == GemTier.TIER_2 ? 1 : 0;
-                player.addPotionEffect(
-                    new PotionEffect(PotionEffectType.STRENGTH, 120, amplifier, false, false)
-                );
-                break;
+        // STRENGTH
+        if (gems.containsKey(GemType.STRENGTH)) {
+            GemTier tier = gems.get(GemType.STRENGTH);
+            int amplifier = tier == GemTier.TIER_2 ? 1 : 0;
+            player.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, 120, amplifier, false, false));
+        }
 
-            case LIFE:
-                // Regeneration, Extra Saturation
-                player.addPotionEffect(
-                    new PotionEffect(PotionEffectType.REGENERATION, 120, 0, false, false)
-                );
-                // Bonus saturation
-                if (player.getFoodLevel() < 20) {
-                    player.setFoodLevel(Math.min(20, player.getFoodLevel() + 1));
-                }
-                break;
+        // LIFE
+        if (gems.containsKey(GemType.LIFE)) {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 120, 0, false, false));
+            if (player.getFoodLevel() < 20) {
+                player.setFoodLevel(Math.min(20, player.getFoodLevel() + 1));
+            }
+        }
 
-            case PUFF:
-                // Puff has no continuous potion passive; fall safety is handled by damage listener logic.
-                break;
+        // PUFF — no continuous potion here; handled elsewhere
 
-            case WEALTH:
-                // Luck
-                player.addPotionEffect(
-                    new PotionEffect(PotionEffectType.LUCK, 120, 1, false, false)
-                );
-                break;
+        // WEALTH
+        if (gems.containsKey(GemType.WEALTH)) {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.LUCK, 120, 1, false, false));
+        }
 
-            case FLUX:
-                // Conduit Power (Flow State)
-                player.removePotionEffect(
-                    PotionEffectType.SLOWNESS
-                );
-                player.removePotionEffect(
-                        PotionEffectType.HUNGER
-                );
-                player.removePotionEffect(
-                        PotionEffectType.WEAKNESS
-                );
-                break;
+        // FLUX
+        if (gems.containsKey(GemType.FLUX)) {
+            player.removePotionEffect(PotionEffectType.SLOWNESS);
+            player.removePotionEffect(PotionEffectType.HUNGER);
+            player.removePotionEffect(PotionEffectType.WEAKNESS);
+        }
 
-            case ASTRA:
-                // Night Vision
-                player.addPotionEffect(
-                    new PotionEffect(PotionEffectType.NIGHT_VISION, 120, 0, false, false)
-                );
-                break;
+        // ASTRA
+        if (gems.containsKey(GemType.ASTRA)) {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 120, 0, false, false));
         }
     }
 }

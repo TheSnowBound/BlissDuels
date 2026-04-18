@@ -4,6 +4,7 @@ import me.thesnowbound.blissDuels.BlissDuels;
 import me.thesnowbound.blissDuels.gem.GemType;
 import me.thesnowbound.blissDuels.managers.GemItemManager;
 import me.thesnowbound.blissDuels.util.ColorUtil;
+import me.thesnowbound.blissDuels.util.GemUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -98,8 +99,18 @@ public class GemSelectorListener implements Listener {
             return;
         }
 
+        // consume the selector
         consumeMainHand(player);
-        player.getInventory().addItem(gem);
+
+        // clear player's existing normal (non-gold) gems from inventory and hands
+        clearPlayerNormalGems(player);
+
+        // give the selected gem (prefer main hand if empty)
+        if (player.getInventory().getItemInMainHand() == null || player.getInventory().getItemInMainHand().getType().isAir()) {
+            player.getInventory().setItemInMainHand(gem);
+        } else {
+            player.getInventory().addItem(gem);
+        }
         player.sendMessage(ColorUtil.color("<##FFD773>Selected: <##B8FFFB>" + selected.getIdentifier() + " &7(T" + tier + ")"));
         player.closeInventory();
     }
@@ -162,5 +173,27 @@ public class GemSelectorListener implements Listener {
 
         hand.setAmount(hand.getAmount() - 1);
         player.getInventory().setItemInMainHand(hand);
+    }
+
+    private void clearPlayerNormalGems(Player player) {
+        GemItemManager manager = plugin.getGemItemManager();
+        // remove from main hand and offhand explicitly
+        ItemStack main = player.getInventory().getItemInMainHand();
+        if (main != null && GemUtil.isGem(main) && !manager.isGoldGem(main)) {
+            player.getInventory().setItemInMainHand(null);
+        }
+        ItemStack off = player.getInventory().getItemInOffHand();
+        if (off != null && GemUtil.isGem(off) && !manager.isGoldGem(off)) {
+            player.getInventory().setItemInOffHand(null);
+        }
+
+        // remove any other normal gems from inventory
+        for (int slot = 0; slot < player.getInventory().getSize(); slot++) {
+            ItemStack item = player.getInventory().getItem(slot);
+            if (item == null) continue;
+            if (GemUtil.isGem(item) && !manager.isGoldGem(item)) {
+                player.getInventory().setItem(slot, null);
+            }
+        }
     }
 }
